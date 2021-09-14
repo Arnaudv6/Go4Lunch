@@ -8,9 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.databinding.FragmentHomeBinding
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.ScaleBarOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+
+
+
 
 class HomeFragment : Fragment() {
 
@@ -32,9 +40,10 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        val context = requireActivity()
+
         //load/initialize the osmdroid configuration, this can be done
         // This won't work unless you have imported this: org.osmdroid.config.Configuration.*
-        // val context = requireActivity()
         // Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
         //setting this before the layout is inflated is a good idea
         //it 'should' ensure that the map has a writable location for the map cache, even without permissions
@@ -44,15 +53,27 @@ class HomeFragment : Fragment() {
         //tile servers will get you banned based on this string.
 
         map = root.findViewById(R.id.map)
-        // map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setTileSource(TileSourceFactory.MAPNIK)
 
         map.setMultiTouchControls(true)
 
         val mapController = map.controller
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-        mapController.setZoom(9.5)
-        val startPoint = GeoPoint(48.8583, 2.2944)
-        mapController.setCenter(startPoint)
+        mapController.setZoom(5.5)
+
+        // add current position and center on it
+        val mLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), map)
+        mLocationOverlay.enableMyLocation()
+        map.getOverlays().add(mLocationOverlay)
+        var myLoc = mLocationOverlay.myLocation
+        mapController.animateTo(myLoc)
+
+        // add scale bar
+        val mScaleBarOverlay = ScaleBarOverlay(map)
+        mScaleBarOverlay.setAlignRight(true)
+        mScaleBarOverlay.setAlignBottom(true)
+        mScaleBarOverlay.setEnableAdjustLength(true)
+        map.getOverlays().add(mScaleBarOverlay)
 
         return root
     }
