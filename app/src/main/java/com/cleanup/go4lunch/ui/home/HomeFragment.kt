@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.databinding.FragmentHomeBinding
+import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -16,9 +18,6 @@ import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-
-
-
 
 class HomeFragment : Fragment() {
 
@@ -51,6 +50,7 @@ class HomeFragment : Fragment() {
         //see also StorageUtils
         //note, the load method also sets the HTTP User Agent to your application's package name, if you abuse osm's
         //tile servers will get you banned based on this string.
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID;
 
         map = root.findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Go4Lunch</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="fragment_1_title">"I'm Hungry"</string>
+    <string name="nav_1">Map View</string>
+    <string name="nav_2">List View</string>
+    <string name="nav_3">Workmates</string>
+    <string name="search_title">Search</string>
 </resources>
