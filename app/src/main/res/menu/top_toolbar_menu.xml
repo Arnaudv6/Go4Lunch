@@ -4,8 +4,11 @@
 
     <item
         android:id="@+id/search"
-        android:icon="@drawable/ic_baseline_search_24"
         android:title="@string/search_title"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always" />
+
+    <!-- todo understand: this widget obeys nothing
+          to change color, just set colorControlNormal in theme
+          also we can rely on variant: $SearchAutoComplete -->
 </menu>
