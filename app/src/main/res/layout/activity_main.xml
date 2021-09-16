@@ -70,11 +70,25 @@
     <!-- must be the last element to catch swipe gesture -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/side_nav"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:layout_marginTop="?attr/actionBarSize"
-        app:headerLayout="@layout/side_nav_panel" />
+        android:background="@color/orange_lighter"
+        app:headerLayout="@layout/side_nav_panel_header"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/drawer_menu">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="90dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="logo"
+            android:src="@drawable/ic_drawing_l" />
+    </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>
 

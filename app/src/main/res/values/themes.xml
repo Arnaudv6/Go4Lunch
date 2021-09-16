@@ -18,5 +18,4 @@
         <item name="colorControlNormal">@color/white</item>
         <item name="android:editTextColor">@color/white</item>
     </style>
-
 </resources>

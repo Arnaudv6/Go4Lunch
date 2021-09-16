@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -11,12 +10,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.cleanup.go4lunch.ui.home.HomeFragment
 
 class MainActivity : AppCompatActivity() {
 
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
-    private lateinit var drawerLayout:DrawerLayout
-    private lateinit var toggle:ActionBarDrawerToggle
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +31,12 @@ class MainActivity : AppCompatActivity() {
         )
 
         setContentView(R.layout.activity_main)
+
+        if (savedInstanceState == null) {
+            //todo replace with newInstance()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container, HomeFragment(), null).commit()
+        }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)

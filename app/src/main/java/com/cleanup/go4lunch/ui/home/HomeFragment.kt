@@ -8,26 +8,21 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.databinding.FragmentHomeBinding
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
-    private var _binding: FragmentHomeBinding? = null
     private lateinit var map: MapView
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,9 +31,7 @@ class HomeFragment : Fragment() {
     ): View {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
+        val view: View = inflater.inflate(R.layout.fragment_home, container, false)
         val context = requireActivity()
 
         //load/initialize the osmdroid configuration, this can be done
@@ -52,7 +45,7 @@ class HomeFragment : Fragment() {
         //tile servers will get you banned based on this string.
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID;
 
-        map = root.findViewById(R.id.map)
+        map = view.findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
 
         map.setMultiTouchControls(true)
@@ -75,12 +68,7 @@ class HomeFragment : Fragment() {
         mScaleBarOverlay.setEnableAdjustLength(true)
         map.getOverlays().add(mScaleBarOverlay)
 
-        return root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        return view
     }
 
     override fun onResume() {
