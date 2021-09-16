@@ -5,8 +5,16 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     tools:openDrawer="start">
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/side_nav"
+        android:layout_gravity="start"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:headerLayout="@layout/side_nav_panel" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container"
@@ -33,15 +41,6 @@
                 app:titleTextColor="@color/design_default_color_on_primary" />
 
         </com.google.android.material.appbar.AppBarLayout>
-
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/side_nav"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            app:headerLayout="@layout/side_nav_panel"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container"
