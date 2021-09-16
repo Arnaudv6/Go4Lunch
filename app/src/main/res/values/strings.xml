@@ -5,4 +5,6 @@
     <string name="nav_2">List View</string>
     <string name="nav_3">Workmates</string>
     <string name="search_title">Search</string>
+    <string name="open_the_drawer">open the drawer</string>
+    <string name="close_the_drawer">close the drawer</string>
 </resources>
