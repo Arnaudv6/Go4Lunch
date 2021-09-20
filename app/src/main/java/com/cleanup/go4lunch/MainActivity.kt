@@ -10,7 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.cleanup.go4lunch.ui.home.HomeFragment
+import com.cleanup.go4lunch.ui.map.MapFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             //todo replace with newInstance()
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container, HomeFragment(), null).commit()
+                .add(R.id.fragment_container, MapFragment(), null).commit()
         }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
