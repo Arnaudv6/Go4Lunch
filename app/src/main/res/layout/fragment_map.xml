@@ -19,12 +19,14 @@
         android:id="@+id/center_on_me"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:layout_margin="40dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="30dp"
         android:adjustViewBounds="true"
         android:backgroundTintMode="screen"
         android:contentDescription="@string/center_on_me"
         android:scaleType="fitXY"
         android:src="@drawable/ic_baseline_my_location_24"
+        app:tint="@color/orange_lighter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
