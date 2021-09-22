@@ -25,16 +25,15 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
 
 class MapFragment() : Fragment() {
 
-    private lateinit var mMapViewModel: MapViewModel
+    private lateinit var viewModel: MapViewModel
     private lateinit var map: MapView
-    private lateinit var locationOverlay: MyLocationNewOverlay  // SimpleLocationOverlay is noop
+    private lateinit var gps: GpsMyLocationProvider
 
     companion object {
         fun newInstance(context: Context): MapFragment {
@@ -51,7 +50,7 @@ class MapFragment() : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // todo ViewModel Factory
-        mMapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MapViewModel::class.java)
 
         // set user agent and map-cache
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
@@ -62,6 +61,7 @@ class MapFragment() : Fragment() {
 
         val view: View = inflater.inflate(R.layout.fragment_map, container, false)
 
+        // map settings
         map = view.findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
@@ -77,24 +77,24 @@ class MapFragment() : Fragment() {
         map.controller.setZoom(4.0)
         // var loc = GeoPoint(48.8583, 2.2944)
 
+        // todo this ultimately belongs in activity, if list-fragment is to update on its own.
         // set location updates throttling, and subscribe to new locations
-        val gpsLocation = GpsMyLocationProvider(context)
-        gpsLocation.locationUpdateMinDistance = 10F  // float, meters
-        gpsLocation.locationUpdateMinTime = 3000 // long, milliseconds
-        gpsLocation.startLocationProvider(IMyLocationConsumer { location, source ->
-            mMapViewModel.updateLocation(location)
-        })
+        gps = GpsMyLocationProvider(context)
+        gps.locationUpdateMinDistance = 10F  // float, meters
+        gps.locationUpdateMinTime = 5000 // long, milliseconds
+        gps.startLocationProvider({ location, source -> viewModel.updateLocation(location) })
 
         val icon =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
                 ?.toBitmap(64, 64)
 
         // if given a position, will be in direction mode
-        locationOverlay = MyLocationNewOverlay(map)
-        // todo consider setting location providers
-        locationOverlay.disableFollowLocation()
-        // locationOverlay.setPersonIcon(icon)
-        locationOverlay.setDirectionArrow(icon, icon)
+        val locationOverlay = MyLocationNewOverlay(gps, map)  // SimpleLocationOverlay is noop
+        // no need to de/activate location in onResume() and onPause(), given above GPS throttling
+        locationOverlay.enableMyLocation()  // so location pin updates
+        locationOverlay.disableFollowLocation()  // so map does not follow
+        locationOverlay.setPersonIcon(icon) // used when Location has no bearing
+        locationOverlay.setDirectionArrow(icon, icon)  // when Location does have bearing
         map.overlays.add(locationOverlay)
 
         val poiProvider = NominatimPOIProvider(BuildConfig.APPLICATION_ID)
@@ -122,45 +122,33 @@ class MapFragment() : Fragment() {
         // add scale bar
         val mScaleBarOverlay = ScaleBarOverlay(map)
         mScaleBarOverlay.setAlignRight(
-            TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_LTR
+            TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
+                    == ViewCompat.LAYOUT_DIRECTION_LTR
         )
         mScaleBarOverlay.setAlignBottom(true)
         mScaleBarOverlay.setEnableAdjustLength(true)
         map.overlays.add(mScaleBarOverlay)
 
+        // bind centerOnMe button
+        val centerOnMeButton = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
+        centerOnMeButton.setOnClickListener { centerOnMe() }
+
+        // wait for location fix to center the map
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            suspend {
+                while (gps.lastKnownLocation == null) {
+                    delay(700)
+                }
+                centerOnMe()
+            }.invoke()
+        }
+
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        centerOnMe()
-        val centerOnMeButton = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
-        centerOnMeButton.setOnClickListener { centerOnMe() }
-    }
-
     private fun centerOnMe() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            suspend {
-                do {
-                    val loc: GeoPoint? = locationOverlay.myLocation
-                    map.controller.animateTo(loc, 15.0, 1)
-                    delay(500)
-                } while (loc == null)
-            }.invoke()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        locationOverlay.enableMyLocation()
-        map.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        locationOverlay.enableMyLocation()
-        map.onPause()
+        val loc: GeoPoint = GeoPoint(gps.lastKnownLocation)
+        map.controller.animateTo(loc, 15.0, 1)
     }
 }
 
