@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.text.TextUtilsCompat
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +25,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.util.*
 
 
 class MapFragment() : Fragment() {
@@ -31,7 +34,7 @@ class MapFragment() : Fragment() {
     private lateinit var map: MapView
     private lateinit var locationOverlay: MyLocationNewOverlay  // SimpleLocationOverlay is noop
 
-    companion object{
+    companion object {
         fun newInstance(context: Context): MapFragment {
             // val args = Bundle()
             val fragment = MapFragment()
@@ -47,13 +50,13 @@ class MapFragment() : Fragment() {
     ): View {
         mMapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
 
-        val view: View = inflater.inflate(R.layout.fragment_map, container, false)
-
         Configuration.getInstance().load(
             context,
             androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
         )
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+
+        val view: View = inflater.inflate(R.layout.fragment_map, container, false)
 
         map = view.findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
@@ -110,7 +113,9 @@ class MapFragment() : Fragment() {
 
         // add scale bar
         val mScaleBarOverlay = ScaleBarOverlay(map)
-        mScaleBarOverlay.setAlignRight(true)
+        mScaleBarOverlay.setAlignRight(
+            TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_LTR
+        )
         mScaleBarOverlay.setAlignBottom(true)
         mScaleBarOverlay.setEnableAdjustLength(true)
         map.overlays.add(mScaleBarOverlay)
@@ -121,20 +126,22 @@ class MapFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val centerOnMe = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
-        centerOnMe.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                suspend {
-                    do {
-                        val loc: GeoPoint? = locationOverlay.myLocation
-                        map.controller.animateTo(loc, 15.0, 1)
-                        delay(100)
-                    } while (loc == null)
-                }.invoke()
-            }
-        }
+        centerOnMe()
+        val centerOnMeButton = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
+        centerOnMeButton.setOnClickListener { centerOnMe() }
     }
 
+    private fun centerOnMe() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            suspend {
+                do {
+                    val loc: GeoPoint? = locationOverlay.myLocation
+                    map.controller.animateTo(loc, 15.0, 1)
+                    delay(500)
+                } while (loc == null)
+            }.invoke()
+        }
+    }
 
     override fun onResume() {
         super.onResume()
