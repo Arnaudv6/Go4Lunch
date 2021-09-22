@@ -33,7 +33,7 @@ class Repository {
             "" +
             "" +
             "" +
-            "valider un déjeune quand l'uilisateur se trouve entre 11h30 et 14h à 10m du restau qu'il a annoncé" +
+            "valider un déjeuner quand l'uilisateur se trouve entre 11h30 et 14h à 10m du restau qu'il a annoncé" +
             "   ajouter le restau dans la liste visitée de l'user" +
             "   lui proposer de le mettre en favori" +
             "   virer son intention" +

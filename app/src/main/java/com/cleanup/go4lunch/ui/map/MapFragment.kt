@@ -24,6 +24,8 @@ import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.ScaleBarOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
@@ -48,13 +50,15 @@ class MapFragment() : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // todo ViewModel Factory
         mMapViewModel = ViewModelProvider(this).get(MapViewModel::class.java)
 
+        // set user agent and map-cache
+        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().load(
             context,
             androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
         )
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
 
         val view: View = inflater.inflate(R.layout.fragment_map, container, false)
 
@@ -62,10 +66,8 @@ class MapFragment() : Fragment() {
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setMultiTouchControls(true)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
-
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
             -TileSystem.MaxLatitude,
@@ -75,7 +77,13 @@ class MapFragment() : Fragment() {
         map.controller.setZoom(4.0)
         // var loc = GeoPoint(48.8583, 2.2944)
 
-//        GpsMyLocationProvider(context)
+        // set location updates throttling, and subscribe to new locations
+        val gpsLocation = GpsMyLocationProvider(context)
+        gpsLocation.locationUpdateMinDistance = 10F  // float, meters
+        gpsLocation.locationUpdateMinTime = 3000 // long, milliseconds
+        gpsLocation.startLocationProvider(IMyLocationConsumer { location, source ->
+            mMapViewModel.updateLocation(location)
+        })
 
         val icon =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
