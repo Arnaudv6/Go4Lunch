@@ -92,6 +92,7 @@ class MapFragment : Fragment() {
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
                 ?.toBitmap(64, 64)
 
+        /*
         // if given a position, will be in direction mode
         val locationOverlay = MyLocationNewOverlay(gps, map)  // SimpleLocationOverlay is noop
         // no need to de/activate location in onResume() and onPause(), given above GPS throttling
@@ -169,6 +170,9 @@ class MapFragment : Fragment() {
     private fun centerOnMe() {
         val loc = GeoPoint(gps.lastKnownLocation)
         map.controller.animateTo(loc, 15.0, 1)
+         */
+
+    return view
     }
 }
 

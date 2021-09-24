@@ -1,12 +1,13 @@
 package com.cleanup.go4lunch.repository
 
 import android.location.Location
+import android.util.Log
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class Repository @Inject constructor() {
-    // todo understsand: @Inject constructor() is mandatory ever since I annontated @Singleton
+    // todo understand: @Inject constructor() is mandatory ever since I annotated @Singleton
 
     private var location: Location = Location("repository")
 
@@ -55,6 +56,7 @@ class Repository @Inject constructor() {
 
     fun setLocation(location: Location) {
         this.location = location
+        Log.e("Arnaud", "Repo speaking: setLocation: ${location.toString()}")
     }
 
 

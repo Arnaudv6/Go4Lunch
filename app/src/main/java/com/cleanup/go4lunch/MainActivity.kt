@@ -22,6 +22,10 @@ import javax.inject.Singleton
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    @Singleton
+    @ActivityScoped
+    val gps = GpsMyLocationProvider(MainApplication.instance)
+
     /*  // make this an object?
     @Module @Singleton @ActivityScoped class GpsMyLocationProvider {
         init {
@@ -29,10 +33,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     */
-
-    @Singleton
-    @ActivityScoped
-    val gps = GpsMyLocationProvider(MainApplication.instance)
 
     private val viewModel: MainViewModel by viewModels()
 
