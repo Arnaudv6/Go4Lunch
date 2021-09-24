@@ -3,6 +3,7 @@ package com.cleanup.go4lunch
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -10,9 +11,22 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.commit
 import com.cleanup.go4lunch.ui.map.MapFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.scopes.ActivityScoped
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import javax.inject.Singleton
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
+    @Singleton
+    @ActivityScoped
+    private lateinit var gps: GpsMyLocationProvider
+
+    private val viewModel: MainViewModel by viewModels()
 
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var drawerLayout: DrawerLayout
@@ -36,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container, MapFragment.newInstance(this), null).commit()
+                .add(R.id.fragment_container, MapFragment.newInstance(), null).commit()
         }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -54,6 +68,45 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.setScrimColor(ContextCompat.getColor(this, android.R.color.transparent))
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true)
+
+
+        findViewById<BottomNavigationView>(R.id.nav_view).setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_list -> {
+                    supportFragmentManager.commit {
+                        replace(
+                            R.id.fragment_container,
+                            MapFragment.newInstance()
+                        )
+                    }
+                }
+                R.id.nav_mates -> {
+                    supportFragmentManager.commit {
+                        replace(
+                            R.id.fragment_container,
+                            MapFragment.newInstance()
+                        )
+                    }
+                }
+                else -> {
+                    supportFragmentManager.commit {
+                        replace(
+                            R.id.fragment_container,
+                            MapFragment.newInstance()
+                        )
+                    }
+                }
+            }
+            true
+        }
+
+        // set location updates throttling, and subscribe to new locations
+        gps = GpsMyLocationProvider(application.applicationContext)
+        gps.locationUpdateMinDistance = 10F  // float, meters
+        gps.locationUpdateMinTime = 5000 // long, milliseconds
+        gps.startLocationProvider { location, _ -> viewModel.updateLocation(location) }
+
+
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -109,6 +162,4 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
-
-
 }

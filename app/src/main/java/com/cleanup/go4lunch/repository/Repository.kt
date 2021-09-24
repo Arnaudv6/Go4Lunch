@@ -1,6 +1,10 @@
 package com.cleanup.go4lunch.repository
 
-class Repository {
+import android.location.Location
+
+class Repository() {
+
+    private var location: Location = Location("repository")
 
     private val string = "" +
             "users:" +
@@ -38,6 +42,18 @@ class Repository {
             "   lui proposer de le mettre en favori" +
             "   virer son intention" +
             ""
+
+    init {
+        // starting Location: Eiffel Tower
+        location.latitude = 48.8583
+        location.longitude = 2.2944
+    }
+
+    fun setLocation(location: Location) {
+        this.location = location
+    }
+
+
 }
 
 

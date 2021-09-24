@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.map
 
 import android.content.Context
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,32 +16,41 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
+import dagger.hilt.EntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.location.NominatimPOIProvider
+import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.FolderOverlay
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
+@EntryPoint
+class MapFragment : Fragment() {
 
-class MapFragment() : Fragment() {
+    @Singleton @ApplicationContext private lateinit var gps: GpsMyLocationProvider
 
     private lateinit var viewModel: MapViewModel
     private lateinit var map: MapView
-    private lateinit var gps: GpsMyLocationProvider
 
     companion object {
-        fun newInstance(context: Context): MapFragment {
-            // val args = Bundle()
-            val fragment = MapFragment()
-            // fragment.arguments = args
-            return fragment
+        fun newInstance(): MapFragment {
+            return MapFragment()
         }
     }
 
@@ -75,14 +85,6 @@ class MapFragment() : Fragment() {
         )
 
         map.controller.setZoom(4.0)
-        // var loc = GeoPoint(48.8583, 2.2944)
-
-        // todo this ultimately belongs in activity, if list-fragment is to update on its own.
-        // set location updates throttling, and subscribe to new locations
-        gps = GpsMyLocationProvider(context)
-        gps.locationUpdateMinDistance = 10F  // float, meters
-        gps.locationUpdateMinTime = 5000 // long, milliseconds
-        gps.startLocationProvider({ location, source -> viewModel.updateLocation(location) })
 
         val icon =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
@@ -98,26 +100,42 @@ class MapFragment() : Fragment() {
         map.overlays.add(locationOverlay)
 
         val poiProvider = NominatimPOIProvider(BuildConfig.APPLICATION_ID)
-        /* val pois = poiProvider.getPOICloseTo(
-                when (myLoc) {
-                    null -> GeoPoint(48.8583, 2.2944)
-                    else -> myLoc
-                }, "restaurant", 50, 0.1
-        )
-        val poiMarkers = FolderOverlay()
-        map.overlays.add(poiMarkers)
+
+        // POIs
 
         val poiIcon =
-                ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_location_on_24, null)
-        for (poi in pois) {
-            val poiMarker = Marker(map)
-            poiMarker.title = poi.mType
-            poiMarker.snippet = poi.mDescription
-            poiMarker.position = poi.mLocation
-            poiMarker.icon = poiIcon
-            poiMarkers.add(poiMarker)
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_location_on_24, null)
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            var pois: ArrayList<POI> = ArrayList()
+            var myLoc: Location? = null
+            suspend {
+                while (myLoc == null) {
+                    myLoc = gps.lastKnownLocation
+                    delay(700)
+                }
+            }.invoke()
+
+            launch(
+                Dispatchers.IO,
+                CoroutineStart.DEFAULT,
+                { pois = poiProvider.getPOICloseTo(GeoPoint(myLoc), "restaurant", 50, 0.025) }
+            ).invokeOnCompletion {
+                val poiMarkers = FolderOverlay()
+                map.overlays.add(poiMarkers)
+
+                for (poi in pois) {
+                    val poiMarker = Marker(map)
+                    poiMarker.title = poi.mType
+                    poiMarker.snippet = poi.mDescription
+                    poiMarker.position = poi.mLocation
+                    poiMarker.icon = poiIcon
+                    poiMarkers.add(poiMarker)
+                }
+            }
+
         }
-*/
+
 
         // add scale bar
         val mScaleBarOverlay = ScaleBarOverlay(map)
@@ -147,7 +165,7 @@ class MapFragment() : Fragment() {
     }
 
     private fun centerOnMe() {
-        val loc: GeoPoint = GeoPoint(gps.lastKnownLocation)
+        val loc = GeoPoint(gps.lastKnownLocation)
         map.controller.animateTo(loc, 15.0, 1)
     }
 }
