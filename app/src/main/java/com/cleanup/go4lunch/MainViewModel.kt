@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    @Singleton @ApplicationContext private val repo: Repository
+    private val repo: Repository
 ) : ViewModel() {
 
     fun updateLocation(location: Location) {

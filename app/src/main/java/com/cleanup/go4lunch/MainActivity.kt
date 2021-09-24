@@ -22,9 +22,17 @@ import javax.inject.Singleton
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    /*  // make this an object?
+    @Module @Singleton @ActivityScoped class GpsMyLocationProvider {
+        init {
+            GpsMyLocationProvider(Go4LunchApplication.instance)
+        }
+    }
+    */
+
     @Singleton
     @ActivityScoped
-    private lateinit var gps: GpsMyLocationProvider
+    val gps = GpsMyLocationProvider(MainApplication.instance)
 
     private val viewModel: MainViewModel by viewModels()
 
@@ -101,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // set location updates throttling, and subscribe to new locations
-        gps = GpsMyLocationProvider(application.applicationContext)
+        // gps = GpsMyLocationProvider(application.applicationContext)
         gps.locationUpdateMinDistance = 10F  // float, meters
         gps.locationUpdateMinTime = 5000 // long, milliseconds
         gps.startLocationProvider { location, _ -> viewModel.updateLocation(location) }

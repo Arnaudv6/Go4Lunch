@@ -17,7 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -40,10 +42,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.collections.ArrayList
 
-@EntryPoint
+@AndroidEntryPoint
 class MapFragment : Fragment() {
 
-    @Singleton @ApplicationContext private lateinit var gps: GpsMyLocationProvider
+    @Inject @Singleton lateinit var gps:GpsMyLocationProvider
 
     private lateinit var viewModel: MapViewModel
     private lateinit var map: MapView

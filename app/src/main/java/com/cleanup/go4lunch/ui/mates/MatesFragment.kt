@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.cleanup.go4lunch.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MatesFragment : Fragment() {
     private val viewModel: MatesViewModel by viewModels()
 

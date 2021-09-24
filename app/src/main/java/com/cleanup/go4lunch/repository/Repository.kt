@@ -1,8 +1,12 @@
 package com.cleanup.go4lunch.repository
 
 import android.location.Location
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class Repository() {
+@Singleton
+class Repository @Inject constructor() {
+    // todo understsand: @Inject constructor() is mandatory ever since I annontated @Singleton
 
     private var location: Location = Location("repository")
 
