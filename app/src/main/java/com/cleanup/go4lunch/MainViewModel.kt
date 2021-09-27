@@ -5,6 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.cleanup.go4lunch.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.map
+import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 import javax.inject.Singleton
 

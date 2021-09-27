@@ -2,14 +2,17 @@ package com.cleanup.go4lunch.repository
 
 import android.location.Location
 import android.util.Log
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import javax.inject.Scope
 import javax.inject.Singleton
 
 @Singleton
+// todo understand: @Inject constructor() is mandatory ever since I annotated @Singleton
 class Repository @Inject constructor() {
-    // todo understand: @Inject constructor() is mandatory ever since I annotated @Singleton
 
-    private var location: Location = Location("repository")
 
     private val string = "" +
             "users:" +
@@ -48,18 +51,24 @@ class Repository @Inject constructor() {
             "   virer son intention" +
             ""
 
+    private val loc = Location("repository")
+    private val locationFlow = MutableStateFlow<Location>(loc)
+
     init {
-        // starting Location: Eiffel Tower
-        location.latitude = 48.8583
-        location.longitude = 2.2944
+        loc.latitude = 48.8583  // starting Location: Eiffel Tower
+        loc.longitude = 2.2944
+        locationFlow.value = loc
     }
 
     fun setLocation(location: Location) {
-        this.location = location
-        Log.e("Arnaud", "Repo speaking: setLocation: ${location.toString()}")
+        // emit() requires "suspend"
+        locationFlow.value = location
+        Log.e("Repository", "setLocation() called with: ${location.toString()}")
     }
 
-
+    fun getLocationFlow(): Flow<Location> {
+        return locationFlow
+    }
 }
 
 

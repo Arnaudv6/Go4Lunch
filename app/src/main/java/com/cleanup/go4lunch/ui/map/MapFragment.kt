@@ -4,21 +4,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
+import androidx.core.text.TextUtilsCompat
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import org.osmdroid.bonuspack.location.NominatimPOIProvider
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import javax.inject.Inject
-import javax.inject.Singleton
+import org.osmdroid.views.overlay.FolderOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.ScaleBarOverlay
+import java.util.*
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
@@ -70,9 +78,6 @@ class MapFragment : Fragment() {
 
         map.controller.setZoom(4.0)
 
-        val icon =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
-                ?.toBitmap(64, 64)
 
         /*
         // if given a position, will be in direction mode
@@ -83,14 +88,28 @@ class MapFragment : Fragment() {
         locationOverlay.setPersonIcon(icon) // used when Location has no bearing
         locationOverlay.setDirectionArrow(icon, icon)  // when Location does have bearing
         map.overlays.add(locationOverlay)
+        */
+
 
         val poiProvider = NominatimPOIProvider(BuildConfig.APPLICATION_ID)
 
         // POIs
+        val poiMarkers = FolderOverlay()
+        map.overlays.add(poiMarkers)
 
-        val poiIcon =
-            ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_location_on_24, null)
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.getLocation().collect {
+                addPinOnLayer(
+                    poiMarkers,
+                    "My position",
+                    "as seen by last gps fix",
+                    it,
+                    R.drawable.ic_baseline_my_location_24
+                )
+            }
+        }
 
+        /*
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             var pois: ArrayList<POI> = ArrayList()
             var myLoc: Location? = null
@@ -106,20 +125,20 @@ class MapFragment : Fragment() {
                 CoroutineStart.DEFAULT,
                 { pois = poiProvider.getPOICloseTo(GeoPoint(myLoc), "restaurant", 50, 0.025) }
             ).invokeOnCompletion {
-                val poiMarkers = FolderOverlay()
-                map.overlays.add(poiMarkers)
-
                 for (poi in pois) {
-                    val poiMarker = Marker(map)
-                    poiMarker.title = poi.mType
-                    poiMarker.snippet = poi.mDescription
-                    poiMarker.position = poi.mLocation
-                    poiMarker.icon = poiIcon
-                    poiMarkers.add(poiMarker)
+                    addPinOnLayer(
+                        poiMarkers,
+                        poi.mType,
+                        poi.mDescription,
+                        poi.mLocation,
+                        R.drawable.ic_baseline_location_on_24
+                    )
                 }
             }
 
         }
+
+         */
 
 
         // add scale bar
@@ -136,6 +155,7 @@ class MapFragment : Fragment() {
         val centerOnMeButton = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
         centerOnMeButton.setOnClickListener { centerOnMe() }
 
+        /*
         // wait for location fix to center the map
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             suspend {
@@ -145,16 +165,32 @@ class MapFragment : Fragment() {
                 centerOnMe()
             }.invoke()
         }
+        */
 
         return view
     }
 
     private fun centerOnMe() {
-        val loc = GeoPoint(gps.lastKnownLocation)
-        map.controller.animateTo(loc, 15.0, 1)
-         */
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.getLocation().collect {
+                map.controller.animateTo(it, 15.0, 1)
+            }
+        }
+    }
 
-        return view
+    private fun addPinOnLayer(
+        layer: FolderOverlay,
+        title: String,
+        description: String,
+        location: GeoPoint,
+        @DrawableRes icon: Int
+    ) {
+        val poiMarker = Marker(map)
+        poiMarker.title = title
+        poiMarker.snippet = description
+        poiMarker.position = location
+        poiMarker.icon = ResourcesCompat.getDrawable(resources, icon, null)
+        layer.add(poiMarker)
     }
 }
 

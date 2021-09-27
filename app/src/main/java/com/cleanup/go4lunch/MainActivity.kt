@@ -3,7 +3,6 @@ package com.cleanup.go4lunch
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +11,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.commit
 import com.cleanup.go4lunch.ui.list.PlacesListFragment
 import com.cleanup.go4lunch.ui.map.MapFragment
 import com.cleanup.go4lunch.ui.mates.MatesFragment
