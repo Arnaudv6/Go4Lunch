@@ -3,6 +3,7 @@ package com.cleanup.go4lunch
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.commit
+import com.cleanup.go4lunch.ui.list.PlacesListFragment
 import com.cleanup.go4lunch.ui.map.MapFragment
+import com.cleanup.go4lunch.ui.mates.MatesFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.scopes.ActivityScoped
@@ -77,32 +80,26 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true)
 
-
+        // todo understand supportFragmentManager retainedFragments is incompatible with Hilt.
         findViewById<BottomNavigationView>(R.id.nav_view).setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_list -> {
-                    supportFragmentManager.commit {
-                        replace(
-                            R.id.fragment_container,
-                            MapFragment.newInstance()
-                        )
-                    }
+                    supportFragmentManager.beginTransaction().replace(
+                        R.id.fragment_container,
+                        PlacesListFragment.newInstance()
+                    ).commit()
                 }
                 R.id.nav_mates -> {
-                    supportFragmentManager.commit {
-                        replace(
-                            R.id.fragment_container,
-                            MapFragment.newInstance()
-                        )
-                    }
+                    supportFragmentManager.beginTransaction().replace(
+                        R.id.fragment_container,
+                        MatesFragment.newInstance()
+                    ).commit()
                 }
                 else -> {
-                    supportFragmentManager.commit {
-                        replace(
-                            R.id.fragment_container,
-                            MapFragment.newInstance()
-                        )
-                    }
+                    supportFragmentManager.beginTransaction().replace(
+                        R.id.fragment_container,
+                        MapFragment.newInstance()
+                    ).commit()
                 }
             }
             true
@@ -113,8 +110,6 @@ class MainActivity : AppCompatActivity() {
         gps.locationUpdateMinDistance = 10F  // float, meters
         gps.locationUpdateMinTime = 5000 // long, milliseconds
         gps.startLocationProvider { location, _ -> viewModel.updateLocation(location) }
-
-
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {

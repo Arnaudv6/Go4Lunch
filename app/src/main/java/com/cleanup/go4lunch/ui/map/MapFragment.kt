@@ -1,51 +1,33 @@
 package com.cleanup.go4lunch.ui.map
 
-import android.content.Context
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.text.TextUtilsCompat
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityScoped
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.osmdroid.bonuspack.location.NominatimPOIProvider
-import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.FolderOverlay
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
 
-    @Inject @Singleton lateinit var gps:GpsMyLocationProvider
+    /*
+    @Inject
+    @Singleton
+    lateinit var gps: GpsMyLocationProvider
+    */
 
     private lateinit var viewModel: MapViewModel
     private lateinit var map: MapView
@@ -172,7 +154,7 @@ class MapFragment : Fragment() {
         map.controller.animateTo(loc, 15.0, 1)
          */
 
-    return view
+        return view
     }
 }
 
