@@ -2,11 +2,14 @@ package com.cleanup.go4lunch.repository
 
 import android.location.Location
 import android.util.Log
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.cleanup.go4lunch.BuildConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.mapNotNull
+import org.osmdroid.bonuspack.location.NominatimPOIProvider
+import org.osmdroid.bonuspack.location.POI
+import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
-import javax.inject.Scope
 import javax.inject.Singleton
 
 @Singleton
@@ -52,12 +55,23 @@ class Repository @Inject constructor() {
             ""
 
     private val loc = Location("repository")
-    private val locationFlow = MutableStateFlow<Location>(loc)
+    private val locationFlow = MutableStateFlow(loc)
+    private val poiProvider = NominatimPOIProvider(BuildConfig.APPLICATION_ID)
+    private val pointsOfInterest: Flow<ArrayList<POI>>
 
     init {
         loc.latitude = 48.8583  // starting Location: Eiffel Tower
         loc.longitude = 2.2944
         locationFlow.value = loc
+
+        pointsOfInterest = locationFlow.mapNotNull { poiLoc: Location ->
+            (
+                    when (poiLoc) {
+                        loc -> null
+                        else -> poiProvider.getPOICloseTo(GeoPoint(poiLoc), "restaurant", 50, 0.025)
+                    }
+                    )
+        }
     }
 
     fun setLocation(location: Location) {
@@ -69,6 +83,12 @@ class Repository @Inject constructor() {
     fun getLocationFlow(): Flow<Location> {
         return locationFlow
     }
+
+    fun getPointsOfInterest(): Flow<ArrayList<POI>> {
+        return pointsOfInterest
+    }
+
+
 }
 
 

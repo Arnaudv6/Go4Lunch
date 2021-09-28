@@ -8,13 +8,14 @@ import com.cleanup.go4lunch.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val repo: Repository
-    ) : ViewModel() {
+) : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is home Fragment"
@@ -25,4 +26,9 @@ class MapViewModel @Inject constructor(
     fun getLocation(): Flow<GeoPoint> {
         return repo.getLocationFlow().map { loc: Location -> GeoPoint(loc) }
     }
+
+    fun getPointsOfInterest(): Flow<ArrayList<POI>> {
+        return repo.getPointsOfInterest()
+    }
+
 }

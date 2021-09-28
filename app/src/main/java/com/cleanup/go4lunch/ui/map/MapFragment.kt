@@ -1,13 +1,14 @@
 package com.cleanup.go4lunch.ui.map
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.text.TextUtilsCompat
+import androidx.core.text.TextUtilsCompat.getLayoutDirectionFromLocale
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +17,8 @@ import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import org.osmdroid.bonuspack.location.NominatimPOIProvider
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -26,7 +28,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.ScaleBarOverlay
-import java.util.*
+import java.util.Locale.getDefault
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
@@ -91,14 +93,14 @@ class MapFragment : Fragment() {
         */
 
 
-        val poiProvider = NominatimPOIProvider(BuildConfig.APPLICATION_ID)
-
         // POIs
         val poiMarkers = FolderOverlay()
         map.overlays.add(poiMarkers)
 
+        // todo uncomment block above and remove that crappy optim as soon as I inject GPS
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.getLocation().collect {
+                poiMarkers.items.clear()
                 addPinOnLayer(
                     poiMarkers,
                     "My position",
@@ -106,47 +108,32 @@ class MapFragment : Fragment() {
                     it,
                     R.drawable.ic_baseline_my_location_24
                 )
-            }
-        }
-
-        /*
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            var pois: ArrayList<POI> = ArrayList()
-            var myLoc: Location? = null
-            suspend {
-                while (myLoc == null) {
-                    myLoc = gps.lastKnownLocation
-                    delay(700)
-                }
-            }.invoke()
-
-            launch(
-                Dispatchers.IO,
-                CoroutineStart.DEFAULT,
-                { pois = poiProvider.getPOICloseTo(GeoPoint(myLoc), "restaurant", 50, 0.025) }
-            ).invokeOnCompletion {
-                for (poi in pois) {
-                    addPinOnLayer(
-                        poiMarkers,
-                        poi.mType,
-                        poi.mDescription,
-                        poi.mLocation,
-                        R.drawable.ic_baseline_location_on_24
-                    )
+                map.postInvalidate()  // force a redraw
+                try {
+                    for (poi in viewModel.getPointsOfInterest().last()) {
+                        addPinOnLayer(
+                            poiMarkers,
+                            poi.mType,
+                            poi.mDescription,
+                            poi.mLocation,
+                            R.drawable.ic_baseline_location_on_24
+                        )
+                    }
+                } catch (e: NoClassDefFoundError) {
+                    Log.e("MapFragment", "network problem or something")
+                    // Current dex file has more than one class in it. Calling Retransform. Classes on this class might fail if no transformations are applied to it!
                 }
             }
+            map.postInvalidate()  // force a redraw
 
         }
 
-         */
-
+        map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
 
         // add scale bar
         val mScaleBarOverlay = ScaleBarOverlay(map)
-        mScaleBarOverlay.setAlignRight(
-            TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
-                    == ViewCompat.LAYOUT_DIRECTION_LTR
-        )
+        val ltr = getLayoutDirectionFromLocale(getDefault()) == ViewCompat.LAYOUT_DIRECTION_LTR
+        mScaleBarOverlay.setAlignRight(ltr)
         mScaleBarOverlay.setAlignBottom(true)
         mScaleBarOverlay.setEnableAdjustLength(true)
         map.overlays.add(mScaleBarOverlay)
@@ -171,10 +158,8 @@ class MapFragment : Fragment() {
     }
 
     private fun centerOnMe() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.getLocation().collect {
-                map.controller.animateTo(it, 15.0, 1)
-            }
+        viewLifecycleOwner.lifecycleScope.launch {
+            map.controller.animateTo(viewModel.getLocation().last(), 15.0, 1)
         }
     }
 
