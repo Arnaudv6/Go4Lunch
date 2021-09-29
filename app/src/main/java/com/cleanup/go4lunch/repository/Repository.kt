@@ -3,17 +3,19 @@ package com.cleanup.go4lunch.repository
 import android.location.Location
 import android.util.Log
 import com.cleanup.go4lunch.BuildConfig
+import com.cleanup.go4lunch.MainApplication
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.mapNotNull
 import org.osmdroid.bonuspack.location.NominatimPOIProvider
 import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-// todo understand: @Inject constructor() is mandatory ever since I annotated @Singleton
 class Repository @Inject constructor() {
 
 
@@ -55,29 +57,47 @@ class Repository @Inject constructor() {
             ""
 
     private val loc = Location("repository")
-    private val locationFlow = MutableStateFlow(loc)
     private val poiProvider = NominatimPOIProvider(BuildConfig.APPLICATION_ID)
+    private val locationFlow = MutableStateFlow(loc)
     private val pointsOfInterest: Flow<ArrayList<POI>>
 
+    private val gps = GpsMyLocationProvider(MainApplication.instance)
+
     init {
+        gps.locationUpdateMinDistance = 10F  // float, meters
+        gps.locationUpdateMinTime = 5000 // long, milliseconds
+        gps.startLocationProvider { location, _ -> updateLocation(location) }
+
         loc.latitude = 48.8583  // starting Location: Eiffel Tower
         loc.longitude = 2.2944
         locationFlow.value = loc
 
+        // todo understand: suspend is buried in mapNotNull
         pointsOfInterest = locationFlow.mapNotNull { poiLoc: Location ->
             (
-                    when (poiLoc) {
-                        loc -> null
-                        else -> poiProvider.getPOICloseTo(GeoPoint(poiLoc), "restaurant", 50, 0.025)
-                    }
-                    )
+                    try {
+                        when (poiLoc) {
+                            loc -> null
+                            else -> poiProvider.getPOICloseTo(
+                                GeoPoint(poiLoc),
+                                "restaurant",
+                                50,
+                                0.025
+                            )
+                        }
+                    } catch (e: NoClassDefFoundError) {
+                        null
+                    })
         }
     }
 
-    fun setLocation(location: Location) {
-        // emit() requires "suspend"
-        locationFlow.value = location
-        Log.e("Repository", "setLocation() called with: ${location.toString()}")
+    private fun updateLocation(location: Location) {
+        if (location.latitude < 51.404 && location.latitude > 42.190
+            && location.longitude < 8.341 && location.longitude > -4.932
+        ) {
+            locationFlow.value = location
+            Log.e("Repository", "setLocation() called with: $location")
+        }
     }
 
     fun getLocationFlow(): Flow<Location> {
@@ -87,7 +107,6 @@ class Repository @Inject constructor() {
     fun getPointsOfInterest(): Flow<ArrayList<POI>> {
         return pointsOfInterest
     }
-
 
 }
 

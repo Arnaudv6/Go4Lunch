@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.ui.map
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +10,14 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.TextUtilsCompat.getLayoutDirectionFromLocale
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -39,7 +39,7 @@ class MapFragment : Fragment() {
     lateinit var gps: GpsMyLocationProvider
     */
 
-    private lateinit var viewModel: MapViewModel
+    private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView
 
     companion object {
@@ -53,9 +53,6 @@ class MapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // todo ViewModel Factory
-        viewModel = ViewModelProvider(this).get(MapViewModel::class.java)
-
         // set user agent and map-cache
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().load(
@@ -109,26 +106,23 @@ class MapFragment : Fragment() {
                     R.drawable.ic_baseline_my_location_24
                 )
                 map.postInvalidate()  // force a redraw
-                try {
-                    for (poi in viewModel.getPointsOfInterest().last()) {
-                        addPinOnLayer(
-                            poiMarkers,
-                            poi.mType,
-                            poi.mDescription,
-                            poi.mLocation,
-                            R.drawable.ic_baseline_location_on_24
-                        )
-                    }
-                } catch (e: NoClassDefFoundError) {
-                    Log.e("MapFragment", "network problem or something")
-                    // Current dex file has more than one class in it. Calling Retransform. Classes on this class might fail if no transformations are applied to it!
-                }
             }
-            map.postInvalidate()  // force a redraw
 
+            viewModel.getPointsOfInterest().collect {
+                for (poi in it) {
+                    addPinOnLayer(
+                        poiMarkers,
+                        poi.mType,
+                        poi.mDescription,
+                        poi.mLocation,
+                        R.drawable.ic_baseline_location_on_24
+                    )
+                }
+                map.postInvalidate()  // force a redraw
+            }
         }
 
-        map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
+        // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
 
         // add scale bar
         val mScaleBarOverlay = ScaleBarOverlay(map)

@@ -5,6 +5,8 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class MainApplication : Application() {
+    // set location updates throttling, and subscribe to new locations
+    // gps = GpsMyLocationProvider(application.applicationContext)
 
     companion object {
         lateinit var instance: Application

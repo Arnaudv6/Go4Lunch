@@ -3,7 +3,6 @@ package com.cleanup.go4lunch
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -16,28 +15,12 @@ import com.cleanup.go4lunch.ui.map.MapFragment
 import com.cleanup.go4lunch.ui.mates.MatesFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.scopes.ActivityScoped
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import javax.inject.Singleton
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    // private val viewModel: MainViewModel by viewModels()
 
-    @Singleton
-    @ActivityScoped
-    val gps = GpsMyLocationProvider(MainApplication.instance)
-
-    /*  // make this an object?
-    @Module @Singleton @ActivityScoped class GpsMyLocationProvider {
-        init {
-            GpsMyLocationProvider(Go4LunchApplication.instance)
-        }
-    }
-    */
-
-    private val viewModel: MainViewModel by viewModels()
-
-    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
+    private val requestPermissionsRequestCode = 1
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
 
@@ -64,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
 
         toggle = ActionBarDrawerToggle(
             this,
@@ -102,12 +85,6 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-        // set location updates throttling, and subscribe to new locations
-        // gps = GpsMyLocationProvider(application.applicationContext)
-        gps.locationUpdateMinDistance = 10F  // float, meters
-        gps.locationUpdateMinTime = 5000 // long, milliseconds
-        gps.startLocationProvider { location, _ -> viewModel.updateLocation(location) }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -141,7 +118,7 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 permissionsToRequest.toTypedArray(),
-                REQUEST_PERMISSIONS_REQUEST_CODE
+                requestPermissionsRequestCode
             )
         }
     }
@@ -159,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 permissionsToRequest.toTypedArray(),
-                REQUEST_PERMISSIONS_REQUEST_CODE
+                requestPermissionsRequestCode
             )
         }
     }
