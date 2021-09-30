@@ -17,7 +17,6 @@ import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -107,7 +106,8 @@ class MapFragment : Fragment() {
                 )
                 map.postInvalidate()  // force a redraw
             }
-
+        }
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.getPointsOfInterest().collect {
                 for (poi in it) {
                     addPinOnLayer(
@@ -152,9 +152,7 @@ class MapFragment : Fragment() {
     }
 
     private fun centerOnMe() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            map.controller.animateTo(viewModel.getLocation().last(), 15.0, 1)
-        }
+        map.controller.animateTo(viewModel.getLocation().last(), 15.0, 1)
     }
 
     private fun addPinOnLayer(
