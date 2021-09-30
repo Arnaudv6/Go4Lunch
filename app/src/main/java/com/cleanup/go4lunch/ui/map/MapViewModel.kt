@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,4 +32,7 @@ class MapViewModel @Inject constructor(
         return repo.getPointsOfInterest()
     }
 
+    fun getGps(): GpsMyLocationProvider {
+        return repo.gps
+    }
 }
