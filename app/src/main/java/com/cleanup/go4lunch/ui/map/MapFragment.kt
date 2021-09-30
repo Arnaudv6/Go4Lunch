@@ -70,14 +70,12 @@ class MapFragment : Fragment() {
         map.controller.setZoom(4.0)
 
         // display user location on map
-        val locationOverlay =
-            MyLocationNewOverlay(viewModel.getGps(), map)  // SimpleLocationOverlay is noop
-        // no need to de/activate location in onResume() and onPause(), given above GPS throttling
         val icon =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
                 ?.toBitmap(64, 64)
-
-        // todo this is what disables my call back in the repo
+        val locationOverlay =
+            MyLocationNewOverlay(viewModel.getGps(), map)  // SimpleLocationOverlay is noop
+        // no need to de/activate location in onResume() and onPause(), given above GPS throttling
         locationOverlay.enableMyLocation()  // so location pin updates
         locationOverlay.disableFollowLocation()  // so map does not follow
         locationOverlay.setPersonIcon(icon) // used when Location has no bearing

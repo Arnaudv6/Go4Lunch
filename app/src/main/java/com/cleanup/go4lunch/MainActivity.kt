@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true)
 
-        // todo understand supportFragmentManager retainedFragments is incompatible with Hilt.
+        // supportFragmentManager retainedFragments is incompatible with Hilt.
         findViewById<BottomNavigationView>(R.id.nav_view).setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_list -> {
