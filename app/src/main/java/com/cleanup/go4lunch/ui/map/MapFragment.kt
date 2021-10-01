@@ -2,7 +2,6 @@ package com.cleanup.go4lunch.ui.map
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +17,10 @@ import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -95,7 +96,7 @@ class MapFragment : Fragment() {
         val poiMarkers = FolderOverlay()
         map.overlays.add(poiMarkers)
         // Todo: Nino, là, j'utilise launchWhenStarted : pas launch, je suppose qu'on est bons ?
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+        lifecycleScope.launchWhenStarted {
             viewModel.poisList.collect {
                 poiMarkers.items.clear()
                 for (poi in it) {
@@ -128,11 +129,9 @@ class MapFragment : Fragment() {
     }
 
     private fun centerOnMe() {
-        lifecycleScope.launchWhenStarted {
-            Log.e("MapFragment", "centerOnMe: ")
-            map.controller.animateTo(
-                viewModel.locationAsGeoPoint.last(), 15.0, 1
-            )
+        lifecycleScope.launch(Dispatchers.Main) {
+            val geoPoint = viewModel.locationAsGeoPoint.stateIn(this).value
+            map.controller.animateTo(geoPoint, 15.0, 1)
         }
     }
 
