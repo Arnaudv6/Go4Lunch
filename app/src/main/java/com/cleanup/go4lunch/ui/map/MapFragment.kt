@@ -1,10 +1,11 @@
 package com.cleanup.go4lunch.ui.map
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -15,8 +16,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.GpsProviderWrapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.last
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -28,11 +31,15 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.Locale.getDefault
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
+    @Inject
+    lateinit var gpsProviderWrapper: GpsProviderWrapper
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView
+    private var icon: Drawable? = null
 
     companion object {
         fun newInstance(): MapFragment {
@@ -53,6 +60,7 @@ class MapFragment : Fragment() {
         )
 
         val view: View = inflater.inflate(R.layout.fragment_map, container, false)
+        icon = ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_location_on_24, null)
 
         // map settings
         map = view.findViewById(R.id.map)
@@ -64,7 +72,7 @@ class MapFragment : Fragment() {
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
             -TileSystem.MaxLatitude,
-            0/*map.getHeight()/2*/
+            0  // map.getHeight()/2
         )
 
         map.controller.setZoom(4.0)
@@ -74,7 +82,7 @@ class MapFragment : Fragment() {
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
                 ?.toBitmap(64, 64)
         val locationOverlay =
-            MyLocationNewOverlay(viewModel.getGps(), map)  // SimpleLocationOverlay is noop
+            MyLocationNewOverlay(gpsProviderWrapper, map)  // SimpleLocationOverlay is noop
         // no need to de/activate location in onResume() and onPause(), given above GPS throttling
         locationOverlay.enableMyLocation()  // so location pin updates
         locationOverlay.disableFollowLocation()  // so map does not follow
@@ -86,16 +94,16 @@ class MapFragment : Fragment() {
         // POIs
         val poiMarkers = FolderOverlay()
         map.overlays.add(poiMarkers)
+        // Todo: Nino, là, j'utilise launchWhenStarted : pas launch, je suppose qu'on est bons ?
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.getPointsOfInterest().collect {
+            viewModel.poisList.collect {
                 poiMarkers.items.clear()
                 for (poi in it) {
                     addPinOnLayer(
                         poiMarkers,
                         poi.mType,
                         poi.mDescription,
-                        poi.mLocation,
-                        R.drawable.ic_baseline_location_on_24
+                        poi.mLocation
                     )
                 }
                 map.postInvalidate()  // force a redraw
@@ -120,8 +128,12 @@ class MapFragment : Fragment() {
     }
 
     private fun centerOnMe() {
-        val loc = viewModel.getGps().lastKnownLocation
-        if (loc != null) map.controller.animateTo(GeoPoint(loc), 15.0, 1)
+        lifecycleScope.launchWhenStarted {
+            Log.e("MapFragment", "centerOnMe: ")
+            map.controller.animateTo(
+                viewModel.locationAsGeoPoint.last(), 15.0, 1
+            )
+        }
     }
 
     private fun addPinOnLayer(
@@ -129,13 +141,12 @@ class MapFragment : Fragment() {
         title: String,
         description: String,
         location: GeoPoint,
-        @DrawableRes icon: Int
     ) {
         val poiMarker = Marker(map)
         poiMarker.title = title
         poiMarker.snippet = description
         poiMarker.position = location
-        poiMarker.icon = ResourcesCompat.getDrawable(resources, icon, null)
+        poiMarker.icon = icon
         layer.add(poiMarker)
     }
 }

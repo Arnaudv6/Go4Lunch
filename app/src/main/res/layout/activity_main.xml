@@ -45,6 +45,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container"
+            android:name="com.cleanup.go4lunch.ui.map.MapFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@id/nav_view"
@@ -86,8 +87,8 @@
             android:layout_gravity="bottom"
             android:layout_marginHorizontal="90dp"
             android:adjustViewBounds="true"
-            android:contentDescription="logo"
-            android:src="@drawable/ic_drawing_l" />
+            android:src="@drawable/ic_drawing_l"
+            tools:ignore="ContentDescription" />
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>
