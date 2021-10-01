@@ -20,8 +20,9 @@ class GpsProviderWrapper @Inject constructor() : IMyLocationConsumer, IMyLocatio
 
     private val mutableLocationFlow = MutableStateFlow(
         Location("repository").apply {
-            latitude = 48.8583  // starting Location: Eiffel Tower
-            longitude = 2.2944
+            latitude = FranceGps.fallbackLatitude
+            longitude = FranceGps.fallbackLongitude
+            altitude = FranceGps.fallbackAltitude
         }
     )
     val locationFlow = mutableLocationFlow.asStateFlow()
@@ -61,6 +62,7 @@ class GpsProviderWrapper @Inject constructor() : IMyLocationConsumer, IMyLocatio
 
     // IMyLocationProvider
     override fun stopLocationProvider() {
+        return  // I should call stopLocationProvider() only when activity goes Stopped I think
         provider.stopLocationProvider()
     }
 
@@ -71,7 +73,7 @@ class GpsProviderWrapper @Inject constructor() : IMyLocationConsumer, IMyLocatio
 
     // IMyLocationProvider
     override fun destroy() {
-        // todo carefully think about that one
+        return  // view calls destroy when fragment dies: we MUST survive.
         provider.destroy()
     }
 }

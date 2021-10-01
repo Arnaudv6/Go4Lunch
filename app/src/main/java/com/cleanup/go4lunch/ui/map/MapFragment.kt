@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.FranceGps
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -75,8 +76,8 @@ class MapFragment : Fragment() {
             -TileSystem.MaxLatitude,
             0  // map.getHeight()/2
         )
-
-        map.controller.setZoom(4.0)
+        map.controller.setCenter(FranceGps.fallbackGeoPoint)
+        map.controller.setZoom(5.0)
 
         // display user location on map
         val icon =
