@@ -1,13 +1,11 @@
 package com.cleanup.go4lunch.ui.map
 
 import org.osmdroid.api.IGeoPoint
+import org.osmdroid.util.BoundingBox
 
 sealed class MapViewAction {
-    data class Zoom(
-        val geoPoint: IGeoPoint,
-        val zoom: Double,
-        val speed: Long
-    ) : MapViewAction()
+    data class CenterOnMe(val geoPoint: IGeoPoint) : MapViewAction()
 
-    // TODO ARNAUD any other view action goes here
+    data class InitialMapBox(val boundingBox: BoundingBox) : MapViewAction()
+
 }

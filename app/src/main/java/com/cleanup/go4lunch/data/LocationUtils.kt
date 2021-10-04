@@ -5,7 +5,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FranceGps @Inject constructor() {
+class LocationUtils @Inject constructor() {
 
     companion object {
         // Eiffel Tower, @5m above the WGS 84: real Paris is 35m above sea: limiting false positives

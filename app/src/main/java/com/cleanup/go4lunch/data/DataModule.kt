@@ -25,5 +25,4 @@ class DataModule {
     fun provideNominatimPOIProvider(): NominatimPOIProvider =
         NominatimPOIProvider(BuildConfig.APPLICATION_ID)
 
-
 }
