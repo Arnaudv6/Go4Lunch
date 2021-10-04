@@ -15,6 +15,7 @@ class GpsProviderWrapper @Inject constructor() : IMyLocationConsumer, IMyLocatio
     // IMyLocationConsumer interface implemented to pass "this" to GpsMyLocationProvider here
     // IMyLocationProvider interface implemented to pass "this" to MyLocationNewOverlay in MapFragment
 
+    // todo Nino : MainApplication, faut l'injecter, là?
     private val provider = GpsMyLocationProvider(MainApplication.instance)
     private val listeners = mutableSetOf<IMyLocationConsumer>()
 

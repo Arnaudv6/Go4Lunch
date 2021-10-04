@@ -20,7 +20,7 @@ class Repository @Inject constructor() {
             poiProvider.getPOICloseTo(
                 geoPoint,
                 "restaurant",
-                50,
+                30,
                 0.025
             ),
             null
@@ -32,7 +32,7 @@ class Repository @Inject constructor() {
             poiProvider.getPOIInside(
                 boundingBox,
                 "restaurant",
-                50,
+                30,
             ),
             null
         )

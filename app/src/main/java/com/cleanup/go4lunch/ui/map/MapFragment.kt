@@ -85,6 +85,7 @@ class MapFragment : Fragment() {
         map.controller.setCenter(FranceGps.fallbackGeoPoint)
         map.controller.setZoom(5.0)
 
+        // todo save and restore view box
         // todo: debouncing belongs in VM
         mapBox.debounce(1000).onEach {
             viewModel.mapBoxChanged(map.boundingBox)
