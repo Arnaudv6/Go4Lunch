@@ -1,57 +1,52 @@
 package com.cleanup.go4lunch.ui.map
 
-import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cleanup.go4lunch.data.FranceGps
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.repository.Repository
+import com.cleanup.go4lunch.data.repository.PoiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    // todo Nino : I don't understand this error.
-    private val gpsProviderWrapper: GpsProviderWrapper,
-    private val repo: Repository,
+    private val repo: PoiRepository,
+    private val franceGps: FranceGps,
+    private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
-    private val mutablePOIsList = MutableStateFlow<ArrayList<POI>>(arrayListOf())
-    val poisList = mutablePOIsList.asStateFlow()
-    val locationAsGeoPoint = gpsProviderWrapper.locationFlow.map { loc: Location -> GeoPoint(loc) }
+    private val boundingBoxMutableStateFlow = MutableStateFlow<BoundingBox?>(null)
+    val poisList =
+        gpsProviderWrapper.locationFlow.combine(boundingBoxMutableStateFlow) { location, boundingBox ->
+            val geoPoint = GeoPoint(location)
 
-    init {
-        /*
-        gpsProviderWrapper.addLocationConsumer { location, _ ->
-            run {
-                if (location != null) {
-                    val geoPoint = GeoPoint(location)
-                    if (FranceGps.isDeviceLocation(geoPoint) && FranceGps.inFrance(geoPoint)) (
-                            viewModelScope.launch(Dispatchers.IO) {
-                                val pois = repo.getPoisNearGeoPoint(geoPoint)
-                                Log.e("MapViewModel", "received ${pois.size}: POIs")
-                                mutablePOIsList.emit(pois)
-                            })
-                }
+            if (boundingBox != null) {
+                repo.getPoisInBox(boundingBox)
+            } else if (franceGps.isDeviceLocation(geoPoint) && franceGps.inFrance(geoPoint)) {
+                repo.getPoisNearGeoPoint(geoPoint)
+            } else {
+                emptyList()
             }
-        }
-        */
-    }
+        }.stateIn()
+
+    private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
+    val viewActionFlow = viewActionChannel.receiveAsFlow()
 
     fun mapBoxChanged(boundingBox: BoundingBox) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val pois = repo.getPoisInBox(boundingBox)
-            Log.e("MapViewModel", "received ${pois.size}: POIs")
-            mutablePOIsList.emit(pois)
-        }
+        boundingBoxMutableStateFlow.tryEmit(boundingBox)
     }
 
+    fun onCenterOnMeClicked() {
+        val location = gpsProviderWrapper.locationFlow.value
+        viewActionChannel.trySend(MapViewAction.Zoom(GeoPoint(location), 15.0, 1))
+    }
 }

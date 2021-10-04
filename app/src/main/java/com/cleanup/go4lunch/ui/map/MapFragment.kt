@@ -12,7 +12,9 @@ import androidx.core.text.TextUtilsCompat.getLayoutDirectionFromLocale
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.FranceGps
@@ -76,7 +78,7 @@ class MapFragment : Fragment() {
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
-        // Todo Nino : là, je ne peux pas virer cette erreur de façon propre?
+        @Suppress("DEPRECATION") // This is just because of bad naming for this CONSTANT
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
             -TileSystem.MaxLatitude,
@@ -121,18 +123,30 @@ class MapFragment : Fragment() {
         val poiMarkers = FolderOverlay()
         map.overlays.add(poiMarkers)
         // Todo: Nino, là, j'utilise launchWhenStarted : pas launch, je suppose qu'on est bons ?
-        lifecycleScope.launchWhenStarted {
-            viewModel.poisList.collect {
-                poiMarkers.items.clear()
-                for (poi in it) {
-                    addPinOnLayer(
-                        poiMarkers,
-                        poi.mType,
-                        poi.mDescription,
-                        poi.mLocation
-                    )
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.poisList.collect {
+                    poiMarkers.items.clear()
+                    for (poi in it) {
+                        addPinOnLayer(
+                            poiMarkers,
+                            poi.mType,
+                            poi.mDescription,
+                            poi.mLocation
+                        )
+                    }
+                    map.postInvalidate()  // force a redraw
                 }
-                map.postInvalidate()  // force a redraw
+            }
+        }
+
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewActionFlow.collect {
+                    when (it) {
+                        is MapViewAction.Zoom -> map.controller.animateTo(it.geoPoint, it.zoom, it.speed)
+                    }
+                }
             }
         }
 
@@ -148,16 +162,9 @@ class MapFragment : Fragment() {
 
         // bind centerOnMe button
         val centerOnMeButton = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
-        centerOnMeButton.setOnClickListener { centerOnMe() }
+        centerOnMeButton.setOnClickListener {  viewModel.onCenterOnMeClicked() }
 
         return view
-    }
-
-    private fun centerOnMe() {
-        lifecycleScope.launch(Dispatchers.Main) {
-            val geoPoint = viewModel.locationAsGeoPoint.stateIn(this).value
-            map.controller.animateTo(geoPoint, 15.0, 1)
-        }
     }
 
     private fun addPinOnLayer(

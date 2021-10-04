@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.data
 
 import android.location.Location
-import com.cleanup.go4lunch.MainApplication
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
@@ -11,12 +10,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GpsProviderWrapper @Inject constructor() : IMyLocationConsumer, IMyLocationProvider {
+class GpsProviderWrapper @Inject constructor(
+    private val provider: GpsMyLocationProvider
+) : IMyLocationConsumer, IMyLocationProvider {
     // IMyLocationConsumer interface implemented to pass "this" to GpsMyLocationProvider here
     // IMyLocationProvider interface implemented to pass "this" to MyLocationNewOverlay in MapFragment
 
-    // todo Nino : MainApplication, faut l'injecter, là?
-    private val provider = GpsMyLocationProvider(MainApplication.instance)
+    @Deprecated("Use flow instead")
     private val listeners = mutableSetOf<IMyLocationConsumer>()
 
     private val mutableLocationFlow = MutableStateFlow(
@@ -34,12 +34,14 @@ class GpsProviderWrapper @Inject constructor() : IMyLocationConsumer, IMyLocatio
         provider.locationUpdateMinTime = 5000  // long, milliseconds
     }
 
+    @Deprecated("Use flow instead")
     fun addLocationConsumer(consumer: IMyLocationConsumer?) {
         consumer?.let {
             listeners.add(it)
         }
     }
 
+    @Deprecated("Use flow instead")
     fun removeLocationConsumer(listener: IMyLocationConsumer?) {
         listeners.remove(listener)
     }
