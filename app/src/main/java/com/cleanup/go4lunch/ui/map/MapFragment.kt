@@ -19,11 +19,14 @@ import com.cleanup.go4lunch.data.FranceGps
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
@@ -42,6 +45,8 @@ class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView
     private var icon: Drawable? = null
+    private var mapBox: MutableStateFlow<BoundingBox> =
+        MutableStateFlow<BoundingBox>(BoundingBox(1.0, 1.0, 1.0, 1.0))
 
     companion object {
         fun newInstance(): MapFragment {
@@ -71,6 +76,7 @@ class MapFragment : Fragment() {
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
+        // Todo Nino : là, je ne peux pas virer cette erreur de façon propre?
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
             -TileSystem.MaxLatitude,
@@ -78,6 +84,23 @@ class MapFragment : Fragment() {
         )
         map.controller.setCenter(FranceGps.fallbackGeoPoint)
         map.controller.setZoom(5.0)
+
+        // todo: debouncing belongs in VM
+        mapBox.debounce(1000).onEach {
+            viewModel.mapBoxChanged(map.boundingBox)
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        map.addMapListener(object : MapListener {
+            override fun onScroll(event: ScrollEvent?): Boolean {
+                mapBox.value = map.boundingBox
+                return true
+            }
+
+            override fun onZoom(event: ZoomEvent?): Boolean {
+                mapBox.value = map.boundingBox
+                return true
+            }
+        })
 
         // display user location on map
         val icon =
