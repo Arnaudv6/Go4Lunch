@@ -12,17 +12,13 @@ import androidx.core.text.TextUtilsCompat.getLayoutDirectionFromLocale
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.data.LocationUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -39,6 +35,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.Locale.getDefault
 import javax.inject.Inject
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MapFragment : Fragment() {
@@ -81,10 +78,8 @@ class MapFragment : Fragment() {
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
             -TileSystem.MaxLatitude,
-            0  // map.getHeight()/2
+            0
         )
-        map.controller.setCenter(LocationUtils.fallbackGeoPoint)
-        map.controller.setZoom(5.0)
 
         viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
             when (it) {
@@ -94,19 +89,14 @@ class MapFragment : Fragment() {
         }
 
         map.addMapListener(object : MapListener {
-            var debounceJob: Job? = null
-
             override fun onScroll(event: ScrollEvent?): Boolean {
-                debounceJob?.cancel()
-                debounceJob = viewModel.viewModelScope.launch {
-                    delay(1500)
-                    viewModel.mapBoxChanged(map.boundingBox)
-                }
+                viewModel.mapBoxChanged(map.boundingBox)
                 return true
             }
 
             override fun onZoom(event: ZoomEvent?): Boolean {
-                return onScroll(null)
+                viewModel.mapBoxChanged(map.boundingBox)
+                return true
             }
         })
 
@@ -128,7 +118,7 @@ class MapFragment : Fragment() {
         val poiMarkers = FolderOverlay()
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
         map.overlays.add(poiMarkers)
-        viewModel.poisList.collectWithLifecycle(viewLifecycleOwner) {
+        viewModel.pointOfInterestListStateFlow.collectWithLifecycle(viewLifecycleOwner) {
             poiMarkers.items.clear()
             for (poi in it) {
                 addPinOnLayer(

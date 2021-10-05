@@ -1,4 +1,4 @@
-package com.cleanup.go4lunch.data.repository
+package com.cleanup.go4lunch.data.pois
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine

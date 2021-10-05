@@ -1,60 +1,61 @@
 package com.cleanup.go4lunch.ui.map
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.data.LocationUtils
-import com.cleanup.go4lunch.data.repository.PoiRepository
+import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.settings.BoxEntity
+import com.cleanup.go4lunch.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.plus
 import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val repo: PoiRepository,
-    private val locationUtils: LocationUtils,
+    private val poiRepository: PoiRepository,
+    private val settingsRepository: SettingsRepository,
+    // private val locationUtils: LocationUtils,
     private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
     private val boundingBoxMutableStateFlow = MutableStateFlow<BoundingBox?>(null)
-
-    private var mapBox: MutableStateFlow<BoundingBox> =
-        MutableStateFlow<BoundingBox>(BoundingBox(1.0, 1.0, 1.0, 1.0))
-
     private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
     val viewActionFlow = viewActionChannel.receiveAsFlow()
 
-    val poisList = MutableStateFlow<List<POI>>(emptyList())
-    /*
-    gpsProviderWrapper.locationFlow.combine(boundingBoxMutableStateFlow) { location, boundingBox ->
-        val geoPoint = GeoPoint(location)
-
-        if (boundingBox != null) {
-            repo.getPOIsInBox(boundingBox)
-        } else if (locationUtils.isDeviceLocation(geoPoint) && locationUtils.inFrance(geoPoint)) {
-            repo.getPOIsNearGeoPoint(geoPoint)
-        } else {
-            emptyList()
-        }
-    }.stateIn()
-    */
-
     init {
-        viewActionChannel.trySend(MapViewAction.InitialMapBox(BoundingBox()))
-
+        val mapBox = settingsRepository.getMapBox()
+        if (mapBox != null)
+            viewActionChannel.trySend(MapViewAction.InitialMapBox(mapBox))
     }
 
-    // todo save and restore view box
-    // todo: debouncing belongs in VM
+    val pointOfInterestListStateFlow: StateFlow<List<POI>> =
+        boundingBoxMutableStateFlow.debounce(3000).map {
+            if (it == null) {
+                emptyList()
+            } else {
+                settingsRepository.setMapBox(
+                    BoxEntity(
+                        it.actualNorth,
+                        it.actualSouth,
+                        it.lonWest,
+                        it.lonEast
+                    )
+                )
+                poiRepository.getPOIsInBox(it)
+            }
+        }.stateIn(viewModelScope.plus(Dispatchers.IO), SharingStarted.Lazily, emptyList())
+
     fun mapBoxChanged(boundingBox: BoundingBox) {
-        Log.e("MapViewModel", "here we request POIs")
         boundingBoxMutableStateFlow.tryEmit(boundingBox)
     }
 
