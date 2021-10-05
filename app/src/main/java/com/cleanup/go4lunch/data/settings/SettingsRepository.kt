@@ -5,13 +5,12 @@ import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class SettingsRepository @Inject constructor(
     private val settingsDao: SettingsDao
 ) {
 
     @WorkerThread
-    fun getMapBox(): BoundingBox? {
+    suspend fun getMapBox(): BoundingBox? {
         val box = settingsDao.getBox() ?: return null
         return BoundingBox(
            box.north,
@@ -22,7 +21,7 @@ class SettingsRepository @Inject constructor(
     }
 
     @WorkerThread
-    fun setMapBox(boxEntity: BoxEntity) {
+    suspend fun setMapBox(boxEntity: BoxEntity) {
         settingsDao.setBox(boxEntity)
     }
 

@@ -33,9 +33,13 @@ class MapViewModel @Inject constructor(
     val viewActionFlow = viewActionChannel.receiveAsFlow()
 
     init {
-        val mapBox = settingsRepository.getMapBox()
-        if (mapBox != null)
-            viewActionChannel.trySend(MapViewAction.InitialMapBox(mapBox))
+        viewModelScope.plus(Dispatchers.IO).run {
+            suspend {
+                val mapBox = settingsRepository.getMapBox()
+                if (mapBox != null)
+                    viewActionChannel.trySend(MapViewAction.InitialMapBox(mapBox))
+            }
+        }
     }
 
     val pointOfInterestListStateFlow: StateFlow<List<POI>> =

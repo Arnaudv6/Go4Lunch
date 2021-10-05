@@ -5,7 +5,10 @@ import androidx.room.RoomDatabase
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsDao
 
-@Database(entities = [BoxEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [BoxEntity::class],
+    version = 1,
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract val settingsDao: SettingsDao
 }
