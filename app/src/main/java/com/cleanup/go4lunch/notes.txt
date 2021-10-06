@@ -3,6 +3,9 @@ users:
    first name
    last name
    liste de restaus en favoris
+        plutot que de sauver une liste,
+        il faut faire une table a part, avec une ligne par combinaison user/restau
+        keyid, userid, restauid
    restau choisi pour midi (MàJ à 16h?)
 
 restaus:
