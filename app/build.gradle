@@ -18,11 +18,11 @@ android {
 
     defaultConfig {
         applicationId "com.cleanup.go4lunch"
-        minSdk 21 // TODO ARNAUD multidex à mettre en place :D => 19
+        minSdk 19
         targetSdk 31
         versionCode 1
         versionName "1.0"
-        // multiDexEnabled true
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,7 +34,6 @@ android {
         }
     }
     compileOptions {
-        // coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }

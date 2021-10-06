@@ -15,7 +15,11 @@ import com.cleanup.go4lunch.ui.map.MapFragment
 import com.cleanup.go4lunch.ui.mates.MatesFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     // private val viewModel: MainViewModel by viewModels()
