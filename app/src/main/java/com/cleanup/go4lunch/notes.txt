@@ -6,14 +6,20 @@ users:
    restau choisi pour midi (MàJ à 16h?)
 
 restaus:
-   nom
-   adresse
-   coordonnées GPS (pour calculer des distances)
-   image (si dispo)
-   type de restau (optionnel)
-   horaires
-   numéro
-   site
+    POI     id
+    POI     nom
+            adresse
+    POI     coordonnées GPS (pour calculer des distances)
+            image (si dispo)
+            type de restau (optionnel)
+            horaires
+            numéro
+            site
+
+cache local:
+    mapBox
+    PoiPins, with their list-source: colleages or mapBox
+
 
 mises à jour responsive:
    compte de l'utilisateur

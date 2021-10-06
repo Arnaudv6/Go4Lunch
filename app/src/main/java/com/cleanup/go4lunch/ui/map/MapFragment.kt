@@ -24,9 +24,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
-import org.osmdroid.events.MapListener
-import org.osmdroid.events.ScrollEvent
-import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.TileSystem
@@ -96,18 +93,6 @@ class MapFragment : Fragment() {
             }
         }
 
-        map.addMapListener(object : MapListener {
-            override fun onScroll(event: ScrollEvent?): Boolean {
-                viewModel.mapBoxChanged(map.boundingBox)
-                return true
-            }
-
-            override fun onZoom(event: ZoomEvent?): Boolean {
-                viewModel.mapBoxChanged(map.boundingBox)
-                return true
-            }
-        })
-
         // display user location on map
         val icon =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
@@ -126,17 +111,19 @@ class MapFragment : Fragment() {
         val poiMarkers = FolderOverlay()
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
         map.overlays.add(poiMarkers)
-        viewModel.pointOfInterestListStateFlow.collectWithLifecycle(viewLifecycleOwner) {
-            poiMarkers.items.clear()
-            for (poi in it) {
-                addPinOnLayer(
-                    poiMarkers,
-                    poi.mType,
-                    poi.mDescription,
-                    poi.mLocation
-                )
+        viewModel.viewStateStateFlow.collectWithLifecycle(viewLifecycleOwner) {
+            if (it != null) {
+                poiMarkers.items.clear()
+                for (poi in it.PoiList) {
+                    addPinOnLayer(
+                        poiMarkers,
+                        poi.mType,
+                        poi.mDescription,
+                        poi.mLocation
+                    )
+                }
+                map.postInvalidate()  // force a redraw
             }
-            map.postInvalidate()  // force a redraw
         }
 
         // add scale bar
@@ -150,6 +137,11 @@ class MapFragment : Fragment() {
         // bind centerOnMe button
         val centerOnMeButton = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
         centerOnMeButton.setOnClickListener { viewModel.onCenterOnMeClicked() }
+
+        // bind updatePoiPins button
+        val updatePoiPins = view.findViewById<AppCompatImageButton>(R.id.update_poi_pins)
+        updatePoiPins.setOnClickListener { viewModel.requestPoiPins(map.boundingBox) }
+        // map.addMapListener(object : MapListener {    override onScroll() and onZoom()    })
 
         return view
     }

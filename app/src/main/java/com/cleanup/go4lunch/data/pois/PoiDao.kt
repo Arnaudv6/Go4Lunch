@@ -1,20 +1,17 @@
-package com.cleanup.go4lunch.data.settings
+package com.cleanup.go4lunch.data.pois
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.cleanup.go4lunch.data.settings.BoxEntity
 import kotlinx.coroutines.flow.Flow
-import org.osmdroid.bonuspack.location.POI
-import javax.inject.Singleton
 
 @Dao
-interface SettingsDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+interface PoiDao {
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun setBox(boxEntity: BoxEntity)
 
     @Query("SELECT * FROM box")
     fun getBox(): Flow<BoxEntity>
-
 }

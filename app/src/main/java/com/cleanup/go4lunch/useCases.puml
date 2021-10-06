@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+'left to right direction
+'(FireBase backend) right of (Colleague1)
+
+usecase backend as "FireBase backend
+==
+users fields:
+--
+id
+credentials
+favorite places
+place to eat today"
+
+package colleagues {
+Colleague1 -> (backend)
+Colleague2 -> (backend)
+Colleague3 -> (backend)
+Colleague4 -> (backend)
+Colleague5 -> (backend)
+}
+
+User -> (backend)
+
+
+
+
+@enduml

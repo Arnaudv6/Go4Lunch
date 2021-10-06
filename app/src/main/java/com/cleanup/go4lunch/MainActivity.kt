@@ -22,8 +22,6 @@ import kotlinx.coroutines.FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    // private val viewModel: MainViewModel by viewModels()
-
     private val requestPermissionsRequestCode = 1
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
