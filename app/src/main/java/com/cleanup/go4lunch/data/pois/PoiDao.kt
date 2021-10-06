@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PoiDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun setBox(boxEntity: BoxEntity)
 
-    @Query("SELECT * FROM box")
-    fun getBox(): Flow<BoxEntity>
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertPoi(poiEntity: PoiEntity)
+
+    @Query("SELECT * FROM poi_pins")
+    fun getPoiEntities(): Flow<List<PoiEntity>>
+
 }

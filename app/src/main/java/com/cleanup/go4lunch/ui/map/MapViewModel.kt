@@ -9,8 +9,6 @@ import com.cleanup.go4lunch.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -26,18 +24,16 @@ class MapViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
-    private val viewStateMutableStateFlow = MutableStateFlow<MapViewState?>(null)
-    val viewStateStateFlow = viewStateMutableStateFlow.asStateFlow()
-
     private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
     val viewActionFlow = viewActionChannel.receiveAsFlow()
     val initialMapBox = settingsRepository.boxFlow
+    val poiListFlow = poiRepository.poisFromCache
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.plus(Dispatchers.IO).launch {
             val poiList = poiRepository.getPOIsInBox(boundingBox)
-            viewStateMutableStateFlow.emit(MapViewState(poiList))
-            settingsRepository.putPOIsInCache(poiList)
+            if (poiList != null)
+                poiRepository.putPOIsInCache(poiList)
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.cleanup.go4lunch.BuildConfig
+import com.cleanup.go4lunch.data.pois.PoiDao
 import com.cleanup.go4lunch.data.settings.SettingsDao
 import dagger.Module
 import dagger.Provides
@@ -40,4 +41,10 @@ class DataModule {
     fun provideSettingsDao(appDatabase: AppDatabase): SettingsDao{
         return appDatabase.settingsDao
     }
+
+    @Provides
+    fun providePoiDao(appDatabase: AppDatabase): PoiDao{
+        return appDatabase.poiDao
+    }
+
 }

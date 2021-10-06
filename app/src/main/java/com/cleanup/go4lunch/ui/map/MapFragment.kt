@@ -111,10 +111,10 @@ class MapFragment : Fragment() {
         val poiMarkers = FolderOverlay()
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
         map.overlays.add(poiMarkers)
-        viewModel.viewStateStateFlow.collectWithLifecycle(viewLifecycleOwner) {
-            if (it != null) {
+        viewModel.poiListFlow.collectWithLifecycle(viewLifecycleOwner) {
+            if (it.isNotEmpty()) {
                 poiMarkers.items.clear()
-                for (poi in it.PoiList) {
+                for (poi in it) {
                     addPinOnLayer(
                         poiMarkers,
                         poi.mType,

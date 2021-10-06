@@ -5,8 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import org.osmdroid.bonuspack.location.POI
-import javax.inject.Singleton
 
 @Dao
 interface SettingsDao {
@@ -15,6 +13,7 @@ interface SettingsDao {
     suspend fun setBox(boxEntity: BoxEntity)
 
     @Query("SELECT * FROM box")
-    fun getBox(): Flow<BoxEntity>
+    fun getBox(): Flow<BoxEntity?>
+    // todo Nino : là, j'ai le droit de ne pas faire un flow de liste ?
 
 }
