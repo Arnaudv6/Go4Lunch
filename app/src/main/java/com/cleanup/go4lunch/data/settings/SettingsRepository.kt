@@ -1,28 +1,31 @@
 package com.cleanup.go4lunch.data.settings
 
-import androidx.annotation.WorkerThread
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class SettingsRepository @Inject constructor(
     private val settingsDao: SettingsDao
 ) {
 
-    @WorkerThread
-    suspend fun getMapBox(): BoundingBox? {
-        val box = settingsDao.getBox() ?: return null
-        return BoundingBox(
-           box.north,
-           box.east,
-           box.south,
-           box.west
+    val boxFlow: Flow<BoundingBox> = settingsDao.getBox().map {
+        BoundingBox(
+            it.north,
+            it.east,
+            it.south,
+            it.west
         )
     }
 
-    @WorkerThread
-    suspend fun setMapBox(boxEntity: BoxEntity) {
-        settingsDao.setBox(boxEntity)
+    fun setMapBox(boxEntity: BoxEntity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            settingsDao.setBox(boxEntity)
+        }
     }
 
 }

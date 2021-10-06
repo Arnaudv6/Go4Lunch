@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Singleton
 
 @Dao
@@ -13,6 +14,6 @@ interface SettingsDao {
     suspend fun setBox(boxEntity: BoxEntity)
 
     @Query("SELECT * FROM box")
-    suspend fun getBox(): BoxEntity?
+    fun getBox(): Flow<BoxEntity>
 
 }

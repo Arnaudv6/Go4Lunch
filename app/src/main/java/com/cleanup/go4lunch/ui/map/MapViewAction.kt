@@ -5,7 +5,4 @@ import org.osmdroid.util.BoundingBox
 
 sealed class MapViewAction {
     data class CenterOnMe(val geoPoint: IGeoPoint) : MapViewAction()
-
-    data class InitialMapBox(val boundingBox: BoundingBox) : MapViewAction()
-
 }

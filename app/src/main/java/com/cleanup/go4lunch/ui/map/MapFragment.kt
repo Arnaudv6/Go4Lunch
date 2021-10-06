@@ -12,13 +12,17 @@ import androidx.core.text.TextUtilsCompat.getLayoutDirectionFromLocale
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -74,6 +78,11 @@ class MapFragment : Fragment() {
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
 
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            val box = viewModel.initialMapBox.firstOrNull()
+            if (box != null) map.zoomToBoundingBox(box, true)
+        }
+
         @Suppress("DEPRECATION") // This is just because of bad naming for this CONSTANT
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
@@ -84,7 +93,6 @@ class MapFragment : Fragment() {
         viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
             when (it) {
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
-                is MapViewAction.InitialMapBox -> map.zoomToBoundingBox(it.boundingBox, true)
             }
         }
 
@@ -158,6 +166,11 @@ class MapFragment : Fragment() {
         poiMarker.position = location
         poiMarker.icon = icon
         layer.add(poiMarker)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.closingMap(map.boundingBox)
     }
 }
 

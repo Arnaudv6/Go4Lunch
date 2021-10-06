@@ -7,12 +7,9 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -31,30 +28,13 @@ class MapViewModel @Inject constructor(
     private val boundingBoxMutableStateFlow = MutableStateFlow<BoundingBox?>(null)
     private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
     val viewActionFlow = viewActionChannel.receiveAsFlow()
-
-    init {
-        viewModelScope.plus(Dispatchers.IO).run {
-            suspend {
-                val mapBox = settingsRepository.getMapBox()
-                if (mapBox != null)
-                    viewActionChannel.trySend(MapViewAction.InitialMapBox(mapBox))
-            }
-        }
-    }
+    val initialMapBox = settingsRepository.boxFlow
 
     val pointOfInterestListStateFlow: StateFlow<List<POI>> =
         boundingBoxMutableStateFlow.debounce(3000).map {
             if (it == null) {
                 emptyList()
             } else {
-                settingsRepository.setMapBox(
-                    BoxEntity(
-                        it.actualNorth,
-                        it.actualSouth,
-                        it.lonWest,
-                        it.lonEast
-                    )
-                )
                 poiRepository.getPOIsInBox(it)
             }
         }.stateIn(viewModelScope.plus(Dispatchers.IO), SharingStarted.Lazily, emptyList())
@@ -67,4 +47,17 @@ class MapViewModel @Inject constructor(
         val location = gpsProviderWrapper.locationFlow.value
         viewActionChannel.trySend(MapViewAction.CenterOnMe(GeoPoint(location)))
     }
+
+    fun closingMap(boundingBox: BoundingBox){
+        settingsRepository.setMapBox(
+            BoxEntity(
+                boundingBox.actualNorth,
+                boundingBox.actualSouth,
+                boundingBox.lonWest,
+                boundingBox.lonEast
+            )
+        )
+    }
+
+
 }
