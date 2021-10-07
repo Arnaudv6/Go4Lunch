@@ -13,7 +13,7 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
-    poiRepository: PoiRepository,
+    private val poiRepository: PoiRepository,
     private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
