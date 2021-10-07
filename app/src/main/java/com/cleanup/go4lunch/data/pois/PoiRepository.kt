@@ -58,7 +58,7 @@ class PoiRepository @Inject constructor(
         }
     }
 
-    companion object{
+    private companion object {
         private const val POI_SERVICE_GO_4_LUNCH: Int = 4
         private fun poiFromPoiEntity(poiEntity: PoiEntity): POI {
             val poi = POI(POI_SERVICE_GO_4_LUNCH)

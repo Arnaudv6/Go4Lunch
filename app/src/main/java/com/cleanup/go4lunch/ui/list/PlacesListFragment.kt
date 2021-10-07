@@ -4,16 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.collectWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class PlacesListFragment : Fragment() {
 
-    private val mViewModelPlaces: PlacesListViewModel by viewModels()
+    private val viewModel: PlacesListViewModel by viewModels()
 
     companion object {
         fun newInstance(): PlacesListFragment {
@@ -28,11 +31,12 @@ class PlacesListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
 
-        val textView: TextView = view.findViewById(R.id.text_dashboard)
-
-        mViewModelPlaces.text.observe(viewLifecycleOwner, {
-            textView.text = it
-        })
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+        val adapter = PlacesListAdapter()
+        recyclerView.adapter = adapter
+        viewModel.viewStateListFlow.collectWithLifecycle(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
 
         return view
     }
