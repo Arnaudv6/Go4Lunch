@@ -69,7 +69,8 @@ class MapFragment : Fragment() {
 
         // map settings
         map = view.findViewById(R.id.map)
-        map.setTileSource(TileSourceFactory.MAPNIK)
+        //map.setTileSource(TileSourceFactory.MAPNIK)
+        map.setTileSource(TileSourceFactory.WIKIMEDIA)
         map.setMultiTouchControls(true)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.isTilesScaledToDpi = true
@@ -77,7 +78,7 @@ class MapFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             val box = viewModel.initialMapBox.firstOrNull()
-            if (box != null) map.zoomToBoundingBox(box, true)
+            if (box != null) map.zoomToBoundingBox(box, false)
         }
 
         @Suppress("DEPRECATION") // This is just because of bad naming for this CONSTANT

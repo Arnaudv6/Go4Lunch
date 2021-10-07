@@ -2,7 +2,8 @@
 <resources>
     <color name="orange_lighter">#ff8a50</color>
     <color name="orange">#ff5722</color>
-    <color name="orange_darker">#c41b00</color>
+    <color name="orange_dark">#88361C</color>
+    <color name="orange_darker">#3C0E00</color>
     <color name="teal_200">#03DAC5</color>
     <color name="teal_700">#018786</color>
     <color name="black">#000000</color>
