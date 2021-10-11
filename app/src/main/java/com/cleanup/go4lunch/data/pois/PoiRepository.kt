@@ -71,12 +71,10 @@ class PoiRepository @Inject constructor(
         }
     }
 
-    fun putPOIsInCache(poiList: List<POI>) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun putPOIsInCache(poiList: List<POI>) {
             for (poi in poiList) {
                 poiDao.insertPoi(PoiEntity(poi))
             }
-        }
     }
 
 

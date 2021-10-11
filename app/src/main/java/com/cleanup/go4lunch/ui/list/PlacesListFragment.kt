@@ -37,11 +37,23 @@ class PlacesListFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         val adapter = PlacesListAdapter()
         recyclerView.adapter = adapter
+        viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
+            when (it) {
+                PlacesListViewAction.ScrollToTop -> (recyclerView.layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(
+                    0,
+                    0
+                )
+            }
+        }
+
         viewModel.viewStateListFlow.collectWithLifecycle(viewLifecycleOwner) {
             adapter.submitList(it)
             lifecycleScope.launchWhenStarted {
                 delay(200)
-                (recyclerView.layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(0, 0)
+                (recyclerView.layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(
+                    0,
+                    0
+                )
             }
         }
 

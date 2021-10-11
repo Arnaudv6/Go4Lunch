@@ -76,11 +76,6 @@ class MapFragment : Fragment() {
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
 
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            val box = viewModel.initialMapBox.firstOrNull()
-            if (box != null) map.zoomToBoundingBox(box, false)
-        }
-
         @Suppress("DEPRECATION") // This is just because of bad naming for this CONSTANT
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
@@ -112,10 +107,12 @@ class MapFragment : Fragment() {
         val poiMarkers = FolderOverlay()
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
         map.overlays.add(poiMarkers)
-        viewModel.poiListFlow.collectWithLifecycle(viewLifecycleOwner) {
-            if (it.isNotEmpty()) {
+        viewModel.viewStateFlow.collectWithLifecycle(viewLifecycleOwner) {
+            map.zoomToBoundingBox(it.boundingBox, false)
+
+            if (it.pois.isNotEmpty()) {
                 poiMarkers.items.clear()
-                for (poi in it) {
+                for (poi in it.pois) {
                     addPinOnLayer(
                         poiMarkers,
                         poi.mType,
@@ -163,7 +160,7 @@ class MapFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        viewModel.closingMap(map.boundingBox)
+        viewModel.onStop(map.boundingBox)
     }
 }
 

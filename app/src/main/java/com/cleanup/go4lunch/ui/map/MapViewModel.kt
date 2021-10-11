@@ -9,6 +9,8 @@ import com.cleanup.go4lunch.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -26,14 +28,21 @@ class MapViewModel @Inject constructor(
 
     private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
     val viewActionFlow = viewActionChannel.receiveAsFlow()
-    val initialMapBox = settingsRepository.boxFlow
-    val poiListFlow = poiRepository.poisFromCache
+
+    // TODO Transform to stateflow
+    val viewStateFlow : Flow<MapViewState> = combine(
+        settingsRepository.boxFlow,
+        poiRepository.poisFromCache
+    ) { initialMapBox, poiListFlow ->
+        MapViewState(initialMapBox, poiListFlow)
+    }
 
     fun requestPoiPins(boundingBox: BoundingBox) {
-        viewModelScope.plus(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val poiList = poiRepository.getPOIsInBox(boundingBox)
-            if (poiList != null)
+            if (poiList != null) {
                 poiRepository.putPOIsInCache(poiList)
+            }
         }
     }
 
@@ -42,7 +51,7 @@ class MapViewModel @Inject constructor(
         viewActionChannel.trySend(MapViewAction.CenterOnMe(GeoPoint(location)))
     }
 
-    fun closingMap(boundingBox: BoundingBox) {
+    fun onStop(boundingBox: BoundingBox) {
         settingsRepository.setMapBox(
             BoxEntity(
                 boundingBox.actualNorth,

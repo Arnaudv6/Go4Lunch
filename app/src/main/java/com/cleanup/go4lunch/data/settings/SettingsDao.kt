@@ -12,7 +12,7 @@ interface SettingsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun setBox(boxEntity: BoxEntity)
 
-    @Query("SELECT * FROM box")
+    @Query("SELECT * FROM box LIMIT 1")
     fun getBox(): Flow<BoxEntity?>
     // todo Nino : là, j'ai le droit de ne pas faire un flow de liste ?
 
