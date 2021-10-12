@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.ui.map.MapViewAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +35,7 @@ class PlacesListViewModel @Inject constructor(
             }.sortedBy { viewState -> viewState.distance }
         }.onEach {
             // todo check I see this log on purpose only
-            Log.e("ViewModel:", "scrolling back to top with viewAction" )
+            Log.e("ViewModel:", "scrolling back to top with viewAction")
             // TODO INJECT DISPATCHERS for testing
             viewModelScope.launch(Dispatchers.Main) {
                 delay(200)
@@ -45,14 +44,17 @@ class PlacesListViewModel @Inject constructor(
         }
 
     private fun viewStateFromPoi(poi: POI): PlacesListViewState {
+        val dist = distanceToPoi(poi.mLocation)
+
         return PlacesListViewState(
             poi.mId,
-            poi.mDescription,
-            poi.mDescription,
-            distanceToPoi(poi.mLocation),
+            poi.mDescription.split(",")[0],  // name
+            " - " + poi.mDescription.split(",")[1],
+            dist,
+            if (dist == null) "???" else "${dist}m",
             colleagues(poi.mId),
             poi.mThumbnail,
-            poi.mDescription,
+            poi.mDescription.split(",")[2],  // hours
             likes(poi.mId)
         )
     }

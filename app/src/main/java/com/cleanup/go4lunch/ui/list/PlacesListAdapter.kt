@@ -35,11 +35,11 @@ class PlacesListAdapter :
         private val image: AppCompatImageView = itemView.findViewById(R.id.list_item_image)
 
         fun bind(viewState: PlacesListViewState) {
-            name.text = viewState.name.split(",")[0]
-            distance.text = "${viewState.distance}m"
-            address.text = viewState.address.split(",")[1]
+            name.text = viewState.name
+            distance.text = viewState.distanceText
+            address.text = viewState.address
             colleagues.text = viewState.colleagues.toString()
-            hours.text = viewState.hours.split(",")[2]
+            hours.text = viewState.hours
             likes.text = viewState.likes.toString()
             image.setImageBitmap(viewState.image)
         }

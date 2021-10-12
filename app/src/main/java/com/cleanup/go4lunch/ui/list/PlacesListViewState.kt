@@ -7,6 +7,7 @@ data class PlacesListViewState(
     val name: String,
     val address: String,
     val distance: Int?,
+    val distanceText: String,
     val colleagues: Int,
     val image: Bitmap?,
     val hours: String,

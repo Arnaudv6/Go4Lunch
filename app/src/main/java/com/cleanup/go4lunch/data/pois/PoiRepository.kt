@@ -15,11 +15,30 @@ import javax.inject.Singleton
 @Singleton
 class PoiRepository @Inject constructor(
     private val poiProvider: NominatimPOIProvider,
+    private val poiRetrofit: PoiRetrofit,
     private val poiDao: PoiDao
 ) {
     // note: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common: OK!
 
+    /*
     suspend fun getPOIsInBox(boundingBox: BoundingBox) {
+        try {
+            val poiListResponse = poiRetrofit.getPoiInBox(
+                // or poiProvider.getPOICloseTo
+                viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
+                limit = 30
+            )
+            // todo can it actually be null?
+            if (poiListResponse.isSuccessful) putPoiListInCache(poiListResponse.body().results.map { item -> {
+                POI()
+            } })
+        } catch (e: Exception) {
+            Log.e("POI repository", "something bad happened while requesting POIs")
+            // todo read documented exceptions
+        }
+    }*/
+
+    suspend fun getPOIsInBox2(boundingBox: BoundingBox) {
         try {
             val poiList = poiProvider.getPOIInside(
                 // or poiProvider.getPOICloseTo
@@ -34,6 +53,9 @@ class PoiRepository @Inject constructor(
             // todo read documented exceptions
         }
     }
+
+
+
 
     val poisFromCache: Flow<List<POI>> = poiDao.getPoiEntities().map { poiEntitiesList ->
         poiEntitiesList.map {
