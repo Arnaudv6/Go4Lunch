@@ -38,7 +38,7 @@ class PoiRepository @Inject constructor(
         }
     }*/
 
-    suspend fun getPOIsInBox2(boundingBox: BoundingBox) {
+    suspend fun getPOIsInBox(boundingBox: BoundingBox) {
         try {
             val poiList = poiProvider.getPOIInside(
                 // or poiProvider.getPOICloseTo
