@@ -1,11 +1,9 @@
 package com.cleanup.go4lunch.data.pois
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import android.util.Log
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.location.NominatimPOIProvider
 import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.BoundingBox
@@ -20,24 +18,21 @@ class PoiRepository @Inject constructor(
     private val poiDao: PoiDao
 ) {
     // note: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common: OK!
-    suspend fun getPOIsInBox(boundingBox: BoundingBox): List<POI>? {
-        val poiList: List<POI>?
+
+    suspend fun getPOIsInBox(boundingBox: BoundingBox) {
         try {
-            poiList = poiProvider.getPOIInside(
-                // poiProvider.getPOICloseTo
+            val poiList = poiProvider.getPOIInside(
+                // or poiProvider.getPOICloseTo
                 boundingBox,
                 "restaurant",
                 30,
             )
+            // todo can it actually be null?
+            if (poiList != null) putPoiListInCache(poiList)
         } catch (e: Exception) {
+            Log.e("POI repository", "something bad happened while requesting POIs")
             // todo read documented exceptions
-            return null
         }
-        // todo if (poiList != null) {
-        CoroutineScope(Dispatchers.IO).launch {
-            putPOIsInCache(poiList)
-        }
-        return poiList
     }
 
     val poisFromCache: Flow<List<POI>> = poiDao.getPoiEntities().map { poiEntitiesList ->
@@ -59,13 +54,10 @@ class PoiRepository @Inject constructor(
         }
     }
 
-    suspend fun putPOIsInCache(poiList: List<POI>) {
+    private suspend fun putPoiListInCache(poiList: List<POI>) {
         for (poi in poiList) {
             poiDao.insertPoi(PoiEntity(poi))
         }
     }
-
-
 }
-
 

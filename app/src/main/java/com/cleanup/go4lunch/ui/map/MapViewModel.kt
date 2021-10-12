@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ class MapViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
+    private val boundingBoxMutableStateFlow = MutableStateFlow<BoundingBox?>(null)
     private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
     val viewActionFlow = viewActionChannel.receiveAsFlow()
 
@@ -42,7 +44,7 @@ class MapViewModel @Inject constructor(
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(Dispatchers.IO) {
-            val poiList = poiRepository.getPOIsInBox(boundingBox)
+            poiRepository.getPOIsInBox(boundingBox)
         }
     }
 
@@ -51,16 +53,22 @@ class MapViewModel @Inject constructor(
         viewActionChannel.trySend(MapViewAction.CenterOnMe(GeoPoint(location)))
     }
 
-    fun onStop(boundingBox: BoundingBox) {
-        settingsRepository.setMapBox(
-            BoxEntity(
-                boundingBox.actualNorth,
-                boundingBox.actualSouth,
-                boundingBox.lonWest,
-                boundingBox.lonEast
-            )
-        )
+    fun mapBoxChanged(box: BoundingBox?) {
+        boundingBoxMutableStateFlow.tryEmit(box)
     }
 
-
+    fun onStop() {
+        val boundingBox = boundingBoxMutableStateFlow.value
+        if (boundingBox != null) {
+            settingsRepository.setMapBox(
+                BoxEntity(
+                    boundingBox.actualNorth,
+                    boundingBox.actualSouth,
+                    boundingBox.lonWest,
+                    boundingBox.lonEast
+                )
+            )
+        }
+    }
 }
+

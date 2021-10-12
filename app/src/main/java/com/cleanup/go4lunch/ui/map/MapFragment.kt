@@ -20,6 +20,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.TileSystem
@@ -85,6 +88,18 @@ class MapFragment : Fragment() {
             }
         }
 
+        map.addMapListener(object : MapListener {
+            override fun onScroll(event: ScrollEvent?): Boolean {
+                viewModel.mapBoxChanged(map.boundingBox)
+                return true
+            }
+
+            override fun onZoom(event: ZoomEvent?): Boolean {
+                viewModel.mapBoxChanged(map.boundingBox)
+                return true
+            }
+        })
+
         // display user location on map
         val icon =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
@@ -102,13 +117,13 @@ class MapFragment : Fragment() {
         // POIs
         val poiMarkers = FolderOverlay()
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
-        map.overlays.add(poiMarkers)
+        map.overlays.add(0, poiMarkers)
         viewModel.viewStateFlow.collectWithLifecycle(viewLifecycleOwner) {
             map.zoomToBoundingBox(it.boundingBox, false)
 
-            if (it.pois.isNotEmpty()) {
+            if (it.poiList.isNotEmpty()) {
                 poiMarkers.items.clear()
-                for (poi in it.pois) {
+                for (poi in it.poiList) {
                     addPinOnLayer(
                         poiMarkers,
                         poi.mType,
@@ -135,6 +150,7 @@ class MapFragment : Fragment() {
         // bind updatePoiPins button
         val updatePoiPins = view.findViewById<AppCompatImageButton>(R.id.update_poi_pins)
         updatePoiPins.setOnClickListener { viewModel.requestPoiPins(map.boundingBox) }
+        // todo : why does it center also?
         // map.addMapListener(object : MapListener {    override onScroll() and onZoom()    })
 
         return view
@@ -156,7 +172,7 @@ class MapFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        viewModel.onStop(map.boundingBox)
+        viewModel.onStop()
     }
 }
 

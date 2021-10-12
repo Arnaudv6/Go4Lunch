@@ -5,5 +5,5 @@ import org.osmdroid.util.BoundingBox
 
 data class MapViewState(
     val boundingBox : BoundingBox,
-    val pois : List<POI>
+    val poiList : List<POI>
 )
