@@ -7,11 +7,14 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
@@ -30,7 +33,7 @@ class MapViewModel @Inject constructor(
     val viewActionFlow = viewActionChannel.receiveAsFlow()
 
     // TODO Transform to stateflow
-    val viewStateFlow : Flow<MapViewState> = combine(
+    val viewStateFlow: Flow<MapViewState> = combine(
         settingsRepository.boxFlow,
         poiRepository.poisFromCache
     ) { initialMapBox, poiListFlow ->
@@ -40,9 +43,6 @@ class MapViewModel @Inject constructor(
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(Dispatchers.IO) {
             val poiList = poiRepository.getPOIsInBox(boundingBox)
-            if (poiList != null) {
-                poiRepository.putPOIsInCache(poiList)
-            }
         }
     }
 

@@ -6,14 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -39,23 +37,13 @@ class PlacesListFragment : Fragment() {
         recyclerView.adapter = adapter
         viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
             when (it) {
-                PlacesListViewAction.ScrollToTop -> (recyclerView.layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(
-                    0,
-                    0
-                )
+                PlacesListViewAction.ScrollToTop -> (
+                        recyclerView.layoutManager as LinearLayoutManager?
+                        )?.scrollToPosition(0)
             }
         }
 
-        viewModel.viewStateListFlow.collectWithLifecycle(viewLifecycleOwner) {
-            adapter.submitList(it)
-            lifecycleScope.launchWhenStarted {
-                delay(200)
-                (recyclerView.layoutManager as LinearLayoutManager?)?.scrollToPositionWithOffset(
-                    0,
-                    0
-                )
-            }
-        }
+        viewModel.viewStateListFlow.collectWithLifecycle(viewLifecycleOwner) { adapter.submitList(it) }
 
         return view
     }

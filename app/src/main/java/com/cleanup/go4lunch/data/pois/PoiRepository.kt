@@ -1,15 +1,17 @@
 package com.cleanup.go4lunch.data.pois
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.location.NominatimPOIProvider
 import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resumeWithException
 
 @ExperimentalCoroutinesApi
 @Singleton
@@ -17,39 +19,25 @@ class PoiRepository @Inject constructor(
     private val poiProvider: NominatimPOIProvider,
     private val poiDao: PoiDao
 ) {
-    // todo Nino : là, je tape dans 2 sources:
-    //  PoiDao
-    //  les fonctions de OsmDroidBonusPack
-    //  le point commun, c'est les POIs. je garde qu'un repo?
-    suspend fun getPOIsNearGeoPoint(geoPoint: GeoPoint): List<POI>? = suspendCancellableCoroutine {
+    // note: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common: OK!
+    suspend fun getPOIsInBox(boundingBox: BoundingBox): List<POI>? {
+        val poiList: List<POI>?
         try {
-            it.resume(
-                poiProvider.getPOICloseTo(
-                    geoPoint,
-                    "restaurant",
-                    30,
-                    0.025
-                ),
-                null
+            poiList = poiProvider.getPOIInside(
+                // poiProvider.getPOICloseTo
+                boundingBox,
+                "restaurant",
+                30,
             )
         } catch (e: Exception) {
-            it.resumeWithException(e)
+            // todo read documented exceptions
+            return null
         }
-    }
-
-    suspend fun getPOIsInBox(boundingBox: BoundingBox): List<POI>? = suspendCancellableCoroutine {
-        try {
-            it.resume(
-                poiProvider.getPOIInside(
-                    boundingBox,
-                    "restaurant",
-                    30,
-                ),
-                null
-            )
-        } catch (e: Exception) {
-            it.resumeWithException(e)
+        // todo if (poiList != null) {
+        CoroutineScope(Dispatchers.IO).launch {
+            putPOIsInCache(poiList)
         }
+        return poiList
     }
 
     val poisFromCache: Flow<List<POI>> = poiDao.getPoiEntities().map { poiEntitiesList ->
@@ -72,9 +60,9 @@ class PoiRepository @Inject constructor(
     }
 
     suspend fun putPOIsInCache(poiList: List<POI>) {
-            for (poi in poiList) {
-                poiDao.insertPoi(PoiEntity(poi))
-            }
+        for (poi in poiList) {
+            poiDao.insertPoi(PoiEntity(poi))
+        }
     }
 
 

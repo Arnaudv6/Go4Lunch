@@ -1,5 +1,6 @@
 package com.cleanup.go4lunch.ui.list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.GpsProviderWrapper
@@ -11,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.location.POI
@@ -32,15 +34,15 @@ class PlacesListViewModel @Inject constructor(
             list.map {
                 viewStateFromPoi(it)
             }.sortedBy { viewState -> viewState.distance }
+        }.onEach {
+            // todo check I see this log on purpose only
+            Log.e("ViewModel:", "scrolling back to top with viewAction" )
+            // TODO INJECT DISPATCHERS for testing
+            viewModelScope.launch(Dispatchers.Main) {
+                delay(200)
+                viewActionChannel.trySend(PlacesListViewAction.ScrollToTop)
+            }
         }
-
-    init {
-        // TODO INJECT DISPATCHERS
-        viewModelScope.launch(Dispatchers.Main) {
-            delay(200)
-            viewActionChannel.trySend(PlacesListViewAction.ScrollToTop)
-        }
-    }
 
     private fun viewStateFromPoi(poi: POI): PlacesListViewState {
         return PlacesListViewState(
