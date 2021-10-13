@@ -20,7 +20,7 @@ class PoiRepository @Inject constructor(
 ) {
     // note: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common: OK!
 
-    /*
+
     suspend fun getPOIsInBox(boundingBox: BoundingBox) {
         try {
             val poiListResponse = poiRetrofit.getPoiInBox(
@@ -29,16 +29,34 @@ class PoiRepository @Inject constructor(
                 limit = 30
             )
             // todo can it actually be null?
-            if (poiListResponse.isSuccessful) putPoiListInCache(poiListResponse.body().results.map { item -> {
-                POI()
-            } })
+            putPoiListInCache(poiListResponse.mapNotNull {
+                poiFromResult(it)
+            })
         } catch (e: Exception) {
             Log.e("POI repository", "something bad happened while requesting POIs")
+            e.fillInStackTrace()
             // todo read documented exceptions
         }
-    }*/
+    }
 
-    suspend fun getPOIsInBox(boundingBox: BoundingBox) {
+    private fun poiFromResult(result: PoiInBoxResult): POI? {
+        if (result.osmId == null
+            || result.displayName == null
+            || result.lat == null
+            || result.lon == null
+            || result.placeId == null
+        ) return null
+        val poi = POI(444)
+        poi.mId = result.placeId
+        poi.mLocation = GeoPoint(result.lat, result.lon)
+        poi.mDescription = result.displayName
+        poi.mType = "restaurant"
+        poi.mCategory = "coucou"
+        return poi
+    }
+
+
+    suspend fun getPOIsInBox2(boundingBox: BoundingBox) {
         try {
             val poiList = poiProvider.getPOIInside(
                 // or poiProvider.getPOICloseTo
@@ -55,8 +73,6 @@ class PoiRepository @Inject constructor(
     }
 
 
-
-
     val poisFromCache: Flow<List<POI>> = poiDao.getPoiEntities().map { poiEntitiesList ->
         poiEntitiesList.map {
             poiFromPoiEntity(it)
@@ -71,14 +87,15 @@ class PoiRepository @Inject constructor(
             poi.mCategory = poiEntity.category
             poi.mDescription = poiEntity.description
             poi.mLocation = GeoPoint(poiEntity.latitude, poiEntity.longitude)
-            poi.mType = poiEntity.type
             return poi
         }
     }
 
-    private suspend fun putPoiListInCache(poiList: List<POI>) {
-        for (poi in poiList) {
-            poiDao.insertPoi(PoiEntity(poi))
+    private suspend fun putPoiListInCache(poiList: List<POI>?) {
+        if (poiList != null) {
+            for (poi in poiList) {
+                poiDao.insertPoi(PoiEntity(poi))
+            }
         }
     }
 }

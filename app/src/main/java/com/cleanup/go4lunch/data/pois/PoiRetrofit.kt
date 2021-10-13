@@ -9,32 +9,20 @@ import retrofit2.http.Query
 interface PoiRetrofit {
     companion object {
         private const val SEARCH_IN_BOX = "search"
-        private const val EMAIL = "arnaud.vallette-d-osia@expleogroup.com"
     }
 
-//    curl "https://nominatim.openstreetmap.org/search?class=restaurant&limit=20&q=restaurant&format=jsonv2&email=arnaud.vallette-d-osia%40expleogroup.com&category=amenity"
 // https://nominatim.openstreetmap.org/search?viewbox=-0.91187%2C46.74362%2C6.06445%2C44.99200&format=json&q=[restaurant]&limit=20&bounded=1
 
     @Headers("User-Agent: ${BuildConfig.APPLICATION_ID}")
     @GET(SEARCH_IN_BOX)
-    fun getPoiInBox(
+    suspend fun getPoiInBox(
         @Query("q") query: String = "[restaurant]",
-        @Query("viewbox") viewBox: String = "<x1>,<y1>,<x2>,<y2>",
+        @Query("viewbox") viewBox: String, // "<x1>,<y1>,<x2>,<y2>"
         @Query("bounded") bounded: Int = 1,
         @Query("limit") limit: Int = 20,
         @Query("format") format: String = "jsonv2",  // [xml|json|jsonv2|geojson|geocodejson]
-    ): Response<PoiInBoxResult>
-
-/*
         @Query("accept-language") lang: String = "fr",  // "EN"
-        @Query("viewbox") viewBox: String = "<x1>,<y1>,<x2>,<y2>",
-        @Query("bounded") bounded: Int = 1,
-        @Query("email") email: String = EMAIL,
-        @Query("format") format: String = "jsonv2",  // [xml|json|jsonv2|geojson|geocodejson]
-        @Query("category") category: String = "amenity",
-        @Query("type") type: String = "restaurant",
-
- */
-
+        // @Query("email") email: String = EMAIL,
+    ): List<PoiInBoxResult>
 
 }
