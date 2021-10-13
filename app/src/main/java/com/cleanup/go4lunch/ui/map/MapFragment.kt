@@ -126,9 +126,9 @@ class MapFragment : Fragment() {
                 for (poi in it.poiList) {
                     addPinOnLayer(
                         poiMarkers,
-                        poi.mType,
-                        poi.mDescription,
-                        poi.mLocation
+                        poi.type,
+                        poi.description,
+                        GeoPoint(poi.latitude, poi.longitude)
                     )
                 }
                 map.postInvalidate()  // force a redraw

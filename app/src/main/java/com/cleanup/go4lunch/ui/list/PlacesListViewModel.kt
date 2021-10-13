@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
@@ -43,19 +43,19 @@ class PlacesListViewModel @Inject constructor(
             }
         }
 
-    private fun viewStateFromPoi(poi: POI): PlacesListViewState {
-        val dist = distanceToPoi(poi.mLocation)
+    private fun viewStateFromPoi(poi: PoiEntity): PlacesListViewState {
+        val dist = distanceToPoi(GeoPoint(poi.latitude, poi.longitude))
 
         return PlacesListViewState(
-            poi.mId,
-            poi.mDescription.split(",")[0],  // name
-            " - " + poi.mDescription.split(",")[1],
+            poi.id,
+            poi.description.split(",")[0],  // name
+            " - " + poi.description.split(",")[1],
             dist,
             if (dist == null) "???" else "${dist}m",
-            colleagues(poi.mId),
-            poi.mThumbnail,
-            poi.mDescription.split(",")[2],  // hours
-            likes(poi.mId)
+            colleagues(poi.id),
+            null, // bitmap
+            poi.description.split(",")[2],  // hours
+            likes(poi.id)
         )
     }
 

@@ -14,7 +14,7 @@
         <item name="colorSurface">@color/orange</item>
         <item name="colorOnSurface">@color/white</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/orange_dark</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/orange_darker</item>
         <!-- Customize your theme here. -->
 
         <item name="colorControlNormal">@color/white</item>

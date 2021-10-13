@@ -3,7 +3,6 @@ package com.cleanup.go4lunch.data
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.data.pois.PoiDao
 import com.cleanup.go4lunch.data.pois.PoiRetrofit
 import com.cleanup.go4lunch.data.settings.SettingsDao
@@ -13,13 +12,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import org.osmdroid.bonuspack.location.NominatimPOIProvider
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 
 
 @Module
@@ -31,11 +29,6 @@ class DataModule {
     fun provideGpsMyLocationProvider(
         application: Application
     ): GpsMyLocationProvider = GpsMyLocationProvider(application)
-
-    @Provides
-    @Singleton
-    fun provideNominatimPOIProvider(): NominatimPOIProvider =
-        NominatimPOIProvider(BuildConfig.APPLICATION_ID)
 
     @Provides
     @Singleton
