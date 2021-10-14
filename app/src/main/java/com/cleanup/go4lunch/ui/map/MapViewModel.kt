@@ -60,7 +60,7 @@ class MapViewModel @Inject constructor(
             MapViewState.Pin(
                 it.id,
                 it.name,
-                going.joinToString(separator = ", ", postfix = "going: "),
+                going.joinToString(separator = ", ", prefix = "going: "),
                 if (going.isEmpty()) iconOrange else iconGreen,
                 GeoPoint(it.latitude, it.longitude)
             )

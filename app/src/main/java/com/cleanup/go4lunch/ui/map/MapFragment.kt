@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.ui.map
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +23,6 @@ import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -79,13 +77,6 @@ class MapFragment : Fragment() {
             -TileSystem.MaxLatitude,
             0
         )
-
-        viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
-            when (it) {
-                is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
-                is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
-            }
-        }
 
         map.addMapListener(object : MapListener {
             override fun onScroll(event: ScrollEvent?): Boolean {
@@ -151,6 +142,17 @@ class MapFragment : Fragment() {
         // map.addMapListener(object : MapListener {    override onScroll() and onZoom()    })
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
+            when (it) {
+                // animations are stub as of OSM-Droid 6.1.11
+                is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
+                is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
+            }
+        }
     }
 
     override fun onStop() {

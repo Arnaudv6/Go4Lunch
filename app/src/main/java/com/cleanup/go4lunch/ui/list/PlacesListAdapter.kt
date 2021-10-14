@@ -38,7 +38,7 @@ class PlacesListAdapter :
             name.text = viewState.name
             distance.text = viewState.distanceText
             address.text = viewState.address
-            colleagues.text = viewState.colleagues.toString()
+            colleagues.text = viewState.colleagues
             hours.text = viewState.hours
             likes.text = viewState.likes.toString()
             image.setImageBitmap(viewState.image)

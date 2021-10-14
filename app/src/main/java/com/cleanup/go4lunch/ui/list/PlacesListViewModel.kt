@@ -51,12 +51,12 @@ class PlacesListViewModel @Inject constructor(
         return PlacesListViewState(
             poi.id,
             poi.name,
-            poi.address,
+            "${poi.cuisine} - ${poi.address}",
             dist,  // distance as an Int, to sort
             if (dist == null) "???" else "${dist}m",  // distance as a text, for display
-            usersRepository.usersGoing(poi.id).size,
+            "(${usersRepository.usersGoing(poi.id).size})",
             null, // bitmap
-            "coucou",  // hours
+            poi.hours,  // hours
             likes(poi.id)
         )
     }
