@@ -1,9 +1,19 @@
 package com.cleanup.go4lunch.ui.map
 
-import com.cleanup.go4lunch.data.pois.PoiEntity
-import org.osmdroid.util.BoundingBox
+import android.graphics.drawable.Drawable
+import org.osmdroid.util.GeoPoint
 
 data class MapViewState(
-    val boundingBox: BoundingBox,
-    val poiList: List<PoiEntity>
-)
+    val pinList: List<Pin>
+    // can't make it a list of Marker as constructor needs a map.
+) {
+    data class Pin(
+        val id: Long,
+        val name: String,
+        val colleagues: String,
+        val icon: Drawable?,
+        val location: GeoPoint
+    )
+}
+
+

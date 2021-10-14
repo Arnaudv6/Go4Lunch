@@ -43,7 +43,6 @@ class MapFragment : Fragment() {
     lateinit var gpsProviderWrapper: GpsProviderWrapper
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView
-    private var icon: Drawable? = null
 
     companion object {
         fun newInstance(): MapFragment {
@@ -64,7 +63,6 @@ class MapFragment : Fragment() {
         )
 
         val view: View = inflater.inflate(R.layout.fragment_map, container, false)
-        icon = ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_location_on_24, null)
 
         // map settings
         map = view.findViewById(R.id.map)
@@ -85,6 +83,7 @@ class MapFragment : Fragment() {
         viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
             when (it) {
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
+                is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
             }
         }
 
@@ -118,18 +117,17 @@ class MapFragment : Fragment() {
         val poiMarkers = FolderOverlay()
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
         map.overlays.add(0, poiMarkers)
-        viewModel.viewStateFlow.collectWithLifecycle(viewLifecycleOwner) {
-            map.zoomToBoundingBox(it.boundingBox, false)
 
-            if (it.poiList.isNotEmpty()) {
+        viewModel.viewStateFlow.collectWithLifecycle(viewLifecycleOwner) {
+            if (it.pinList.isNotEmpty()) {
                 poiMarkers.items.clear()
-                for (poi in it.poiList) {
-                    addPinOnLayer(
-                        poiMarkers,
-                        poi.type,
-                        poi.description,
-                        GeoPoint(poi.latitude, poi.longitude)
-                    )
+                for (pin in it.pinList) {
+                    val poiMarker = Marker(map)
+                    poiMarker.title = pin.name
+                    poiMarker.snippet = pin.colleagues
+                    poiMarker.position = pin.location
+                    poiMarker.icon = pin.icon
+                    poiMarkers.add(poiMarker)
                 }
                 map.postInvalidate()  // force a redraw
             }
@@ -150,24 +148,9 @@ class MapFragment : Fragment() {
         // bind updatePoiPins button
         val updatePoiPins = view.findViewById<AppCompatImageButton>(R.id.update_poi_pins)
         updatePoiPins.setOnClickListener { viewModel.requestPoiPins(map.boundingBox) }
-        // todo : why does it center also?
         // map.addMapListener(object : MapListener {    override onScroll() and onZoom()    })
 
         return view
-    }
-
-    private fun addPinOnLayer(
-        layer: FolderOverlay,
-        title: String,
-        description: String,
-        location: GeoPoint,
-    ) {
-        val poiMarker = Marker(map)
-        poiMarker.title = title
-        poiMarker.snippet = description
-        poiMarker.position = location
-        poiMarker.icon = icon
-        layer.add(poiMarker)
     }
 
     override fun onStop() {

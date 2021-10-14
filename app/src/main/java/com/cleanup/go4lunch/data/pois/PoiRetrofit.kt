@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.data.pois
 
 import com.cleanup.go4lunch.BuildConfig
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
@@ -23,6 +22,6 @@ interface PoiRetrofit {
         @Query("format") format: String = "jsonv2",  // [xml|json|jsonv2|geojson|geocodejson]
         @Query("accept-language") lang: String = "fr",  // "EN"
         // @Query("email") email: String = EMAIL,
-    ): List<PoiInBoxResult>
+    ): List<PoiInBoxResult>?
 
 }

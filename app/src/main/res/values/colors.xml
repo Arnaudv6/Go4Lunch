@@ -3,8 +3,9 @@
     <color name="orange_lighter">#ff8a50</color>
     <color name="orange">#ff5722</color>
     <color name="orange_darker">#c41b00</color>
-    <color name="brown_lighter">#42302D</color>
+    <color name="brown_lighter">#423b38</color>
     <color name="brown">#2B211F</color>
+    <color name="green">#4CAF50</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 </resources>

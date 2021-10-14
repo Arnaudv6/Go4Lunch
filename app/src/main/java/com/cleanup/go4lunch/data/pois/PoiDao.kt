@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PoiDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    // replace our (possibly dated) data with fresh, readily downloaded data
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPoi(poiEntity: PoiEntity)
 
     @Query("SELECT * FROM poi_pins")

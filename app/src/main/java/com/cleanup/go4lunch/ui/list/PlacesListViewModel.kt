@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.users.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
     poiRepository: PoiRepository,
+    private val usersRepository: UsersRepository,
     private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
@@ -48,13 +50,13 @@ class PlacesListViewModel @Inject constructor(
 
         return PlacesListViewState(
             poi.id,
-            poi.description.split(",")[0],  // name
-            " - " + poi.description.split(",")[1],
-            dist,
-            if (dist == null) "???" else "${dist}m",
-            colleagues(poi.id),
+            poi.name,
+            poi.address,
+            dist,  // distance as an Int, to sort
+            if (dist == null) "???" else "${dist}m",  // distance as a text, for display
+            usersRepository.usersGoing(poi.id).size,
             null, // bitmap
-            poi.description.split(",")[2],  // hours
+            "coucou",  // hours
             likes(poi.id)
         )
     }
@@ -62,10 +64,6 @@ class PlacesListViewModel @Inject constructor(
     private fun distanceToPoi(geoPoint: GeoPoint?): Int? {
         if (geoPoint == null || gpsProviderWrapper.lastKnownLocation == null) return null
         return geoPoint.distanceToAsDouble(GeoPoint(gpsProviderWrapper.lastKnownLocation)).toInt()
-    }
-
-    private fun colleagues(id: Long): Int {
-        return id.toInt() // todo make this code relevant
     }
 
     private fun likes(id: Long): Int {

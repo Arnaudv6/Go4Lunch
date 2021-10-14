@@ -15,46 +15,50 @@ class PoiRepository @Inject constructor(
 ) {
     // note: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common: OK!
 
-
     suspend fun getPOIsInBox(boundingBox: BoundingBox) {
+        var poiListResponse : List<PoiInBoxResult>? = null
         try {
-            val poiListResponse = poiRetrofit.getPoiInBox(
+            poiListResponse = poiRetrofit.getPoiInBox(
                 // or poiProvider.getPOICloseTo
                 viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
                 limit = 30
             )
-            // todo can it actually be null?
-            putPoiListInCache(poiListResponse.mapNotNull {
-                if (
-                    it.placeId == null
-                    || it.lat == null
-                    || it.lon == null
-                    || it.displayName == null
-                ) null else
-                    PoiEntity(
-                        it.placeId,
-                        it.lat,
-                        it.lon,
-                        "type",
-                        "category",
-                        it.displayName
-                    )
-            })
         } catch (e: Exception) {
             Log.e("POI repository", "something bad happened while requesting POIs")
             e.fillInStackTrace()
             // todo read documented exceptions
         }
-    }
-
-    val poisFromCache: Flow<List<PoiEntity>> = poiDao.getPoiEntities()
-
-    private suspend fun putPoiListInCache(poiList: List<PoiEntity>?) {
-        if (poiList != null) {
-            for (poi in poiList) {
+        // todo Nino can it actually be null?
+        if (poiListResponse != null) {
+            for (poi in poiListResponse.mapNotNull { poiEntityFromResult(it) }) {
                 poiDao.insertPoi(poi)
             }
         }
     }
+
+    private fun poiEntityFromResult(result: PoiInBoxResult): PoiEntity? {
+        if (
+            result.poiClass != "amenity"
+            || result.type != "restaurant"
+            || result.placeId == null
+            || result.displayName == null
+            || result.lat == null
+            || result.lon == null
+        ) return null
+        val poi = PoiEntity(
+            result.placeId,
+            result.displayName.split(",")[0],
+            result.lat,
+            result.lon,
+            "", "", "", "", ""
+        )
+        return completePoiData(poi)
+    }
+
+    private fun completePoiData(poi: PoiEntity): PoiEntity {
+        return poi
+    }
+
+    val poisFromCache: Flow<List<PoiEntity>> = poiDao.getPoiEntities()
 }
 
