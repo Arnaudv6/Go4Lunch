@@ -38,13 +38,16 @@ class PoiRepository @Inject constructor(
 
     private fun poiEntityFromResult(result: PoiInBoxResult): PoiEntity? {
         if (
-            result.poiClass != "amenity"
+            result.category != "amenity"
             || result.type != "restaurant"
             || result.placeId == null
             || result.displayName == null
             || result.lat == null
             || result.lon == null
-        ) return null
+        )
+        {
+            return null
+        }
         val poi = PoiEntity(
             result.placeId,
             result.displayName.split(",")[0],

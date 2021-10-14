@@ -16,8 +16,7 @@ data class PoiInBoxResult(
     @SerializedName("display_name")
     val displayName: String?,
 
-    @SerializedName("class")
-    val poiClass: String?, // amenity
+    val category: String?, // amenity
 
     val type: String // restaurant
 
