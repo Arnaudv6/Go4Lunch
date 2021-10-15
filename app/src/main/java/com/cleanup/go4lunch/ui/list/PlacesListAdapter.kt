@@ -9,6 +9,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
 
 
@@ -42,7 +43,7 @@ class PlacesListAdapter :
             colleagues.text = viewState.colleagues
             hours.text = viewState.hours
             likes.rating = viewState.likes
-            image.setImageBitmap(viewState.image)
+            Glide.with(itemView).load(viewState.image).into(image)
         }
     }
 

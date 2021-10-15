@@ -29,9 +29,9 @@ class PoiRepository @Inject constructor(
             e.fillInStackTrace()
             // todo read documented exceptions
         }
-        // todo Nino can it actually be null?
-
+        // todo display them in map at once, only fetch advanced data one at a time
         // todo don't request if already in DB !
+        // todo Nino can it actually be null?
         if (poiListResponse != null) {
             for (poiResult in poiListResponse) {
                 delay(1500)
@@ -62,7 +62,9 @@ class PoiRepository @Inject constructor(
             result.lat,
             result.lon,
             addressFromDisplayName(result.displayName),
-            "", "", "", "", ""
+            "",
+            PoiImages.getImageUrl(),
+            "", "", ""
         )
         return completePoiData(poi)
     }

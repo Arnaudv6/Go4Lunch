@@ -53,11 +53,14 @@ class PlacesListViewModel @Inject constructor(
         return PlacesListViewState(
             poi.id,
             poi.name,
-            if (poi.cuisine.isEmpty()) address else "${poi.cuisine} - $address",
+            listOfNotNull(
+                poi.cuisine.ifEmpty { null },
+                address.ifEmpty { null }
+            ).joinToString(" - "),
             dist,  // distance as an Int, to sort
             if (dist == null) "???" else "${dist}m",  // distance as a text, for display
             "(${usersRepository.usersGoing(poi.id).size})",
-            null, // bitmap
+            poi.imageUrl,
             fuzzyHours(poi),
             usersRepository.likes(poi.id).toFloat()
         )
