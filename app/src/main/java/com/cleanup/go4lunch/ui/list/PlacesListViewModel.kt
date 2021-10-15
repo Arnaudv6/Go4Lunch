@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -47,27 +48,40 @@ class PlacesListViewModel @Inject constructor(
 
     private fun viewStateFromPoi(poi: PoiEntity): PlacesListViewState {
         val dist = distanceToPoi(GeoPoint(poi.latitude, poi.longitude))
+        val address = poi.address.split(" - ")[0]
 
         return PlacesListViewState(
             poi.id,
             poi.name,
-            "${poi.cuisine} - ${poi.address}",
+            if (poi.cuisine.isEmpty()) address else "${poi.cuisine} - $address",
             dist,  // distance as an Int, to sort
             if (dist == null) "???" else "${dist}m",  // distance as a text, for display
             "(${usersRepository.usersGoing(poi.id).size})",
             null, // bitmap
-            poi.hours,  // hours
-            likes(poi.id)
+            fuzzyHours(poi),
+            usersRepository.likes(poi.id).toFloat()
         )
+    }
+
+    companion object {
+        private val WEEK_DAYS = arrayOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
+        private fun dayInRange(day: String): Boolean {  // this fails on ranges that go from Sunday to Monday
+            return true
+        }
+    }
+
+    private fun fuzzyHours(poi: PoiEntity): String {
+        if (poi.hours.isEmpty()) return "hours unknown"
+        // todo make this fuzzy : poi.hours
+        //val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("E;H;m"))
+        val now = ZonedDateTime.now()
+        // hours and minutes don't have leading zeros.
+        return poi.hours
+        return "closed"
     }
 
     private fun distanceToPoi(geoPoint: GeoPoint?): Int? {
         if (geoPoint == null || gpsProviderWrapper.lastKnownLocation == null) return null
         return geoPoint.distanceToAsDouble(GeoPoint(gpsProviderWrapper.lastKnownLocation)).toInt()
     }
-
-    private fun likes(id: Long): Int {
-        return id.toInt() // todo make this code relevant
-    }
-
 }

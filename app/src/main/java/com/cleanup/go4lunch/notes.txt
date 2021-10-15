@@ -37,4 +37,10 @@ valider un déjeuner quand l'uilisateur se trouve entre 11h30 et 14h à 10m du r
 
 Mettre un bouton pour chercher dans la zone de l'écran? ou binder ma recherche sur l'écran ?
 
+settings:
+    clear POI db
+    force theme
+
+
+
 

@@ -40,6 +40,7 @@ class PoiRepository @Inject constructor(
                     val poi = completePoiData(poiEntity)
                     poiDao.insertPoi(poi)
                 }
+                // todo snackbar
             }
         }
     }
@@ -68,9 +69,12 @@ class PoiRepository @Inject constructor(
 
     private fun addressFromDisplayName(displayName: String): String {
         val table = displayName.split(", ")
-        return "${table[1]} ${table[2]} - ${table[table.lastIndex - 1]} ${table[table.lastIndex - 5]}"
+        val formattedAddress =
+            "${table[1]} ${table[2]} - ${table[table.lastIndex - 1]} ${table[table.lastIndex - 5]}"
+        return if (formattedAddress.trim('-', ' ')
+                .isEmpty()
+        ) "address unknown" else formattedAddress
     }
-
 
     private suspend fun completePoiData(poi: PoiEntity): PoiEntity {
         val result: PoiDetailResult?
@@ -85,7 +89,7 @@ class PoiRepository @Inject constructor(
         val e = result?.extraTags ?: return poi
         poi.phone = e.phone ?: ""
         poi.site = e.website ?: ""
-        poi.cuisine = e.cuisine ?: ""
+        poi.cuisine = e.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: ""
         poi.hours = e.hours ?: ""
         return poi
     }

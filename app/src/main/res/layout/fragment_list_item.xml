@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/list_item_address"
         app:layout_constraintEnd_toStartOf="@+id/list_item_distance"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,7 +23,7 @@
         android:id="@+id/list_item_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/list_item_margin"
+        android:layout_marginHorizontal="@dimen/list_item_margin"
         android:ellipsize="end"
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@id/list_item_name"
@@ -38,10 +39,22 @@
         android:ellipsize="end"
         android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/list_item_hours"
-        app:layout_constraintEnd_toStartOf="@+id/list_item_colleagues"
+        app:layout_constraintEnd_toStartOf="@+id/list_item_colleagues_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/list_item_name"
         tools:text="@tools:sample/cities" />
+
+    <ImageView
+        android:id="@+id/list_item_colleagues_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/list_item_margin"
+        android:src="@drawable/ic_baseline_group_24"
+        app:layout_constraintEnd_toStartOf="@id/list_item_colleagues"
+        app:layout_constraintStart_toEndOf="@id/list_item_address"
+        app:layout_constraintTop_toTopOf="@id/list_item_address"
+        app:tint="?attr/colorOnSecondary"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/list_item_colleagues"
@@ -52,7 +65,6 @@
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@id/list_item_address"
         app:layout_constraintEnd_toStartOf="@id/list_item_image"
-        app:layout_constraintStart_toEndOf="@id/list_item_address"
         app:layout_constraintTop_toTopOf="@id/list_item_address"
         tools:text="@tools:sample/date/hhmm" />
 
@@ -68,18 +80,21 @@
         app:layout_constraintTop_toBottomOf="@id/list_item_address"
         tools:text="@tools:sample/first_names" />
 
-    <TextView
+    <RatingBar
         android:id="@+id/list_item_likes"
+        style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/list_item_margin"
-        android:ellipsize="end"
-        android:maxLines="1"
+        android:layout_height="18dp"
+        android:layout_marginHorizontal="@dimen/list_item_margin"
+        android:isIndicator="true"
+        android:numStars="3"
+        android:rating="3"
+        android:stepSize="1"
+        android:theme="@style/RatingBar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/list_item_image"
         app:layout_constraintStart_toEndOf="@id/list_item_hours"
-        app:layout_constraintTop_toTopOf="@id/list_item_hours"
-        tools:text="@tools:sample/date/hhmm" />
+        app:layout_constraintTop_toTopOf="@id/list_item_hours" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/list_item_image"

@@ -3,6 +3,7 @@ package com.cleanup.go4lunch.ui.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.DiffUtil
@@ -31,7 +32,7 @@ class PlacesListAdapter :
         private val address: TextView = itemView.findViewById(R.id.list_item_address)
         private val colleagues: TextView = itemView.findViewById(R.id.list_item_colleagues)
         private val hours: TextView = itemView.findViewById(R.id.list_item_hours)
-        private val likes: TextView = itemView.findViewById(R.id.list_item_likes)
+        private val likes: RatingBar = itemView.findViewById(R.id.list_item_likes)
         private val image: AppCompatImageView = itemView.findViewById(R.id.list_item_image)
 
         fun bind(viewState: PlacesListViewState) {
@@ -40,7 +41,7 @@ class PlacesListAdapter :
             address.text = viewState.address
             colleagues.text = viewState.colleagues
             hours.text = viewState.hours
-            likes.text = viewState.likes.toString()
+            likes.rating = viewState.likes
             image.setImageBitmap(viewState.image)
         }
     }
