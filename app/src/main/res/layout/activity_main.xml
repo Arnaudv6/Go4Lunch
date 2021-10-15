@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
-    >
+    tools:openDrawer="start">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container"
@@ -78,7 +78,7 @@
         android:layout_gravity="start"
         android:layout_marginTop="?attr/actionBarSize"
         android:theme="@style/Theme.Go4Lunch.drawer"
-        app:headerLayout="@layout/side_nav_panel_header"
+        app:headerLayout="@layout/drawer_header"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:menu="@menu/drawer_menu">

@@ -26,6 +26,7 @@
     <style name="Theme.Go4Lunch.drawer" parent="Theme.Go4Lunch">
         <item name="colorSurface">@color/orange_lighter</item>
         <item name="colorOnSurface">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="RatingBar" parent="android:style/Widget.Material.RatingBar.Small">

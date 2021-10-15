@@ -64,8 +64,9 @@ class MapFragment : Fragment() {
 
         // map settings
         map = view.findViewById(R.id.map)
-        //map.setTileSource(TileSourceFactory.MAPNIK)
-        map.setTileSource(TileSourceFactory.WIKIMEDIA)
+        map.setTileSource(TileSourceFactory.MAPNIK)
+        // WIKIMEDIA map first appears white until map takes screen's height :/
+        map.setMinZoomLevel(null) // null: use Tile Provider's value
         map.setMultiTouchControls(true)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.isTilesScaledToDpi = true

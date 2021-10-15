@@ -23,6 +23,6 @@ inline fun <T> Flow<T>.collectWithLifecycle(
 
 }
 
-// todo generig debounce. Problem is with mutliple parrallel debouncers...
+// todo generic debounce. bellow code is crappy and fails with mutliple parrallel debouncers...
 // https://gist.github.com/faruktoptas/c45272047fae8da61acfb7b14c451793
 

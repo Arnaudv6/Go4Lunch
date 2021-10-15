@@ -11,5 +11,7 @@
     <string name="settings">SETTINGS</string>
     <string name="your_lunch">YOUR LUNCH</string>
     <string name="center_on_me">Center on me</string>
+    <string name="credits_text">© OpenStreetMap contributors\n(openstreetmap.org, nominatim.org)</string>
+    <string name="credits">Credits:</string>
 </resources>
 

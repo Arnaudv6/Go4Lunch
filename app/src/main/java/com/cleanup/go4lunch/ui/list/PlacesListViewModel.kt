@@ -37,7 +37,7 @@ class PlacesListViewModel @Inject constructor(
                 viewStateFromPoi(it)
             }.sortedBy { viewState -> viewState.distance }
         }.onEach {
-            // todo check I see this log on purpose only
+            // todo Nino: onEach, c'est une bonne idée ?
             Log.e("ViewModel:", "scrolling back to top with viewAction")
             // TODO INJECT DISPATCHERS for testing
             viewModelScope.launch(Dispatchers.Main) {
@@ -75,7 +75,7 @@ class PlacesListViewModel @Inject constructor(
 
     private fun fuzzyHours(poi: PoiEntity): String {
         if (poi.hours.isEmpty()) return "hours unknown"
-        // todo make this fuzzy : poi.hours
+        // todo implement fuzzy poi.hours
         //val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("E;H;m"))
         val now = ZonedDateTime.now()
         // hours and minutes don't have leading zeros.

@@ -13,7 +13,7 @@ data class BoxEntity(
     val west: Double,
     val east: Double,
 
-    // todo Nino : deprecated does not work here: must write explicit constructors?
+    // deprecated will only work with an explicit constructors
     @Deprecated("Don't set key: single-row table")
     @PrimaryKey(autoGenerate = false)
     val key: Int = 1

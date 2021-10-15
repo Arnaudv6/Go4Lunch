@@ -1,3 +1,8 @@
+Notes:
+    my usage of nominatim is borderline, autocompletion is unacceptable use
+    distances are calculated by GPS coordinates, not taking routes into account
+    restaurants images are not really related to their restaurants
+
 users:
    avatar
    first name
@@ -8,20 +13,9 @@ users:
         keyid, userid, restauid
    restau choisi pour midi (MàJ à 16h?)
 
-restaus:
-    POI     id
-    POI     nom
-            adresse
-    POI     coordonnées GPS (pour calculer des distances)
-            image (si dispo)
-            type de restau (optionnel)
-            horaires
-            numéro
-            site
-
-cache local:
-    mapBox
-    PoiPins, with their list-source: colleages or mapBox
+todo
+    some pins should come from server, or app should make sure to download
+    PoiPins, with their list-source: colleagues or mapBox
 
 
 mises à jour responsive:
@@ -35,12 +29,8 @@ valider un déjeuner quand l'uilisateur se trouve entre 11h30 et 14h à 10m du r
    lui proposer de le mettre en favori
    virer son intention
 
-Mettre un bouton pour chercher dans la zone de l'écran? ou binder ma recherche sur l'écran ?
-
 settings:
     clear POI db
     force theme
-
-
 
 
