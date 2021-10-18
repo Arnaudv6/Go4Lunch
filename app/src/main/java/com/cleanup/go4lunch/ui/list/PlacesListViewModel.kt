@@ -3,11 +3,13 @@ package com.cleanup.go4lunch.ui.list
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.poole.openinghoursparser.OpeningHoursParser
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.leonard.OpeningHoursEvaluator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -17,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -61,26 +63,27 @@ class PlacesListViewModel @Inject constructor(
             if (dist == null) "???" else "${dist}m",  // distance as a text, for display
             "(${usersRepository.usersGoing(poi.id).size})",
             poi.imageUrl,
-            fuzzyHours(poi),
+            fuzzyHours(poi.hours),
             usersRepository.likes(poi.id).toFloat()
         )
     }
 
-    companion object {
-        private val WEEK_DAYS = arrayOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        private fun dayInRange(day: String): Boolean {  // this fails on ranges that go from Sunday to Monday
-            return true
-        }
-    }
+    private fun fuzzyHours(hours: String): String {
+        // https://github.com/leonardehrenfried/opening-hours-evaluator
+        if (hours.isEmpty()) return "hours unknown"
 
-    private fun fuzzyHours(poi: PoiEntity): String {
-        if (poi.hours.isEmpty()) return "hours unknown"
-        // todo implement fuzzy poi.hours
-        //val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("E;H;m"))
-        val now = ZonedDateTime.now()
-        // hours and minutes don't have leading zeros.
-        return poi.hours
-        return "closed"
+        try {
+            val parser = OpeningHoursParser(hours.byteInputStream())
+            val rules = parser.rules(true)
+            val now = LocalDateTime.now()
+            if (OpeningHoursEvaluator.isOpenAt(now, rules))
+                return "Open" // todo: until when ?
+            val next = OpeningHoursEvaluator.isOpenNext(now, rules)
+            if (next != null) return next.toString() // todo replace that with format
+        } catch (e :Exception){
+            Log.e("PlacesListViewModel", "Failed to parse time")
+        }
+        return hours
     }
 
     private fun distanceToPoi(geoPoint: GeoPoint?): Int? {

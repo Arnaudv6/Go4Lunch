@@ -25,5 +25,7 @@ data class PoiEntity(
     var phone: String,
     var site: String,
     var hours: String
+    // https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification
+    // https://wiki.openstreetmap.org/wiki/Key:opening_hours#Java
 )
 
