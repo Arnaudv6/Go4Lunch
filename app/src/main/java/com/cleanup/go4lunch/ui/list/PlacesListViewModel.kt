@@ -79,7 +79,10 @@ class PlacesListViewModel @Inject constructor(
             if (OpeningHoursEvaluator.isOpenAt(now, rules))
                 return "Open" // todo: until when ?
             val next = OpeningHoursEvaluator.isOpenNext(now, rules)
-            if (next != null) return next.toString() // todo replace that with format
+            if (next.isPresent) {
+                if (next.get().dayOfWeek == now.dayOfWeek) return "opens at ${next.get().hour}:${next.get().minute.toString().padStart(1,'0')}"
+                return "opens on ${next.get().dayOfWeek.name} at ${next.get().hour}:${next.get().minute.toString().padStart(2,'0')}"
+            }
         } catch (e :Exception){
             Log.e("PlacesListViewModel", "Failed to parse time")
         }
