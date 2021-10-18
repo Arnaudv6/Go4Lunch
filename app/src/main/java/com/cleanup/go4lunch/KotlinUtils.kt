@@ -23,6 +23,6 @@ inline fun <T> Flow<T>.collectWithLifecycle(
 
 }
 
-// todo generic debounce. bellow code is crappy and fails with mutliple parrallel debouncers...
+// write a good generic debounce. bellow code is crappy and fails with mutliple parrallel debouncers...
 // https://gist.github.com/faruktoptas/c45272047fae8da61acfb7b14c451793
 

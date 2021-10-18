@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // todo Nino: une activité séparée pour les permissions, ça permet que tout soit actif sur la suivante?
         requestPermissionsIfNecessary(
             arrayOf(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,

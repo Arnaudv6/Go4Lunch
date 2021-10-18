@@ -13,7 +13,7 @@ class SettingsRepository @Inject constructor(
 ) {
 
     val boxFlow: Flow<BoundingBox> = settingsDao.getBox().mapNotNull {
-        if (it == null) it
+        if (it == null) null
         else
             BoundingBox(
                 it.north,

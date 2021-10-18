@@ -15,6 +15,7 @@ import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -148,10 +149,14 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
+            // todo Nino : meme dans onViewCreated, je ne suis pas trigger au changement de theme ?
             when (it) {
                 // animations are stub as of OSM-Droid 6.1.11
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
                 is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
+                is MapViewAction.PoiRetrieval -> Snackbar
+                    .make(view, "Poi ${it.progress.first}/${it.progress.second} data received",Snackbar.LENGTH_LONG)
+                    .setAction("Dismiss"){}.show() // empty action will dismiss.
             }
         }
     }

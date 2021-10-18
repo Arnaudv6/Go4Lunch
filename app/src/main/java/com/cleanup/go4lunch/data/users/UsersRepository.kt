@@ -13,6 +13,7 @@ class UsersRepository @Inject constructor() {
 
     fun likes(restaurantId: Long): Int {
         return Random.nextInt(3) // todo make this code relevant
+        // todo Nino : il faut que les avis viennent du web ? google ? on c'est des avis in-house?
     }
 
 }

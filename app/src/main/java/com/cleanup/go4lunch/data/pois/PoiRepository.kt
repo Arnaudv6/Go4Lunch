@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,8 +15,12 @@ class PoiRepository @Inject constructor(
     private val poiRetrofit: PoiRetrofit,
     private val poiDao: PoiDao
 ) {
-    // note: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common: OK!
+    // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
+    val poiDataRetrievalStateFlow = MutableStateFlow(Pair(0, 0))
+
+
+    // todo call // call.enqueue?
     suspend fun getPOIsInBox(boundingBox: BoundingBox) {
         var poiListResponse: List<PoiInBoxResult>? = null
         try {
@@ -29,18 +34,18 @@ class PoiRepository @Inject constructor(
             e.fillInStackTrace()
             // todo read documented exceptions
         }
-        // todo display them in map at once, only fetch advanced data one at a time
+        // todo display them in map at once, only fetch advanced data one at a time?
         // todo don't request if already in DB !
         // todo Nino can it actually be null?
         if (poiListResponse != null) {
-            for (poiResult in poiListResponse) {
+            for (poiResultIdx in 0..poiListResponse.lastIndex) {
                 delay(1500)
-                val poiEntity = poiEntityFromResult(poiResult)
+                val poiEntity = poiEntityFromResult(poiListResponse[poiResultIdx])
                 if (poiEntity != null) {
                     val poi = completePoiData(poiEntity)
                     poiDao.insertPoi(poi)
                 }
-                // todo snackbar
+                poiDataRetrievalStateFlow.emit(Pair(poiResultIdx+1, poiListResponse.size))
             }
         }
     }
@@ -73,9 +78,8 @@ class PoiRepository @Inject constructor(
         val table = displayName.split(", ")
         val formattedAddress =
             "${table[1]} ${table[2]} - ${table[table.lastIndex - 1]} ${table[table.lastIndex - 5]}"
-        return if (formattedAddress.trim('-', ' ')
-                .isEmpty()
-        ) "address unknown" else formattedAddress
+        if (formattedAddress.trim('-', ' ').isEmpty()) return "address unknown"
+        return formattedAddress
     }
 
     private suspend fun completePoiData(poi: PoiEntity): PoiEntity {

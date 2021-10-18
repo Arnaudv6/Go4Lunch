@@ -15,6 +15,8 @@
         <item name="colorOnSurface">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
+        <!-- SearchView Widget cursor color -->
+        <item name="colorAccent">@color/white</item>
         <!-- Customize your theme here. -->
         <item name="android:listDivider">@color/brown_lighter</item>
 
@@ -26,6 +28,7 @@
     <style name="Theme.Go4Lunch.drawer" parent="Theme.Go4Lunch">
         <item name="colorSurface">@color/brown_lighter</item>
         <item name="colorOnSurface">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="RatingBar" parent="android:style/Widget.Material.RatingBar.Small">
