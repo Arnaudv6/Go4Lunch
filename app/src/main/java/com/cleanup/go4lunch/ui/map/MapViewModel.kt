@@ -1,7 +1,5 @@
 package com.cleanup.go4lunch.ui.map
 
-import android.content.Context
-import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
@@ -11,7 +9,6 @@ import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -29,15 +26,8 @@ class MapViewModel @Inject constructor(
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
     private val settingsRepository: SettingsRepository,
-    private val gpsProviderWrapper: GpsProviderWrapper,
-    @ApplicationContext appContext: Context
+    private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
-
-    // todo Nino : comment je transforme ce Drawable? en Drawable, stp ?
-    private val iconGreen =
-        ResourcesCompat.getDrawable(appContext.resources, R.drawable.poi_green, null)
-    private val iconOrange =
-        ResourcesCompat.getDrawable(appContext.resources, R.drawable.poi_orange, null)
 
     private val boundingBoxMutableStateFlow = MutableStateFlow(BoundingBox())
     private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
@@ -50,7 +40,7 @@ class MapViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             poiRepository.poiDataRetrievalStateFlow.collect {
-                if (it != Pair(0,0)) viewActionChannel.trySend(MapViewAction.PoiRetrieval(it))
+                if (it != Pair(0, 0)) viewActionChannel.trySend(MapViewAction.PoiRetrieval(it))
             }
         }
     }
@@ -60,14 +50,18 @@ class MapViewModel @Inject constructor(
         MapViewState(poiList.map {
             val going = usersRepository.usersGoing(it.id)
             MapViewState.Pin(
-                it.id,
-                it.name,
-                if (going.isNotEmpty()) going.joinToString(
+                id = it.id,
+                name = it.name,
+                colleagues = if (going.isNotEmpty()) going.joinToString(
                     separator = ", ",
                     prefix = "going: "
                 ) else "",
-                if (going.isEmpty()) iconOrange else iconGreen,
-                GeoPoint(it.latitude, it.longitude)
+                icon = if (going.isEmpty()) {
+                    R.drawable.poi_orange
+                } else {
+                    R.drawable.poi_green
+                },
+                location = GeoPoint(it.latitude, it.longitude)
             )
         })
     }

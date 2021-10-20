@@ -22,10 +22,11 @@ class PoiRepository @Inject constructor(
 
     // todo call // call.enqueue?
     // todo snackbar if no restaurant to request
+    // TODO CONSIDER REFACTING THIS INTO A FLOW EMITTING PoiEntity
+    //  fun getPOIsInBox(boundingBox: BoundingBox) = flow {
     suspend fun getPOIsInBox(boundingBox: BoundingBox) {
-        var poiListResponse: List<PoiInBoxResult>? = null
-        try {
-            poiListResponse = poiRetrofit.getPoiInBox(
+        val poiListResponse: List<PoiInBoxResult>? = try {
+            poiRetrofit.getPoiInBox(
                 // or poiProvider.getPOICloseTo
                 viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
                 limit = 30
@@ -34,6 +35,7 @@ class PoiRepository @Inject constructor(
             Log.e("PoiRepository", "something bad happened while requesting POIs")
             e.fillInStackTrace()
             // todo read documented exceptions
+            null
         }
         // todo display them in map at once, only fetch advanced data one at a time?
         // todo don't request if already in DB !
