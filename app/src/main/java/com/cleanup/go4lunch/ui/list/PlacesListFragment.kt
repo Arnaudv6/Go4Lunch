@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,6 +48,14 @@ class PlacesListFragment : Fragment() {
                         )?.scrollToPosition(0)
             }
         }
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState ==  SCROLL_STATE_IDLE) {
+                    viewModel.onRecyclerViewIdle()
+                }
+            }
+        })
 
         viewModel.viewStateListFlow.collectWithLifecycle(viewLifecycleOwner) { adapter.submitList(it) }
 

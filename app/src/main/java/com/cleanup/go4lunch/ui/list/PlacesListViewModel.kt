@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.list
 
 import android.app.Application
+import android.location.Location
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
@@ -13,13 +14,9 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
@@ -29,48 +26,72 @@ import javax.inject.Inject
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
     poiRepository: PoiRepository,
+    gpsProviderWrapper: GpsProviderWrapper,
     private val usersRepository: UsersRepository,
-    private val gpsProviderWrapper: GpsProviderWrapper,
     private val application: Application
 ) : ViewModel() {
 
     private val viewActionChannel = Channel<PlacesListViewAction>(Channel.BUFFERED)
     val viewActionFlow = viewActionChannel.receiveAsFlow()
 
-    val viewStateListFlow =
-        poiRepository.poisFromCache.combine(gpsProviderWrapper.locationFlow) { list, _ ->
-            list.map {
-                viewStateFromPoi(it)
-            }.sortedBy { viewState -> viewState.distance }
-        }.onEach {
-            // todo Nino: onEach, c'est une bonne idée ?
-            Log.e("ViewModel:", "scrolling back to top with viewAction")
-            // TODO INJECT DISPATCHERS for testing
-            viewModelScope.launch(Dispatchers.Main) {
-                delay(200)
-                viewActionChannel.trySend(PlacesListViewAction.ScrollToTop)
+    private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
+
+    val viewStateListFlow: Flow<List<PlacesListViewState>> =
+        poiRepository.poisFromCache.combine(gpsProviderWrapper.locationFlow) { list, location ->
+            list.sortedBy { poiEntity ->
+                distanceBetween(
+                    geoPoint1 = GeoPoint(poiEntity.latitude, poiEntity.longitude),
+                    geoPoint2 = GeoPoint(location)
+                )
+            }.map {
+                viewStateFromPoi(it, location)
             }
         }
 
-    private fun viewStateFromPoi(poi: PoiEntity): PlacesListViewState {
-        val dist = distanceToPoi(GeoPoint(poi.latitude, poi.longitude))
+    init {
+        // TODO INJECT DISPATCHERS
+        viewModelScope.launch() {
+            combine(
+                recyclerViewStabilizedMutableSharedFlow.sample(1_000).onEach {
+                    Log.d(
+                        "Nino",
+                        "recyclerViewStabilizedMutableSharedFlow.sample() called"
+                    )
+                },
+                viewStateListFlow.debounce(200).onEach {
+                    Log.d(
+                        "Nino",
+                        "newPoiExposedMutableSharedFlow.debounce() called"
+                    )
+                }
+            ) { _, _ ->
+                Log.d("Nino", "combine() called, emitting scrollToTop")
+                viewActionChannel.trySend(PlacesListViewAction.ScrollToTop)
+            }
+        }
+    }
+
+    private fun viewStateFromPoi(poi: PoiEntity, location: Location): PlacesListViewState {
+        val dist = distanceBetween(
+            geoPoint1 = GeoPoint(poi.latitude, poi.longitude),
+            geoPoint2 = GeoPoint(location)
+        )
         val address = poi.address.split(" - ")[0]
         val coloredHours = fuzzyHours(poi.hours.trim())
 
         return PlacesListViewState(
-            poi.id,
-            poi.name,
-            listOfNotNull(
+            id = poi.id,
+            name = poi.name,
+            address = listOfNotNull(
                 poi.cuisine.ifEmpty { null },
                 address.ifEmpty { null }
             ).joinToString(" - "),
-            dist,  // distance as an Int, to sort
-            if (dist == null) "???" else "${dist}m",  // distance as a text, for display
-            "(${usersRepository.usersGoing(poi.id).size})",
-            poi.imageUrl,
-            coloredHours.first,
-            coloredHours.second,
-            usersRepository.likes(poi.id).toFloat()
+            distanceText = "${dist}m",  // distance as a text, for display
+            colleagues = "(${usersRepository.usersGoing(poi.id).size})",
+            image = poi.imageUrl,
+            hours = coloredHours.first,
+            hoursColor = coloredHours.second,
+            likes = usersRepository.likes(poi.id).toFloat()
         )
     }
 
@@ -111,8 +132,10 @@ class PlacesListViewModel @Inject constructor(
         return "${instant.dayOfWeek.name} at $formatted"
     }
 
-    private fun distanceToPoi(geoPoint: GeoPoint?): Int? {
-        if (geoPoint == null || gpsProviderWrapper.lastKnownLocation == null) return null
-        return geoPoint.distanceToAsDouble(GeoPoint(gpsProviderWrapper.lastKnownLocation)).toInt()
+    private fun distanceBetween(geoPoint1: GeoPoint, geoPoint2: GeoPoint): Int =
+        geoPoint1.distanceToAsDouble(geoPoint2).toInt()
+
+    fun onRecyclerViewIdle() {
+        recyclerViewStabilizedMutableSharedFlow.tryEmit(Unit)
     }
 }

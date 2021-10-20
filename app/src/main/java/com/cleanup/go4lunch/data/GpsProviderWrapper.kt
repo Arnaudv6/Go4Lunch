@@ -2,6 +2,7 @@ package com.cleanup.go4lunch.data
 
 import android.location.Location
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
@@ -26,7 +27,7 @@ class GpsProviderWrapper @Inject constructor(
             altitude = LocationUtils.fallbackAltitude
         }
     )
-    val locationFlow = mutableLocationFlow.asStateFlow()
+    val locationFlow: StateFlow<Location> = mutableLocationFlow.asStateFlow()
 
     init {
         provider.startLocationProvider(this)
