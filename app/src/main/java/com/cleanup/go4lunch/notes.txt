@@ -2,6 +2,7 @@ Notes:
     my usage of nominatim is borderline, autocompletion is unacceptable use
     distances are calculated by GPS coordinates, not taking routes into account
     restaurants images are not really related to their restaurants
+    scaleBar is erratic non-sense
 
 users:
    avatar

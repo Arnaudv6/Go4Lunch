@@ -149,7 +149,7 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
-            // todo Nino : meme dans onViewCreated, je ne suis pas trigger au changement de theme ?
+            // todo: meme dans onViewCreated, je ne suis pas trigger au changement de theme ?
             when (it) {
                 // animations are stub as of OSM-Droid 6.1.11
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
@@ -160,9 +160,6 @@ class MapFragment : Fragment() {
                 // todo snackbar belongs in activity, right ?
             }
         }
-
-        Snackbar.make(view, "Poi data 3/30 received",Snackbar.LENGTH_INDEFINITE).setAnchorView(view).setAction("Dismiss"){}.show()
-
     }
 
     override fun onStop() {

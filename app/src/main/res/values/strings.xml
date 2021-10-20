@@ -13,9 +13,8 @@
     <string name="center_on_me">Center on me</string>
     <string name="credits_text">© OpenStreetMap contributors\n(openstreetmap.org, nominatim.org)</string>
     <string name="credits">Credits:</string>
-    <string name="permissions_text">App uses GPS and internet connexion</string>
     <string name="login_text">Login to share meals with your colleagues</string>
-    <string name="permissions_button">Request permissions</string>
+    <string name="permissions_button">Request GPS &amp; Internet permissions</string>
     <string name="login_button">Login</string>
 </resources>
 
