@@ -155,10 +155,14 @@ class MapFragment : Fragment() {
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
                 is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
                 is MapViewAction.PoiRetrieval -> Snackbar
-                    .make(view, "Poi ${it.progress.first}/${it.progress.second} data received",Snackbar.LENGTH_LONG)
+                    .make(view, "Poi data ${it.progress.first}/${it.progress.second} received",Snackbar.LENGTH_LONG)
                     .setAction("Dismiss"){}.show() // empty action will dismiss.
+                // todo snackbar belongs in activity, right ?
             }
         }
+
+        Snackbar.make(view, "Poi data 3/30 received",Snackbar.LENGTH_INDEFINITE).setAnchorView(view).setAction("Dismiss"){}.show()
+
     }
 
     override fun onStop() {

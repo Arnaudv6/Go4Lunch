@@ -42,6 +42,7 @@ class PlacesListAdapter :
             address.text = viewState.address
             colleagues.text = viewState.colleagues
             hours.text = viewState.hours
+            hours.setTextColor(viewState.hoursColor)
             likes.rating = viewState.likes
             Glide.with(itemView).load(viewState.image).into(image)
         }

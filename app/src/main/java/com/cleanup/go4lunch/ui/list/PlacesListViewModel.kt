@@ -1,9 +1,12 @@
 package com.cleanup.go4lunch.ui.list
 
+import android.app.Application
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.poole.openinghoursparser.OpeningHoursParser
+import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
@@ -27,7 +30,8 @@ import javax.inject.Inject
 class PlacesListViewModel @Inject constructor(
     poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
-    private val gpsProviderWrapper: GpsProviderWrapper
+    private val gpsProviderWrapper: GpsProviderWrapper,
+    private val application: Application
 ) : ViewModel() {
 
     private val viewActionChannel = Channel<PlacesListViewAction>(Channel.BUFFERED)
@@ -51,6 +55,7 @@ class PlacesListViewModel @Inject constructor(
     private fun viewStateFromPoi(poi: PoiEntity): PlacesListViewState {
         val dist = distanceToPoi(GeoPoint(poi.latitude, poi.longitude))
         val address = poi.address.split(" - ")[0]
+        val coloredHours = fuzzyHours(poi.hours.trim())
 
         return PlacesListViewState(
             poi.id,
@@ -63,30 +68,47 @@ class PlacesListViewModel @Inject constructor(
             if (dist == null) "???" else "${dist}m",  // distance as a text, for display
             "(${usersRepository.usersGoing(poi.id).size})",
             poi.imageUrl,
-            fuzzyHours(poi.hours),
+            coloredHours.first,
+            coloredHours.second,
             usersRepository.likes(poi.id).toFloat()
         )
     }
 
-    private fun fuzzyHours(hours: String): String {
+    private fun fuzzyHours(hours: String): Pair<String, Int> {
         // https://github.com/leonardehrenfried/opening-hours-evaluator
-        if (hours.isEmpty()) return "hours unknown"
-
+        if (hours.isEmpty()) return Pair(
+            "hours unknown",
+            ContextCompat.getColor(application, R.color.black)
+        )
         try {
             val parser = OpeningHoursParser(hours.byteInputStream())
             val rules = parser.rules(true)
             val now = LocalDateTime.now()
-            if (OpeningHoursEvaluator.isOpenAt(now, rules))
-                return "Open" // todo: until when ?
-            val next = OpeningHoursEvaluator.isOpenNext(now, rules)
-            if (next.isPresent) {
-                if (next.get().dayOfWeek == now.dayOfWeek) return "opens at ${next.get().hour}:${next.get().minute.toString().padStart(1,'0')}"
-                return "opens on ${next.get().dayOfWeek.name} at ${next.get().hour}:${next.get().minute.toString().padStart(2,'0')}"
-            }
-        } catch (e :Exception){
+            if (OpeningHoursEvaluator.isOpenAt(now, rules)) return Pair(
+                "Opened until ${
+                    fuzzyInstant(
+                        OpeningHoursEvaluator.isOpenUntil(now, rules).get(),
+                        now
+                    )
+                }",
+                ContextCompat.getColor(application, R.color.green)
+            )
+            val opens = OpeningHoursEvaluator.isOpenNext(now, rules)
+            if (opens.isPresent) return Pair(
+                "Closed, opens at ${fuzzyInstant(opens.get(), now)}",
+                ContextCompat.getColor(application, R.color.orange_darker)
+            )
+            return Pair("Closed indefinitely", ContextCompat.getColor(application, R.color.black))
+        } catch (e: Exception) {
             Log.e("PlacesListViewModel", "Failed to parse time")
         }
-        return hours
+        return Pair(hours, ContextCompat.getColor(application, R.color.black))
+    }
+
+    private fun fuzzyInstant(instant: LocalDateTime, now: LocalDateTime): String {
+        val formatted = "%d:%02d".format(instant.hour, instant.minute)
+        if (instant.dayOfWeek == now.dayOfWeek) return formatted
+        return "${instant.dayOfWeek.name} at $formatted"
     }
 
     private fun distanceToPoi(geoPoint: GeoPoint?): Int? {

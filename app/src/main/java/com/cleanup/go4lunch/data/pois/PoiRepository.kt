@@ -21,6 +21,7 @@ class PoiRepository @Inject constructor(
 
 
     // todo call // call.enqueue?
+    // todo snackbar if no restaurant to request
     suspend fun getPOIsInBox(boundingBox: BoundingBox) {
         var poiListResponse: List<PoiInBoxResult>? = null
         try {

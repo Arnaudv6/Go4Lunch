@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.list
 
 import android.graphics.Bitmap
+import androidx.annotation.ColorInt
 
 data class PlacesListViewState(
     val id: Long,
@@ -11,6 +12,8 @@ data class PlacesListViewState(
     val colleagues: String,
     val image: String,
     val hours: String,
+    @ColorInt
+    val hoursColor: Int,
     val likes: Float
 )
 
