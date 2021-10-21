@@ -13,11 +13,35 @@ data class PoiInBoxResult(
 
     val lon: Double?,
 
-    @SerializedName("display_name")
-    val displayName: String?,
+    val address: Address?,
+
+    @SerializedName("extratags")
+    val extraTags: ExtraTags?,
 
     val category: String?, // amenity
 
     val type: String // restaurant
+) {
+    data class Address(
+        val amenity: String?,
 
-)
+        @SerializedName("house_number")
+        val number: String?,
+
+        val road: String?,
+
+        val municipality: String?,
+
+        val postcode: String?
+    )
+
+    data class ExtraTags(
+        val cuisine: String?,
+        val phone: String?,
+        val website: String?,
+
+        @SerializedName("opening_hours")
+        val hours: String?
+    )
+}
+

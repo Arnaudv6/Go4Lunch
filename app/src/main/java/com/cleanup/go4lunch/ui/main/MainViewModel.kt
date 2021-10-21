@@ -10,11 +10,11 @@ class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,
 
 ) : ViewModel(){
-    fun onResume() {
-        gpsProviderWrapper.startLocationProvider()
+    fun onStop() {
+        gpsProviderWrapper.stopWrapper()
     }
 
-    fun onPause() {
-        gpsProviderWrapper.stopWrapper()
+    fun onStart() {
+        gpsProviderWrapper.startLocationProvider()
     }
 }

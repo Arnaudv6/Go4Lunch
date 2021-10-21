@@ -22,18 +22,8 @@ interface PoiRetrofit {
         @Query("limit") limit: Int = 20,
         @Query("format") format: String = "jsonv2",  // [xml|json|jsonv2|geojson|geocodejson]
         @Query("accept-language") lang: String = "EN",  // "fr"
+        @Query("addressdetails") addressDetails: Int = 1,
+        @Query("extratags") extraTags: Int = 1,
         // @Query("email") email: String = EMAIL,
     ): List<PoiInBoxResult>?
-
-    @Headers("User-Agent: ${BuildConfig.APPLICATION_ID}")
-    @GET(SEARCH_DETAILS)
-    suspend fun getPoiDetails(
-        @Query("osmtype") osmType: String = "N",
-        @Query("osmid") osmId: Long,
-        @Query("class") itemClass: String = "amenity",
-        @Query("linkedplaces") linkedPlaces: Int = 0,
-        @Query("format") format: String = "json",
-        @Query("accept-language") lang: String = "EN",  // "fr"
-    ): PoiDetailResult?
-
 }

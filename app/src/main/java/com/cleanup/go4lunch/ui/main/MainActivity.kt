@@ -97,13 +97,16 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
-
-        viewModel.onResume()
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.onPause()
+    override fun onStart() {
+        super.onStart()
+        viewModel.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.onStop()
     }
 
     override fun onBackPressed() {
@@ -133,6 +136,7 @@ class MainActivity : AppCompatActivity() {
                 requestPermissionsRequestCode
             )
         }
+        viewModel.onStart()
     }
 
     private fun requestPermissionsIfNecessary(permissions: Array<String>) {
