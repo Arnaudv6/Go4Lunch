@@ -9,7 +9,7 @@ import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -26,6 +26,7 @@ class MapViewModel @Inject constructor(
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
     private val settingsRepository: SettingsRepository,
+    private val ioDispatcher: CoroutineDispatcher,
     private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
@@ -34,11 +35,11 @@ class MapViewModel @Inject constructor(
     val viewActionFlow: Flow<MapViewAction> = viewActionChannel.receiveAsFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             viewActionChannel.trySend(MapViewAction.InitialBox(settingsRepository.boxFlow.first()))
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             poiRepository.poiDataRetrievalStateFlow.collect {
                 if (it != Pair(0, 0)) viewActionChannel.trySend(MapViewAction.PoiRetrieval(it))
             }
@@ -67,7 +68,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun requestPoiPins(boundingBox: BoundingBox) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             poiRepository.getPOIsInBox(boundingBox)
         }
     }

@@ -2,6 +2,7 @@ package com.cleanup.go4lunch.ui.list
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.location.Location
 import android.util.Log
 import androidx.core.content.ContextCompat
@@ -13,9 +14,11 @@ import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
+import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.leonard.OpeningHoursEvaluator
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
@@ -34,17 +37,22 @@ class PlacesListViewModel @Inject constructor(
     poiRepository: PoiRepository,
     gpsProviderWrapper: GpsProviderWrapper,
     private val usersRepository: UsersRepository,
+    ioDispatcher: CoroutineDispatcher,
     @ApplicationContext val appContext: Context
 ) : ViewModel() {
     private val viewActionChannel = Channel<PlacesListViewAction>(Channel.BUFFERED)
     val viewActionFlow: Flow<PlacesListViewAction> = viewActionChannel.receiveAsFlow()
+
+    // todo Nino : what's the right way (this fails ans uses default value)
+    private val colorOnSecondary =
+        MaterialColors.getColor(appContext, R.attr.colorOnSecondary, Color.parseColor("#888888"))
 
     private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
 
     val viewStateListFlow: Flow<List<PlacesListViewState>> =
         poiRepository.poisFromCache.combine(gpsProviderWrapper.locationFlow) { list, location ->
             list.sortedBy { poiEntity ->
-                distanceBetween(  // todo remove double with line 75
+                distanceBetween(  // todo remove double with line 86
                     geoPoint1 = GeoPoint(poiEntity.latitude, poiEntity.longitude),
                     geoPoint2 = GeoPoint(location)
                 )
@@ -54,8 +62,7 @@ class PlacesListViewModel @Inject constructor(
         }
 
     init {
-        // TODO INJECT DISPATCHERS
-        viewModelScope.launch() {
+        viewModelScope.launch(ioDispatcher) {
             combine(
                 recyclerViewStabilizedMutableSharedFlow.sample(1_000).onEach {
                     Log.d(
@@ -104,7 +111,7 @@ class PlacesListViewModel @Inject constructor(
         // https://github.com/leonardehrenfried/opening-hours-evaluator
         if (hours.isEmpty()) return Pair(
             "hours unknown",
-            ContextCompat.getColor(appContext, R.color.black)
+            colorOnSecondary
         )
         try {
             val parser = OpeningHoursParser(hours.byteInputStream())
@@ -126,12 +133,12 @@ class PlacesListViewModel @Inject constructor(
             )
             return Pair(
                 "Closed indefinitely",
-                ContextCompat.getColor(appContext, R.color.black)
+                colorOnSecondary
             )
         } catch (e: Exception) {
             Log.e("PlacesListViewModel", "Failed to parse time")
         }
-        return Pair(hours, ContextCompat.getColor(appContext, R.color.black))
+        return Pair(hours, colorOnSecondary)
     }
 
     private fun fuzzyInstant(instant: LocalDateTime, now: LocalDateTime): String {
@@ -139,7 +146,6 @@ class PlacesListViewModel @Inject constructor(
         if (instant.dayOfWeek == now.dayOfWeek) return formatted
         return "${instant.dayOfWeek.name} at $formatted"
     }
-
 
     private fun distanceBetween(geoPoint1: GeoPoint, geoPoint2: GeoPoint): Int =
         geoPoint1.distanceToAsDouble(geoPoint2).toInt()
