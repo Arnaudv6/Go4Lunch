@@ -17,8 +17,12 @@ class GpsProviderWrapper @Inject constructor(
     // IMyLocationConsumer interface implemented to pass "this" to GpsMyLocationProvider here
     // IMyLocationProvider interface implemented to pass "this" to MyLocationNewOverlay in MapFragment
 
-    @Deprecated("Use flow instead")
-    private val listeners = mutableSetOf<IMyLocationConsumer>()
+    companion object {
+        private const val DEPRECATION = "Only here for MyLocationNewOverlay's use."
+    }
+
+    @Deprecated(DEPRECATION)
+    private var myLocationNewOverlayListener: IMyLocationConsumer? = null
 
     private val mutableLocationFlow = MutableStateFlow(
         Location("repository").apply {
@@ -35,39 +39,36 @@ class GpsProviderWrapper @Inject constructor(
         provider.locationUpdateMinTime = 5000  // long, milliseconds
     }
 
-    @Deprecated("Use flow instead")
-    fun addLocationConsumer(consumer: IMyLocationConsumer?) {
-        consumer?.let {
-            listeners.add(it)
-        }
-    }
-
-    @Deprecated("Use flow instead")
-    fun removeLocationConsumer(listener: IMyLocationConsumer?) {
-        listeners.remove(listener)
-    }
-
     // CONSUMER IMyLocationConsumer
     override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
         location?.let {
             mutableLocationFlow.value = it
         }
-
-        listeners.forEach {
-            it.onLocationChanged(location, this)
-        }
+        @Suppress("DEPRECATION")
+        myLocationNewOverlayListener?.onLocationChanged(location, this)
     }
 
     // IMyLocationProvider
-    override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
-        addLocationConsumer(myLocationConsumer)
+    fun startLocationProvider(): Boolean {
         return provider.startLocationProvider(this)
     }
 
     // IMyLocationProvider
-    override fun stopLocationProvider() {
-        return  // I should call stopLocationProvider() only when activity goes Stopped I think
+    @Deprecated(DEPRECATION + "Use flow instead")
+    override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
+        @Suppress("DEPRECATION")
+        myLocationNewOverlayListener = myLocationConsumer
+        return startLocationProvider()
+    }
+
+    fun stopWrapper() {
         provider.stopLocationProvider()
+    }
+
+    // IMyLocationProvider
+    @Deprecated(DEPRECATION)
+    override fun stopLocationProvider() {
+        return
     }
 
     // IMyLocationProvider
@@ -76,8 +77,12 @@ class GpsProviderWrapper @Inject constructor(
     }
 
     // IMyLocationProvider
+    @Deprecated(DEPRECATION)
     override fun destroy() {
-        return  // view calls destroy when fragment dies: we MUST survive.
+        return
+    }
+
+    fun destroyWrapper() {
         provider.destroy()
     }
 }

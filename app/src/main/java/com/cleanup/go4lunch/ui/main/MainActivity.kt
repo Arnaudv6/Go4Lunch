@@ -1,8 +1,9 @@
-package com.cleanup.go4lunch
+package com.cleanup.go4lunch.ui.main
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -10,6 +11,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.list.PlacesListFragment
 import com.cleanup.go4lunch.ui.map.MapFragment
 import com.cleanup.go4lunch.ui.mates.MatesFragment
@@ -25,20 +28,10 @@ class MainActivity : AppCompatActivity() {
     private val requestPermissionsRequestCode = 1
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        requestPermissionsIfNecessary(
-            arrayOf(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.INTERNET,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_NETWORK_STATE,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
 
         setContentView(R.layout.activity_main)
 
@@ -79,23 +72,38 @@ class MainActivity : AppCompatActivity() {
                         MapFragment.newInstance()
                     ).commit()
                 }
-            }
+            }.exhaustive
             true
         }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-
         toggle.syncState()
-
     }
 
-    // TODO ARNAUD
     override fun onResume() {
+        // when coming from requestPermissionsIfNecessary, activity onResume is called.
+        //  Then we launch GPS
         super.onResume()
 
-        //viewModel.onResume()
+        requestPermissionsIfNecessary(
+            arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+
+        viewModel.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onPause()
     }
 
     override fun onBackPressed() {

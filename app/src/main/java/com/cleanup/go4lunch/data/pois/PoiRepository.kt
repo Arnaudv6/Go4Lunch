@@ -17,7 +17,7 @@ class PoiRepository @Inject constructor(
 ) {
     // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
-    val poiDataRetrievalStateFlow = MutableStateFlow(Pair(0, 0))
+    val poiDataRetrievalStateFlow: MutableStateFlow<Pair<Int, Int>> = MutableStateFlow(Pair(0, 0))
 
 
     // todo call // call.enqueue?
@@ -48,7 +48,7 @@ class PoiRepository @Inject constructor(
                     val poi = completePoiData(poiEntity)
                     poiDao.insertPoi(poi)
                 }
-                poiDataRetrievalStateFlow.emit(Pair(poiResultIdx+1, poiListResponse.size))
+                poiDataRetrievalStateFlow.emit(Pair(poiResultIdx + 1, poiListResponse.size))
             }
         }
     }

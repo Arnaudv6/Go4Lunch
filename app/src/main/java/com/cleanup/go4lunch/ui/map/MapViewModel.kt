@@ -31,7 +31,7 @@ class MapViewModel @Inject constructor(
 
     private val boundingBoxMutableStateFlow = MutableStateFlow(BoundingBox())
     private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
-    val viewActionFlow = viewActionChannel.receiveAsFlow()
+    val viewActionFlow: Flow<MapViewAction> = viewActionChannel.receiveAsFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -46,7 +46,7 @@ class MapViewModel @Inject constructor(
     }
 
     // TODO Transform to stateflow
-    val viewStateFlow = poiRepository.poisFromCache.map { poiList ->
+    val viewStateFlow: Flow<MapViewState> = poiRepository.poisFromCache.map { poiList ->
         MapViewState(poiList.map {
             val going = usersRepository.usersGoing(it.id)
             MapViewState.Pin(

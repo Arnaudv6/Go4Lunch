@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
+import com.cleanup.go4lunch.exhaustive
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -46,7 +47,7 @@ class PlacesListFragment : Fragment() {
                 PlacesListViewAction.ScrollToTop -> (
                         recyclerView.layoutManager as LinearLayoutManager?
                         )?.scrollToPosition(0)
-            }
+            }.exhaustive
         }
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {

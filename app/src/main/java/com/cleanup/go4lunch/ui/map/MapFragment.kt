@@ -1,5 +1,6 @@
 package com.cleanup.go4lunch.ui.map
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +16,10 @@ import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.exhaustive
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
@@ -42,6 +45,10 @@ class MapFragment : Fragment() {
     lateinit var gpsProviderWrapper: GpsProviderWrapper
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView
+
+    @Inject
+    @ApplicationContext
+    lateinit var appContext: Context
 
     companion object {
         fun newInstance(): MapFragment {
@@ -119,7 +126,9 @@ class MapFragment : Fragment() {
                     poiMarker.title = pin.name
                     poiMarker.snippet = pin.colleagues
                     poiMarker.position = pin.location
-                    poiMarker.icon = pin.icon
+                    poiMarker.icon =
+                        ResourcesCompat.getDrawable(appContext.resources, pin.icon, null)
+                    // don't worry about the loop: getDrawable is cached by Android
                     poiMarkers.add(poiMarker)
                 }
                 map.postInvalidate()  // force a redraw
@@ -155,10 +164,14 @@ class MapFragment : Fragment() {
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
                 is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
                 is MapViewAction.PoiRetrieval -> Snackbar
-                    .make(view, "Poi data ${it.progress.first}/${it.progress.second} received",Snackbar.LENGTH_LONG)
-                    .setAction("Dismiss"){}.show() // empty action will dismiss.
+                    .make(
+                        view,
+                        "Poi data ${it.progress.first}/${it.progress.second} received",
+                        Snackbar.LENGTH_LONG
+                    )
+                    .setAction("Dismiss") {}.show() // empty action will dismiss.
                 // todo snackbar belongs in activity, right ?
-            }
+            }.exhaustive
         }
     }
 

@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.ui.map
 
-import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import org.osmdroid.util.GeoPoint
 
