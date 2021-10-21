@@ -1,5 +1,6 @@
 package com.cleanup.go4lunch.ui.list
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.util.Log
@@ -27,10 +28,13 @@ import javax.inject.Inject
 @FlowPreview
 @ExperimentalCoroutinesApi
 @HiltViewModel
+// todo Nino, can silence this warning, right?
+@SuppressLint("StaticFieldLeak")
 class PlacesListViewModel @Inject constructor(
     poiRepository: PoiRepository,
     gpsProviderWrapper: GpsProviderWrapper,
-    private val usersRepository: UsersRepository
+    private val usersRepository: UsersRepository,
+    @ApplicationContext val appContext: Context
 ) : ViewModel() {
     private val viewActionChannel = Channel<PlacesListViewAction>(Channel.BUFFERED)
     val viewActionFlow: Flow<PlacesListViewAction> = viewActionChannel.receiveAsFlow()
@@ -96,50 +100,44 @@ class PlacesListViewModel @Inject constructor(
         )
     }
 
-    companion object {
-        @Inject
-        @ApplicationContext
-        lateinit var appContext: Context
-
-        private fun fuzzyHours(hours: String): Pair<String, Int> {
-            // https://github.com/leonardehrenfried/opening-hours-evaluator
-            if (hours.isEmpty()) return Pair(
-                "hours unknown",
+    private fun fuzzyHours(hours: String): Pair<String, Int> {
+        // https://github.com/leonardehrenfried/opening-hours-evaluator
+        if (hours.isEmpty()) return Pair(
+            "hours unknown",
+            ContextCompat.getColor(appContext, R.color.black)
+        )
+        try {
+            val parser = OpeningHoursParser(hours.byteInputStream())
+            val rules = parser.rules(true)
+            val now = LocalDateTime.now()
+            if (OpeningHoursEvaluator.isOpenAt(now, rules)) return Pair(
+                "Opened until ${
+                    fuzzyInstant(
+                        OpeningHoursEvaluator.isOpenUntil(now, rules).get(),
+                        now
+                    )
+                }",
+                ContextCompat.getColor(appContext, R.color.green)
+            )
+            val opens = OpeningHoursEvaluator.isOpenNext(now, rules)
+            if (opens.isPresent) return Pair(
+                "Closed, opens at ${fuzzyInstant(opens.get(), now)}",
+                ContextCompat.getColor(appContext, R.color.orange_darker)
+            )
+            return Pair(
+                "Closed indefinitely",
                 ContextCompat.getColor(appContext, R.color.black)
             )
-            try {
-                val parser = OpeningHoursParser(hours.byteInputStream())
-                val rules = parser.rules(true)
-                val now = LocalDateTime.now()
-                if (OpeningHoursEvaluator.isOpenAt(now, rules)) return Pair(
-                    "Opened until ${
-                        fuzzyInstant(
-                            OpeningHoursEvaluator.isOpenUntil(now, rules).get(),
-                            now
-                        )
-                    }",
-                    ContextCompat.getColor(appContext, R.color.green)
-                )
-                val opens = OpeningHoursEvaluator.isOpenNext(now, rules)
-                if (opens.isPresent) return Pair(
-                    "Closed, opens at ${fuzzyInstant(opens.get(), now)}",
-                    ContextCompat.getColor(appContext, R.color.orange_darker)
-                )
-                return Pair(
-                    "Closed indefinitely",
-                    ContextCompat.getColor(appContext, R.color.black)
-                )
-            } catch (e: Exception) {
-                Log.e("PlacesListViewModel", "Failed to parse time")
-            }
-            return Pair(hours, ContextCompat.getColor(appContext, R.color.black))
+        } catch (e: Exception) {
+            Log.e("PlacesListViewModel", "Failed to parse time")
         }
+        return Pair(hours, ContextCompat.getColor(appContext, R.color.black))
+    }
 
-        private fun fuzzyInstant(instant: LocalDateTime, now: LocalDateTime): String {
-            val formatted = "%d:%02d".format(instant.hour, instant.minute)
-            if (instant.dayOfWeek == now.dayOfWeek) return formatted
-            return "${instant.dayOfWeek.name} at $formatted"
-        }
+    private fun fuzzyInstant(instant: LocalDateTime, now: LocalDateTime): String {
+        val formatted = "%d:%02d".format(instant.hour, instant.minute)
+        if (instant.dayOfWeek == now.dayOfWeek) return formatted
+        return "${instant.dayOfWeek.name} at $formatted"
     }
 
 

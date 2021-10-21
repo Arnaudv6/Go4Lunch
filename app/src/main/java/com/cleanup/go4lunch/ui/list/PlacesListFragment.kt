@@ -15,7 +15,9 @@ import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.exhaustive
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class PlacesListFragment : Fragment() {
