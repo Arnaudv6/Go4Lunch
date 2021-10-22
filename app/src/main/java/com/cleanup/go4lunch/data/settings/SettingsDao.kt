@@ -15,5 +15,11 @@ interface SettingsDao {
     @Query("SELECT * FROM box LIMIT 1")
     fun getBox(): Flow<BoxEntity?>
     // OK: result does not have to be a list.
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun setNavNum(intEntity: IntEntity)
+
+    @Query("SELECT * FROM int_store WHERE key_string=:key LIMIT 1")
+    fun getNavNum(key: String=IntEntity.NAV_NUM): Flow<IntEntity?>
 }
 

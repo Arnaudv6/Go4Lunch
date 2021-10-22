@@ -11,15 +11,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.exhaustive
-import com.cleanup.go4lunch.ui.list.PlacesListFragment
-import com.cleanup.go4lunch.ui.map.MapFragment
-import com.cleanup.go4lunch.ui.mates.MatesFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.first
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -51,28 +50,57 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true)
 
+        val navBar: BottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+
         // supportFragmentManager retainedFragments is incompatible with Hilt.
-        findViewById<BottomNavigationView>(R.id.nav_view).setOnItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_list -> {
-                    supportFragmentManager.beginTransaction().replace(
-                        R.id.fragment_container,
-                        PlacesListFragment.newInstance()
-                    ).commit()
-                }
-                R.id.nav_mates -> {
-                    supportFragmentManager.beginTransaction().replace(
-                        R.id.fragment_container,
-                        MatesFragment.newInstance()
-                    ).commit()
-                }
-                else -> {
-                    supportFragmentManager.beginTransaction().replace(
-                        R.id.fragment_container,
-                        MapFragment.newInstance()
-                    ).commit()
-                }
-            }.exhaustive
+        val viewPager: ViewPager2 = findViewById<ViewPager2>(R.id.view_pager)
+        val adapter = MainPagerAdapter(this)
+        viewPager.adapter = adapter
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.navNumFlow.first() {  // I'm only interrested in first()
+                viewPager.currentItem = it
+                true
+            }
+        }
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                if (position != 0) super.onPageScrolled(
+                    position,
+                    positionOffset,
+                    positionOffsetPixels
+                )
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                navBar.menu.findItem(
+                    when (position) {
+                        0 -> R.id.nav_map
+                        1 -> R.id.nav_list
+                        else -> R.id.nav_mates
+                    }
+                ).isChecked = true
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+            }
+        })
+
+
+        navBar.setOnItemSelectedListener {
+            viewModel.setNavNum(it.order)
+            viewPager.currentItem = when (it.itemId) {
+                R.id.nav_map -> 0
+                R.id.nav_list -> 1
+                else -> 2
+            }
             true
         }
     }

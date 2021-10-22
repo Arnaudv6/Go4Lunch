@@ -43,7 +43,7 @@ class PlacesListViewModel @Inject constructor(
     private val viewActionChannel = Channel<PlacesListViewAction>(Channel.BUFFERED)
     val viewActionFlow: Flow<PlacesListViewAction> = viewActionChannel.receiveAsFlow()
 
-    // todo Nino : what's the right way (this fails ans uses default value)
+    // todo Nino : what's the right way (this fails and uses default value)
     private val colorOnSecondary =
         MaterialColors.getColor(appContext, R.attr.colorOnSecondary, Color.parseColor("#888888"))
 

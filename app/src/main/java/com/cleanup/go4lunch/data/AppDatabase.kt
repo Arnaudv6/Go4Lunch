@@ -5,10 +5,12 @@ import androidx.room.RoomDatabase
 import com.cleanup.go4lunch.data.pois.PoiDao
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.settings.BoxEntity
+import com.cleanup.go4lunch.data.settings.IntEntity
 import com.cleanup.go4lunch.data.settings.SettingsDao
 
 @Database(
     entities = [
+        IntEntity::class,
         BoxEntity::class,
         PoiEntity::class
     ],

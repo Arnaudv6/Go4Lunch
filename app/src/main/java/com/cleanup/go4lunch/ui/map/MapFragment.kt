@@ -158,11 +158,11 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
-            // todo: meme dans onViewCreated, je ne suis pas trigger au changement de theme ?
             when (it) {
                 // animations are stub as of OSM-Droid 6.1.11
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
                 is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
+                // todo: change theme: does not always work. and I don't get an ancient value. I get non-sense view reset
                 is MapViewAction.PoiRetrieval -> Snackbar
                     .make(
                         view,
@@ -170,7 +170,6 @@ class MapFragment : Fragment() {
                         Snackbar.LENGTH_LONG
                     )
                     .setAction("Dismiss") {}.show() // empty action will dismiss.
-                // todo snackbar belongs in activity, right ?
             }.exhaustive
         }
     }
