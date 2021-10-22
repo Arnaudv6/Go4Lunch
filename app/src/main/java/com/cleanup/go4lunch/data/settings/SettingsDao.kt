@@ -14,7 +14,6 @@ interface SettingsDao {
 
     @Query("SELECT * FROM box LIMIT 1")
     fun getBox(): Flow<BoxEntity?>
-    // it is OK not to put results in a list.
-
+    // OK: result does not have to be a list.
 }
 

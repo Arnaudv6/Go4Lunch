@@ -18,9 +18,10 @@ class PoiRepository @Inject constructor(
 
     val poiDataRetrievalStateFlow: MutableStateFlow<Pair<Int, Int>> = MutableStateFlow(Pair(0, 0))
 
-    // todo call // call.enqueue?
-    // todo SnackBar if no result
-    // TODO CONSIDER REFACTORING THIS INTO A FLOW EMITTING PoiEntity
+    // todo
+    //  call / call.enqueue?
+    //  SnackBar if no result
+    //  CONSIDER REFACTORING THIS INTO A FLOW EMITTING PoiEntity
     //  fun getPOIsInBox(boundingBox: BoundingBox) = flow {
     suspend fun getPOIsInBox(boundingBox: BoundingBox) {
         val poiListResponse: List<PoiInBoxResult>? = try {
@@ -29,15 +30,14 @@ class PoiRepository @Inject constructor(
                 viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
                 limit = 30
             )
-        } catch (e: Exception) {
+        } catch (e: Exception) {  // todo read documented exceptions
             Log.e("PoiRepository", "something bad happened while requesting POIs")
-            throw(e)
-            e.fillInStackTrace()
-            // todo read documented exceptions
+            e.printStackTrace()
             null
         }
-        // todo delay(1500)
-        // todo don't request if already in DB ?
+        // todo
+        //  delay(1500)
+        //  don't request if already in DB ?
         if (poiListResponse != null) {  // yes, it can be null
             for (poiResultIdx in 0..poiListResponse.lastIndex) {
                 val poiEntity = poiEntityFromResult(poiListResponse[poiResultIdx])

@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toStartOf="@+id/list_item_distance"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/first_names" />
+        tools:text="@sample/restaurants.json/data/name" />
 
     <TextView
         android:id="@+id/list_item_distance"
@@ -25,13 +25,13 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/list_item_margin"
         android:ellipsize="end"
-        android:textColor="@color/grey"
         android:maxLines="1"
+        android:textColor="@color/grey"
         app:layout_constraintBottom_toBottomOf="@id/list_item_name"
         app:layout_constraintEnd_toStartOf="@id/list_item_image"
         app:layout_constraintStart_toEndOf="@id/list_item_name"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/us_zipcodes" />
+        tools:text="@sample/restaurants.json/data/distance" />
 
     <TextView
         android:id="@+id/list_item_address"
@@ -43,7 +43,7 @@
         app:layout_constraintEnd_toStartOf="@+id/list_item_colleagues_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/list_item_name"
-        tools:text="@tools:sample/cities" />
+        tools:text="@sample/restaurants.json/data/address" />
 
     <ImageView
         android:id="@+id/list_item_colleagues_image"
@@ -67,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="@id/list_item_address"
         app:layout_constraintEnd_toStartOf="@id/list_item_image"
         app:layout_constraintTop_toTopOf="@id/list_item_address"
-        tools:text="@tools:sample/date/hhmm" />
+        tools:text="@sample/restaurants.json/data/colleagues" />
 
     <TextView
         android:id="@+id/list_item_hours"
@@ -79,7 +79,8 @@
         app:layout_constraintEnd_toStartOf="@+id/list_item_likes"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/list_item_address"
-        tools:text="@tools:sample/first_names" />
+        tools:text="@sample/restaurants.json/data/hours"
+        tools:textColor="@sample/restaurants.json/data/color" />
 
     <RatingBar
         android:id="@+id/list_item_likes"
@@ -95,7 +96,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/list_item_image"
         app:layout_constraintStart_toEndOf="@id/list_item_hours"
-        app:layout_constraintTop_toTopOf="@id/list_item_hours" />
+        app:layout_constraintTop_toTopOf="@id/list_item_hours"
+        tools:rating="@sample/restaurants.json/data/stars" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/list_item_image"

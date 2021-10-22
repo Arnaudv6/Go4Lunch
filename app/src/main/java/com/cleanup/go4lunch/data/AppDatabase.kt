@@ -8,9 +8,12 @@ import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsDao
 
 @Database(
-    entities = [BoxEntity::class, PoiEntity::class],
+    entities = [
+        BoxEntity::class,
+        PoiEntity::class
+    ],
     version = 1,
-    exportSchema = false // to get red of a compile-time warning
+    exportSchema = false // get rid of a compile-time warning
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract val settingsDao: SettingsDao
