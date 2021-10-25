@@ -12,12 +12,9 @@ import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
@@ -64,8 +61,10 @@ class MapViewModel @Inject constructor(
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(ioDispatcher) {
-            viewActionLiveEvent.value =
-                MapViewAction.PoiRetrieval(poiRepository.getPOIsInBox(boundingBox))
+            val numberOfPoi = MapViewAction.PoiRetrieval(poiRepository.getPOIsInBox(boundingBox))
+            withContext(Dispatchers.Main) {
+                viewActionLiveEvent.value = numberOfPoi
+            }
         }
     }
 

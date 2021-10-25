@@ -139,7 +139,7 @@ class PlacesListViewModel @Inject constructor(
                 colorOnSecondary
             )
         } catch (e: Exception) {
-            Log.e("PlacesListViewModel", "Failed to parse time")
+            Log.d("PlacesListViewModel", "Failed to parse time")
         }
         return Pair(hours, colorOnSecondary)
     }

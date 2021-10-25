@@ -44,7 +44,7 @@ class MapFragment : Fragment() {
     @Inject
     lateinit var gpsProviderWrapper: GpsProviderWrapper
     private val viewModel: MapViewModel by viewModels()
-    private lateinit var map: MapView
+    private lateinit var map: MapView // init in onCreateView, not constructor...
 
     @Inject
     @ApplicationContext
@@ -72,6 +72,7 @@ class MapFragment : Fragment() {
 
         // map settings
         map = view.findViewById(R.id.map)
+        map.setDestroyMode(false)
 
         map.setTileSource(TileSourceFactory.MAPNIK)
         // WIKIMEDIA map first appears white until map takes screen's height :/
@@ -180,21 +181,5 @@ class MapFragment : Fragment() {
         super.onStop()
         viewModel.onStop()
     }
-
-    /*
-    override fun onResume() {
-        super.onResume()
-        initMap() // remove this and map is empty...
-    }
-
-    private fun initMap() {
-        Log.e("MapFragment", "initMap: called")
-        val tileProvider = MapTileProviderBasic(appContext, TileSourceFactory.MAPNIK)
-        val mTileRequestCompleteHandler = SimpleInvalidationHandler(map)
-        tileProvider.setTileRequestCompleteHandler(mTileRequestCompleteHandler)
-        map.tileProvider = tileProvider
-    }
-    */
-
 }
 
