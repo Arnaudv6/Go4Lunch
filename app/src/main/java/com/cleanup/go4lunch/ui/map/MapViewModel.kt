@@ -81,6 +81,7 @@ class MapViewModel @Inject constructor(
 
     fun onStop() {
         val boundingBox = boundingBoxMutableStateFlow.value
+        // viewActionLiveEvent.value = MapViewAction.InitialBox(boundingBox)
         if (boundingBox != BoundingBox()) {
             settingsRepository.setMapBox(
                 BoxEntity(

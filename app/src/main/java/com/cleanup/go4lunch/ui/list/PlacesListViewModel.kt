@@ -101,7 +101,11 @@ class PlacesListViewModel @Inject constructor(
                 poi.cuisine.ifEmpty { null },
                 address.ifEmpty { null }
             ).joinToString(" - "),
-            distanceText = "${dist}m",  // distance as a text, for display
+            distanceText = when {
+                dist > 30_000 -> "${dist / 1000}km"
+                dist > 1_000 -> "${"%.1f".format(dist / 1000.0)}km"
+                else -> "${dist}m"
+            },
             colleagues = "(${usersRepository.usersGoing(poi.id).size})",
             image = poi.imageUrl,
             hours = coloredHours.first,
@@ -121,17 +125,14 @@ class PlacesListViewModel @Inject constructor(
             val rules = parser.rules(true)
             val now = LocalDateTime.now()
             if (OpeningHoursEvaluator.isOpenAt(now, rules)) return Pair(
-                "Opened until ${
-                    fuzzyInstant(
-                        OpeningHoursEvaluator.isOpenUntil(now, rules).get(),
-                        now
-                    )
-                }",
+                "Open (closes ${
+                    fuzzyInstant(OpeningHoursEvaluator.isOpenUntil(now, rules).get(), now)
+                })",
                 ContextCompat.getColor(appContext, R.color.green)
             )
             val opens = OpeningHoursEvaluator.isOpenNext(now, rules)
             if (opens.isPresent) return Pair(
-                "Closed, opens at ${fuzzyInstant(opens.get(), now)}",
+                "Closed, opens ${fuzzyInstant(opens.get(), now)}",
                 ContextCompat.getColor(appContext, R.color.orange_darker)
             )
             return Pair(
@@ -146,7 +147,7 @@ class PlacesListViewModel @Inject constructor(
 
     private fun fuzzyInstant(instant: LocalDateTime, now: LocalDateTime): String {
         val formatted = "%d:%02d".format(instant.hour, instant.minute)
-        if (instant.dayOfWeek == now.dayOfWeek) return formatted
+        if (instant.dayOfWeek == now.dayOfWeek) return "at $formatted"
         return "${instant.dayOfWeek.name} at $formatted"
     }
 
