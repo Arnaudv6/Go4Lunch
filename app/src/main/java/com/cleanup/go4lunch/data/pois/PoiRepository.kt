@@ -17,9 +17,7 @@ class PoiRepository @Inject constructor(
     // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
     // todo
-    //  SnackBar if no result
-    //  delay(1500)
-    //  don't request if already in DB ?
+    //  debouce with 1_500 delay
     //  CONSIDER REFACTORING THIS INTO A FLOW EMITTING PoiEntity
     //  fun getPOIsInBox(boundingBox: BoundingBox) = flow {
     suspend fun getPOIsInBox(boundingBox: BoundingBox): Int =

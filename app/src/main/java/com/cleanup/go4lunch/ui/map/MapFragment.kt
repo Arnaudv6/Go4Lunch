@@ -25,9 +25,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
-import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.tileprovider.util.SimpleInvalidationHandler
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -74,18 +72,15 @@ class MapFragment : Fragment() {
 
         // map settings
         map = view.findViewById(R.id.map)
+
         map.setTileSource(TileSourceFactory.MAPNIK)
         // WIKIMEDIA map first appears white until map takes screen's height :/
+
         map.setMinZoomLevel(null) // null: use Tile Provider's value
         map.setMultiTouchControls(true)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
-
-        val tileProvider = MapTileProviderBasic(appContext, TileSourceFactory.MAPNIK)
-        val mTileRequestCompleteHandler = SimpleInvalidationHandler(map)
-        tileProvider.setTileRequestCompleteHandler(mTileRequestCompleteHandler)
-        map.tileProvider = tileProvider
 
         @Suppress("DEPRECATION") // This is just because of bad naming for this CONSTANT
         map.setScrollableAreaLimitLatitude(
@@ -127,7 +122,7 @@ class MapFragment : Fragment() {
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             if (it.pinList.isNotEmpty()) {
-                poiMarkers.items.clear()
+                poiMarkers.items?.clear()
                 for (pin in it.pinList) {
                     val poiMarker = Marker(map)
                     poiMarker.title = pin.name

@@ -1,10 +1,9 @@
 package com.cleanup.go4lunch.data.settings
 
+import android.util.Log
 import com.cleanup.go4lunch.data.MyLocationUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
@@ -31,9 +30,7 @@ class SettingsRepository @Inject constructor(
         }
     }
 
-    val navNumFlow: Flow<Int> = settingsDao.getNavNum().mapNotNull {
-        it?.data
-    }
+    suspend fun getNavNum(): Int? = settingsDao.getNavNum()?.data
 
     fun setNavNum(num: Int) {
         CoroutineScope(ioDispatcher).launch {

@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.exhaustive
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -55,13 +54,13 @@ class PlacesListFragment : Fragment() {
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState ==  SCROLL_STATE_IDLE) {
+                if (newState == SCROLL_STATE_IDLE) {
                     viewModel.onRecyclerViewIdle()
                 }
             }
         })
 
-        viewModel.viewStateListFlow.collectWithLifecycle(viewLifecycleOwner) { adapter.submitList(it) }
+        viewModel.viewStateListLiveData.observe(viewLifecycleOwner) { adapter.submitList(it) }
 
         return view
     }

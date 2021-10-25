@@ -7,6 +7,7 @@ import android.location.Location
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import ch.poole.openinghoursparser.OpeningHoursParser
 import com.cleanup.go4lunch.R
@@ -49,8 +50,7 @@ class PlacesListViewModel @Inject constructor(
 
     private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
 
-    // todo change this to livedata
-    val viewStateListFlow: Flow<List<PlacesListViewState>> =
+    private val viewStateListFlow: Flow<List<PlacesListViewState>> =
         poiRepository.poisFromCache.combine(gpsProviderWrapper.locationFlow) { list, location ->
             list.sortedBy { poiEntity ->
                 distanceBetween(  // todo remove double with line 86
@@ -61,6 +61,8 @@ class PlacesListViewModel @Inject constructor(
                 viewStateFromPoi(it, location)
             }
         }
+
+    val viewStateListLiveData = viewStateListFlow.asLiveData()
 
     init {
         viewModelScope.launch(ioDispatcher) {

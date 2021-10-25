@@ -11,13 +11,16 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.exhaustive
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -54,12 +57,12 @@ class MainActivity : AppCompatActivity() {
 
         // supportFragmentManager retainedFragments is incompatible with Hilt.
         viewPager = findViewById(R.id.view_pager)
+        lifecycleScope.launch(Dispatchers.Main) {
+            viewPager.currentItem = viewModel.getNavNum()
+        }
+
         val adapter = MainPagerAdapter(this)
         viewPager.adapter = adapter
-
-        viewModel.navNumLiveData.observe(this) {
-            if (it != null) viewPager.currentItem = it
-        }
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -118,8 +121,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         viewModel.onDestroy(viewPager.currentItem)
+        super.onDestroy()
     }
 
     override fun onBackPressed() {
