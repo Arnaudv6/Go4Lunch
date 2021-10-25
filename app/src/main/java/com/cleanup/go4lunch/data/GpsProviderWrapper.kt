@@ -26,9 +26,9 @@ class GpsProviderWrapper @Inject constructor(
 
     private val mutableLocationFlow = MutableStateFlow(
         Location("repository").apply {
-            latitude = LocationUtils.fallbackLatitude
-            longitude = LocationUtils.fallbackLongitude
-            altitude = LocationUtils.fallbackAltitude
+            latitude = MyLocationUtils.fallbackLatitude
+            longitude = MyLocationUtils.fallbackLongitude
+            altitude = MyLocationUtils.fallbackAltitude
         }
     )
     val locationFlow: StateFlow<Location> = mutableLocationFlow.asStateFlow()

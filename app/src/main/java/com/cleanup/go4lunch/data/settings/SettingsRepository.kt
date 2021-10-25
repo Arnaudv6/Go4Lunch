@@ -1,10 +1,10 @@
 package com.cleanup.go4lunch.data.settings
 
+import com.cleanup.go4lunch.data.MyLocationUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
@@ -14,15 +14,15 @@ class SettingsRepository @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    val boxFlow: Flow<BoundingBox> = settingsDao.getBox().mapNotNull {
-        if (it == null) null
-        else
-            BoundingBox(
-                it.north,
-                it.east,
-                it.south,
-                it.west
-            )
+    suspend fun getInitialBox(): BoundingBox = run {
+        val box = settingsDao.getBox()
+        if (box == null) MyLocationUtils.FRANCE_BOX
+        else BoundingBox(
+            box.north,
+            box.east,
+            box.south,
+            box.west
+        )
     }
 
     fun setMapBox(boxEntity: BoxEntity) {
@@ -35,7 +35,7 @@ class SettingsRepository @Inject constructor(
         it?.data
     }
 
-    fun setNavNum(num:Int){
+    fun setNavNum(num: Int) {
         CoroutineScope(ioDispatcher).launch {
             settingsDao.setNavNum(IntEntity(IntEntity.NAV_NUM, num))
         }

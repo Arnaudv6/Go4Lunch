@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.exhaustive
 import com.google.android.material.snackbar.Snackbar
@@ -26,7 +25,9 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
+import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.tileprovider.util.SimpleInvalidationHandler
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -36,6 +37,7 @@ import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.Locale.getDefault
 import javax.inject.Inject
+
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -80,6 +82,11 @@ class MapFragment : Fragment() {
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
 
+        val tileProvider = MapTileProviderBasic(appContext, TileSourceFactory.MAPNIK)
+        val mTileRequestCompleteHandler = SimpleInvalidationHandler(map)
+        tileProvider.setTileRequestCompleteHandler(mTileRequestCompleteHandler)
+        map.tileProvider = tileProvider
+
         @Suppress("DEPRECATION") // This is just because of bad naming for this CONSTANT
         map.setScrollableAreaLimitLatitude(
             TileSystem.MaxLatitude,
@@ -118,7 +125,7 @@ class MapFragment : Fragment() {
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
         map.overlays.add(0, poiMarkers)
 
-        viewModel.viewStateFlow.collectWithLifecycle(viewLifecycleOwner) {
+        viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             if (it.pinList.isNotEmpty()) {
                 poiMarkers.items.clear()
                 for (pin in it.pinList) {
@@ -157,7 +164,7 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
+        viewModel.viewActionLiveEvent.observe(viewLifecycleOwner) {
             when (it) {
                 // animations are stub as of OSM-Droid 6.1.11
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
@@ -166,7 +173,7 @@ class MapFragment : Fragment() {
                 is MapViewAction.PoiRetrieval -> Snackbar
                     .make(
                         view,
-                        "Poi data ${it.progress.first}/${it.progress.second} received",
+                        "${it.results} POI received and updated on view",
                         Snackbar.LENGTH_LONG
                     )
                     .setAction("Dismiss") {}.show() // empty action will dismiss.
@@ -178,5 +185,21 @@ class MapFragment : Fragment() {
         super.onStop()
         viewModel.onStop()
     }
+
+    /*
+    override fun onResume() {
+        super.onResume()
+        initMap() // remove this and map is empty...
+    }
+
+    private fun initMap() {
+        Log.e("MapFragment", "initMap: called")
+        val tileProvider = MapTileProviderBasic(appContext, TileSourceFactory.MAPNIK)
+        val mTileRequestCompleteHandler = SimpleInvalidationHandler(map)
+        tileProvider.setTileRequestCompleteHandler(mTileRequestCompleteHandler)
+        map.tileProvider = tileProvider
+    }
+    */
+
 }
 

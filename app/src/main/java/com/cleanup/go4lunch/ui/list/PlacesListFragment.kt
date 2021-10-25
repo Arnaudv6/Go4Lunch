@@ -44,7 +44,8 @@ class PlacesListFragment : Fragment() {
 
         val adapter = PlacesListAdapter()
         recyclerView.adapter = adapter
-        viewModel.viewActionFlow.collectWithLifecycle(viewLifecycleOwner) {
+
+        viewModel.viewActionLiveData.observe(viewLifecycleOwner) {
             when (it) {
                 PlacesListViewAction.ScrollToTop -> (
                         recyclerView.layoutManager as LinearLayoutManager?

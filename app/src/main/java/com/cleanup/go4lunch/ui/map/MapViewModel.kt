@@ -1,6 +1,8 @@
 package com.cleanup.go4lunch.ui.map
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
@@ -8,12 +10,13 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
+import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -31,23 +34,15 @@ class MapViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val boundingBoxMutableStateFlow = MutableStateFlow(BoundingBox())
-    private val viewActionChannel = Channel<MapViewAction>(Channel.BUFFERED)
-    val viewActionFlow: Flow<MapViewAction> = viewActionChannel.receiveAsFlow()
+    val viewActionLiveEvent = SingleLiveEvent<MapViewAction>()
 
     init {
-        viewModelScope.launch(ioDispatcher) {
-            viewActionChannel.trySend(MapViewAction.InitialBox(settingsRepository.boxFlow.first()))
-        }
-
-        viewModelScope.launch(ioDispatcher) {
-            poiRepository.poiDataRetrievalStateFlow.collect {
-                if (it != Pair(0, 0)) viewActionChannel.trySend(MapViewAction.PoiRetrieval(it))
-            }
+        viewModelScope.launch {
+            viewActionLiveEvent.value = MapViewAction.InitialBox(settingsRepository.getInitialBox())
         }
     }
 
-    // TODO Transform to stateflow
-    val viewStateFlow: Flow<MapViewState> = poiRepository.poisFromCache.map { poiList ->
+    val viewStateLiveData: LiveData<MapViewState> = poiRepository.poisFromCache.map { poiList ->
         MapViewState(poiList.map {
             val going = usersRepository.usersGoing(it.id)
             MapViewState.Pin(
@@ -65,17 +60,18 @@ class MapViewModel @Inject constructor(
                 location = GeoPoint(it.latitude, it.longitude)
             )
         })
-    }
+    }.asLiveData()
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(ioDispatcher) {
-            poiRepository.getPOIsInBox(boundingBox)
+            viewActionLiveEvent.value =
+                MapViewAction.PoiRetrieval(poiRepository.getPOIsInBox(boundingBox))
         }
     }
 
     fun onCenterOnMeClicked() {
         val location = gpsProviderWrapper.locationFlow.value
-        viewActionChannel.trySend(MapViewAction.CenterOnMe(GeoPoint(location)))
+        viewActionLiveEvent.value = MapViewAction.CenterOnMe(GeoPoint(location))
     }
 
     fun mapBoxChanged(box: BoundingBox) {

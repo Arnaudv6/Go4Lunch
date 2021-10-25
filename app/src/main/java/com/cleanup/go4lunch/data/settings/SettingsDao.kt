@@ -13,7 +13,7 @@ interface SettingsDao {
     suspend fun setBox(boxEntity: BoxEntity)
 
     @Query("SELECT * FROM box LIMIT 1")
-    fun getBox(): Flow<BoxEntity?>
+    suspend fun getBox(): BoxEntity?
     // OK: result does not have to be a list.
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

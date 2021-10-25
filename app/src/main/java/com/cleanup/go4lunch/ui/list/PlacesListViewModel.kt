@@ -14,6 +14,7 @@ import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
+import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,7 +22,6 @@ import io.leonard.OpeningHoursEvaluator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
@@ -40,8 +40,8 @@ class PlacesListViewModel @Inject constructor(
     ioDispatcher: CoroutineDispatcher,
     @ApplicationContext val appContext: Context
 ) : ViewModel() {
-    private val viewActionChannel = Channel<PlacesListViewAction>(Channel.BUFFERED)
-    val viewActionFlow: Flow<PlacesListViewAction> = viewActionChannel.receiveAsFlow()
+    val viewActionLiveData = SingleLiveEvent<PlacesListViewAction>()
+    // This would have been a channel, in pure kotlin/flow terms, but livedata fits better the view.
 
     // todo Nino : what's the right way (this fails and uses default value)
     private val colorOnSecondary =
@@ -49,6 +49,7 @@ class PlacesListViewModel @Inject constructor(
 
     private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
 
+    // todo change this to livedata
     val viewStateListFlow: Flow<List<PlacesListViewState>> =
         poiRepository.poisFromCache.combine(gpsProviderWrapper.locationFlow) { list, location ->
             list.sortedBy { poiEntity ->
@@ -78,7 +79,7 @@ class PlacesListViewModel @Inject constructor(
                 }
             ) { _, _ ->
                 Log.d("Nino", "combine() called, emitting scrollToTop")
-                viewActionChannel.trySend(PlacesListViewAction.ScrollToTop)
+                viewActionLiveData.value = PlacesListViewAction.ScrollToTop
             }
         }
     }
