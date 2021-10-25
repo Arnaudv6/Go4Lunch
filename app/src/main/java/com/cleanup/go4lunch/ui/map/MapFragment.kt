@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.exhaustive
 import com.google.android.material.snackbar.Snackbar
@@ -109,6 +110,10 @@ class MapFragment : Fragment() {
         // SimpleLocationOverlay is noop
         val locationOverlay = MyLocationNewOverlay(gpsProviderWrapper, map)
 
+        // todo make it livedata? put some of this in VM?
+        gpsProviderWrapper.possibleLocation.collectWithLifecycle(viewLifecycleOwner){
+            locationOverlay.enableMyLocation()  // so location pin updates
+        }
         // no need to de/activate location in onResume() and onPause(), given GPS throttling
         locationOverlay.enableMyLocation()  // so location pin updates
         locationOverlay.disableFollowLocation()  // so map does not follow

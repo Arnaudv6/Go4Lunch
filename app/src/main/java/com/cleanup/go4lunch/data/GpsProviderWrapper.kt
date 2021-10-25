@@ -1,6 +1,8 @@
 package com.cleanup.go4lunch.data
 
 import android.location.Location
+import android.util.Log
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,9 +41,16 @@ class GpsProviderWrapper @Inject constructor(
         provider.locationUpdateMinTime = 5000  // long, milliseconds
     }
 
+    private val possibleLocationMutableStateFlow = MutableStateFlow(false)
+    val possibleLocation: Flow<Boolean> = possibleLocationMutableStateFlow
+    fun locationPermissionUpdate(fine: Boolean, coarse: Boolean) {
+        possibleLocationMutableStateFlow.tryEmit(fine || coarse)
+    }
+
     // CONSUMER IMyLocationConsumer
     override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
         location?.let {
+            Log.e("wrapper", "onLocationChanged: nouvelle position")
             mutableLocationFlow.value = it
         }
         @Suppress("DEPRECATION")

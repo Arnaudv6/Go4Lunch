@@ -46,9 +46,9 @@ class PlacesListFragment : Fragment() {
 
         viewModel.viewActionLiveData.observe(viewLifecycleOwner) {
             when (it) {
-                PlacesListViewAction.ScrollToTop -> (
-                        recyclerView.layoutManager as LinearLayoutManager?
-                        )?.scrollToPosition(0)
+                PlacesListViewAction.ScrollToTop ->
+                    // todo Nino : tu voulais passer sur scrollToPositionWithOffset(), là, ou pas ?
+                    (recyclerView.layoutManager as LinearLayoutManager?)?.scrollToPosition(0)
             }.exhaustive
         }
 

@@ -24,4 +24,8 @@ class MainViewModel @Inject constructor(
     fun onStart() {
         gpsProviderWrapper.startLocationProvider()
     }
+
+    fun permissionsUpdated(fine: Boolean, coarse:Boolean) {
+        gpsProviderWrapper.locationPermissionUpdate(fine, coarse)
+    }
 }
