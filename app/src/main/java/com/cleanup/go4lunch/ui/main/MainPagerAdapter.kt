@@ -12,13 +12,16 @@ import kotlinx.coroutines.FlowPreview
 
 @ExperimentalCoroutinesApi
 @FlowPreview
-class MainPagerAdapter(fragmentActivity: FragmentActivity) :
+class MainPagerAdapter(
+    fragmentActivity: FragmentActivity,
+    private val activityLauncher: ActivityLauncher
+) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int = 3
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> MapFragment.newInstance()
+            0 -> MapFragment.newInstance(activityLauncher)
             1 -> PlacesListFragment.newInstance()
             else -> MatesFragment.newInstance()
         }.exhaustive

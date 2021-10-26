@@ -17,6 +17,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.main.ActivityLauncher
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -52,7 +53,8 @@ class MapFragment : Fragment() {
     lateinit var appContext: Context
 
     companion object {
-        fun newInstance(): MapFragment {
+        fun newInstance(activityLauncher: ActivityLauncher): MapFragment {
+            // todo Nino : là je ne sais plus : me passer l'activité, c'est compliqué? je fais un requireActivity si je veux startActivity()
             return MapFragment()
         }
     }
@@ -73,8 +75,7 @@ class MapFragment : Fragment() {
 
         // map settings
         map = view.findViewById(R.id.map)
-        map.setDestroyMode(false)
-
+        map.setDestroyMode(false)  // https://github.com/osmdroid/osmdroid/issues/277
         map.setTileSource(TileSourceFactory.MAPNIK)
         // WIKIMEDIA map first appears white until map takes screen's height :/
 
@@ -111,7 +112,7 @@ class MapFragment : Fragment() {
         val locationOverlay = MyLocationNewOverlay(gpsProviderWrapper, map)
 
         // todo make it livedata? put some of this in VM?
-        gpsProviderWrapper.possibleLocation.collectWithLifecycle(viewLifecycleOwner){
+        gpsProviderWrapper.possibleLocation.collectWithLifecycle(viewLifecycleOwner) {
             locationOverlay.enableMyLocation()  // so location pin updates
         }
         // no need to de/activate location in onResume() and onPause(), given GPS throttling
@@ -123,6 +124,8 @@ class MapFragment : Fragment() {
 
         // POIs
         val poiMarkers = FolderOverlay()
+        // if performance becomes an issue,
+        // https://github.com/osmdroid/osmdroid/wiki/Markers,-Lines-and-Polygons-(Java)#fast-overlay
         // map.setOnClickListener { poiMarkers.closeAllInfoWindows() }
         map.overlays.add(0, poiMarkers)
 
@@ -134,6 +137,10 @@ class MapFragment : Fragment() {
                     poiMarker.title = pin.name
                     poiMarker.snippet = pin.colleagues
                     poiMarker.position = pin.location
+                    poiMarker.setPanToView(true)  // onClick, animate to map center?
+                    poiMarker.setInfoWindow(  // set this to null to disable
+                        MyMarkerInfoWindow(requireActivity(), pin.id, map)
+                    )
                     poiMarker.icon =
                         ResourcesCompat.getDrawable(appContext.resources, pin.icon, null)
                     // don't worry about the loop: getDrawable is cached by Android

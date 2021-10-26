@@ -17,7 +17,7 @@ class PoiRepository @Inject constructor(
     // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
     // todo
-    //  debouce with 1_500 delay
+    //  deBounce with 1_500 delay
     //  CONSIDER REFACTORING THIS INTO A FLOW EMITTING PoiEntity
     //  fun getPOIsInBox(boundingBox: BoundingBox) = flow {
     suspend fun getPOIsInBox(boundingBox: BoundingBox): Int =
@@ -64,7 +64,7 @@ class PoiRepository @Inject constructor(
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)
         ) return "address unknown"
-        return "${address.number} ${address.road} - ${address.postcode} ${address.municipality}"
+        return "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
     }
 
     val poisFromCache: Flow<List<PoiEntity>> = poiDao.getPoiEntities()

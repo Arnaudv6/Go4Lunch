@@ -16,5 +16,9 @@
     <string name="login_text">Login to share meals with your colleagues</string>
     <string name="permissions_button">Request GPS &amp; Internet permissions</string>
     <string name="login_button">Login</string>
+    <string name="going_at_noon">Going at noon</string>
+    <string name="call">CALL</string>
+    <string name="like">LIKE</string>
+    <string name="website">WEBSITE</string>
 </resources>
 

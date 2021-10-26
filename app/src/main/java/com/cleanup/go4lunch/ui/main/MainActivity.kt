@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.main
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -25,7 +26,10 @@ import kotlinx.coroutines.launch
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
+class MainActivity :
+    AppCompatActivity(),
+    ActivityCompat.OnRequestPermissionsResultCallback,
+    ActivityLauncher {
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 44
     }
@@ -65,9 +69,21 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             viewPager.currentItem = viewModel.getNavNum()
         }
 
-        val adapter = MainPagerAdapter(this)
+        // Todo Nino : là il connait l'activité, je lui balance quand meme une interface ?
+        val adapter = MainPagerAdapter(this, this)
         viewPager.adapter = adapter
 
+        /*
+        viewPager.rootView.setOnTouchListener { view, event ->
+            when{
+                event.action == MotionEvent.EDGE_RIGHT && event.action == MotionEvent.ACTION_MOVE -> {
+                    view.performClick()
+                    true
+                }
+                else -> false
+            }
+        }
+         */
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -128,8 +144,14 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, granted)
         viewModel.permissionsUpdated(
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED,
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED,
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED,
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED,
         )
     }
 
@@ -146,4 +168,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
             this, permissionsToRequest, PERMISSIONS_REQUEST_CODE
         )
     }
+
+    override fun launch(intent: Intent) {
+        this.startActivity(intent)
+    }
 }
+
+
