@@ -21,7 +21,7 @@ class MainPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> MapFragment.newInstance(activityLauncher)
+            0 -> MapFragment.newInstance()
             1 -> PlacesListFragment.newInstance()
             else -> MatesFragment.newInstance()
         }.exhaustive

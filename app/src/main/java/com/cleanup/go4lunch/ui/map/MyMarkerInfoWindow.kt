@@ -13,7 +13,7 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 
 @ExperimentalCoroutinesApi
 class MyMarkerInfoWindow(
-    private val activity: Activity,
+    private val activity: Activity, // TODO check for leaks (laters)
     private val osmId: Long,
     mapView: MapView,
     layoutResId: Int = org.osmdroid.library.R.layout.bonuspack_bubble
@@ -29,7 +29,6 @@ class MyMarkerInfoWindow(
         title.setOnClickListener {
             activity.startActivity(DetailsActivity.navigate(activity, osmId))
 
-            // todo Nino : je peux injecter appContext et m'en servir pour startActivity(), ou c'est mal ?
             Log.e("TAG", "onOpen: ")
         }
     }

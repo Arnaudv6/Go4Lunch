@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SettingsDao {
@@ -17,7 +16,7 @@ interface SettingsDao {
     suspend fun setBox(boxEntity: BoxEntity)
 
     @Query("SELECT * FROM int_store WHERE key_string=:key LIMIT 1")
-    suspend fun getNavNum(key: String=IntEntity.NAV_NUM): IntEntity?
+    suspend fun getNavNum(key: String = IntEntity.NAV_NUM): IntEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun setNavNum(intEntity: IntEntity)
