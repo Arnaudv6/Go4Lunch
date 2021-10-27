@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore
 import androidx.room.PrimaryKey;
 
+// TODO SharedPrefs instead for a single primitive
 @Entity(
     tableName = "int_store",
 )
@@ -16,7 +17,6 @@ data class IntEntity (
 ){
     companion object{
         const val NAV_NUM = "nav_num"
-        // todo Nino : c'est le bon endroit pour mettre ca?
     }
 }
 

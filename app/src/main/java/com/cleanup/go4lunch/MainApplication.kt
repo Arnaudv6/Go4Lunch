@@ -8,3 +8,5 @@ class MainApplication : Application()
 
 // this can be accessed with:
 //  @ApplicationContext appContext: Context
+// ou
+//  application: Application

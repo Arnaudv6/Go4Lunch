@@ -11,6 +11,7 @@ class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
+    // TODO : utiliser une livedata (singleLiveEvent) pour faire naviguer le pager
     suspend fun getNavNum(): Int = settingsRepository.getNavNum() ?: 0
 
     fun onDestroy(num: Int) {

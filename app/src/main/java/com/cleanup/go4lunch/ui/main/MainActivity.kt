@@ -65,11 +65,9 @@ class MainActivity :
         // supportFragmentManager retainedFragments is incompatible with Hilt.
         viewPager = findViewById(R.id.view_pager)
         lifecycleScope.launch(Dispatchers.Main) {
-            // todo Nino : l'app ne revient qu'une fois sur 2 sur le bon fragment au lancement: une idée?
             viewPager.currentItem = viewModel.getNavNum()
         }
 
-        // Todo Nino : là il connait l'activité, je lui balance quand meme une interface ?
         val adapter = MainPagerAdapter(this, this)
         viewPager.adapter = adapter
 

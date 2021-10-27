@@ -15,6 +15,7 @@ import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
+import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,19 +33,20 @@ import javax.inject.Inject
 @FlowPreview
 @ExperimentalCoroutinesApi
 @HiltViewModel
-// todo Nino, can silence this warning, right?
+// todo application instead
 @SuppressLint("StaticFieldLeak")
 class PlacesListViewModel @Inject constructor(
     poiRepository: PoiRepository,
     gpsProviderWrapper: GpsProviderWrapper,
     private val usersRepository: UsersRepository,
     ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext val appContext: Context
+    @ApplicationContext val appContext: Context,
+    private val poiMapperDelegate : PoiMapperDelegate
 ) : ViewModel() {
     val viewActionLiveData = SingleLiveEvent<PlacesListViewAction>()
     // This would have been a channel, in pure kotlin/flow terms, but livedata fits better the view.
 
-    // todo Nino : what's the right way (this fails and uses default value)
+    // todo : what's not the right way (this fails and uses default value)
     private val colorOnSecondary =
         MaterialColors.getColor(appContext, R.attr.colorOnSecondary, Color.parseColor("#888888"))
 
@@ -96,7 +98,7 @@ class PlacesListViewModel @Inject constructor(
         return PlacesListViewState(
             id = poi.id,
             name = poi.name,
-            address = poi.cuisineAndAddress(),
+            address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
             distanceText = when {
                 dist > 30_000 -> "${dist / 1000}km"
                 dist > 1_000 -> "${"%.1f".format(dist / 1000.0)}km"

@@ -9,7 +9,7 @@
         <!-- Secondary brand color. I use them on buttons -->
         <item name="colorSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/orange_lighter</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
 
         <item name="colorSurface">@color/orange</item>
         <item name="colorOnSurface">@color/white</item>

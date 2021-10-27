@@ -48,15 +48,18 @@ class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView // init in onCreateView, not constructor...
 
-    @Inject
-    @ApplicationContext
-    lateinit var appContext: Context
+    private lateinit var activityLauncher : ActivityLauncher
 
     companion object {
-        fun newInstance(activityLauncher: ActivityLauncher): MapFragment {
-            // todo Nino : là j'ai besoin de l'activité pour startActivity()... requireActivity()?
+        fun newInstance(): MapFragment {
             return MapFragment()
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        activityLauncher = context as ActivityLauncher
     }
 
     override fun onCreateView(
@@ -142,7 +145,7 @@ class MapFragment : Fragment() {
                         MyMarkerInfoWindow(requireActivity(), pin.id, map)
                     )
                     poiMarker.icon =
-                        ResourcesCompat.getDrawable(appContext.resources, pin.icon, null)
+                        ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
                     // don't worry about the loop: getDrawable is cached by Android
                     poiMarkers.add(poiMarker)
                 }
