@@ -17,4 +17,7 @@ interface PoiDao {
     @Query("SELECT * FROM poi_pins")
     fun getPoiEntities(): Flow<List<PoiEntity>>
 
+    @Query("SELECT * FROM poi_pins WHERE id=:osmId LIMIT 1")
+    suspend fun getPoiById(osmId: Long): PoiEntity?
+
 }

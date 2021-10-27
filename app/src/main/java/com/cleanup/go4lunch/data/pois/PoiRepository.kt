@@ -60,6 +60,10 @@ class PoiRepository @Inject constructor(
         )
     }
 
+    suspend fun getPoiById(osmId: Long):PoiEntity?{
+        return poiDao.getPoiById(osmId)
+    }
+
     private fun addressFromDisplayName(address: PoiInBoxResult.Address): String {
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)

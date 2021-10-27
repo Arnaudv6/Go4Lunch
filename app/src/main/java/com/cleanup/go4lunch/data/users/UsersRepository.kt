@@ -7,8 +7,11 @@ import kotlin.random.Random
 @Singleton
 class UsersRepository @Inject constructor() {
 
-    fun usersGoing(placeId: Long): List<String> {
-        return if (placeId % 2 == 0L) listOf("Kevin", "Sasha") else emptyList()
+    fun usersGoing(osmId: Long): List<User> {
+        return if (osmId % 2 == 0L) listOf(
+            User(1, "Kevin","McNolan","",135465),
+            User(2,"Sasha","VanViktor","",952473)
+            ) else emptyList()
     }
 
     fun likes(restaurantId: Long): Int {
@@ -18,5 +21,9 @@ class UsersRepository @Inject constructor() {
         //  make this code relevant
         //  notes, c'est celles de google
     }
+
+    fun goingAtNoon(): Long = 135423
+
+    fun like(osmId: Long): Boolean = osmId % 2 == 0L
 
 }

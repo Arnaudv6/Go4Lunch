@@ -2,6 +2,7 @@ package com.cleanup.go4lunch.data.pois
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -27,5 +28,16 @@ data class PoiEntity(
     var hours: String
     // https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification
     // https://wiki.openstreetmap.org/wiki/Key:opening_hours#Java
-)
+) {
+
+    @Ignore
+    // Todo Nino, @ignore : inutile pour les functions?
+    fun cuisineAndAddress(): String {
+        return listOfNotNull(
+            this.cuisine.ifEmpty { null },
+            this.address.split(" - ")[0].ifEmpty { null }
+        ).joinToString(" - ")
+    }
+
+}
 

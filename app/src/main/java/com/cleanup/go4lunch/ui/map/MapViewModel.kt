@@ -41,7 +41,7 @@ class MapViewModel @Inject constructor(
 
     val viewStateLiveData: LiveData<MapViewState> = poiRepository.poisFromCache.map { poiList ->
         MapViewState(poiList.map {
-            val going = usersRepository.usersGoing(it.id)
+            val going = usersRepository.usersGoing(it.id).map { user -> user.firstName }
             MapViewState.Pin(
                 id = it.id,
                 name = it.name,

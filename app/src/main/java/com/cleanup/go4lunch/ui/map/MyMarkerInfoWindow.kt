@@ -21,14 +21,13 @@ class MyMarkerInfoWindow(
         super.onOpen(item)
         if (mView == null) return
         // to avoid getting parent's parent, have to replace bonuspack_bubble with own layout
+        // todo fermer les autres infoWindow
         (mView.findViewById<TextView>(R.id.bubble_title).parent.parent as LinearLayout).setOnClickListener {
             activity.startActivity(DetailsActivity.navigate(activity, osmId))
 
             // todo Nino : je peux injecter appContext et m'en servir pour startActivity(), ou c'est mal ?
             Log.e("TAG", "onOpen: ")
         }
-
     }
-
-
 }
+

@@ -91,16 +91,12 @@ class PlacesListViewModel @Inject constructor(
             geoPoint1 = GeoPoint(poi.latitude, poi.longitude),
             geoPoint2 = GeoPoint(location)
         )
-        val address = poi.address.split(" - ")[0]
         val coloredHours = fuzzyHours(poi.hours.trim())
 
         return PlacesListViewState(
             id = poi.id,
             name = poi.name,
-            address = listOfNotNull(
-                poi.cuisine.ifEmpty { null },
-                address.ifEmpty { null }
-            ).joinToString(" - "),
+            address = poi.cuisineAndAddress(),
             distanceText = when {
                 dist > 30_000 -> "${dist / 1000}km"
                 dist > 1_000 -> "${"%.1f".format(dist / 1000.0)}km"
