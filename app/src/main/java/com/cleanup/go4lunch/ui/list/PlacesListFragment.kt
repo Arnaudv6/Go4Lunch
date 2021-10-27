@@ -49,6 +49,7 @@ class PlacesListFragment : Fragment() {
                 PlacesListViewAction.ScrollToTop ->
                     // todo Nino : tu voulais passer sur scrollToPositionWithOffset(), là, ou pas ?
                     (recyclerView.layoutManager as LinearLayoutManager?)?.scrollToPosition(0)
+                else -> {}
             }.exhaustive
         }
 

@@ -31,7 +31,7 @@ data class PoiEntity(
 ) {
 
     @Ignore
-    // Todo Nino, @ignore : inutile pour les functions?
+    // Todo Nino, @Ignore : inutile pour les functions?
     fun cuisineAndAddress(): String {
         return listOfNotNull(
             this.cuisine.ifEmpty { null },

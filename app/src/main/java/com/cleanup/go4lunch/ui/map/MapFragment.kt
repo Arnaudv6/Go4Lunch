@@ -54,7 +54,7 @@ class MapFragment : Fragment() {
 
     companion object {
         fun newInstance(activityLauncher: ActivityLauncher): MapFragment {
-            // todo Nino : là je ne sais plus : me passer l'activité, c'est compliqué? je fais un requireActivity si je veux startActivity()
+            // todo Nino : là j'ai besoin de l'activité pour startActivity()... requireActivity()?
             return MapFragment()
         }
     }
@@ -185,6 +185,7 @@ class MapFragment : Fragment() {
                         Snackbar.LENGTH_LONG
                     )
                     .setAction("Dismiss") {}.show() // empty action will dismiss.
+                else -> {}
             }.exhaustive
         }
     }

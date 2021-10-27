@@ -1,14 +1,17 @@
 package com.cleanup.go4lunch.ui.map
 
 import android.app.Activity
+import android.graphics.Paint
 import android.util.Log
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 
+@ExperimentalCoroutinesApi
 class MyMarkerInfoWindow(
     private val activity: Activity,
     private val osmId: Long,
@@ -21,8 +24,9 @@ class MyMarkerInfoWindow(
         super.onOpen(item)
         if (mView == null) return
         // to avoid getting parent's parent, have to replace bonuspack_bubble with own layout
-        // todo fermer les autres infoWindow
-        (mView.findViewById<TextView>(R.id.bubble_title).parent.parent as LinearLayout).setOnClickListener {
+        val title = mView.findViewById<TextView>(R.id.bubble_title)
+        title.paintFlags = title.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        title.setOnClickListener {
             activity.startActivity(DetailsActivity.navigate(activity, osmId))
 
             // todo Nino : je peux injecter appContext et m'en servir pour startActivity(), ou c'est mal ?
