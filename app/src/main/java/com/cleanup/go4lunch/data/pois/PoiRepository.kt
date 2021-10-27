@@ -3,7 +3,6 @@ package com.cleanup.go4lunch.data.pois
 import android.util.Log
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -60,7 +59,7 @@ class PoiRepository @Inject constructor(
         )
     }
 
-    suspend fun getPoiById(osmId: Long):PoiEntity?{
+    suspend fun getPoiById(osmId: Long): PoiEntity? {
         return poiDao.getPoiById(osmId)
     }
 

@@ -20,6 +20,7 @@ class MainViewModel @Inject constructor(
 
     fun onDestroy(num: Int) {
         settingsRepository.setNavNum(num)
+        gpsProviderWrapper.destroyWrapper()
     }
 
     fun onStop() {

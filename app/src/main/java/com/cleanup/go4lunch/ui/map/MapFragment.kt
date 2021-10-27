@@ -47,6 +47,7 @@ class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView // init in onCreateView, not constructor...
 
+    // todo remove if we don't hand it to MyMarkerInfoWindow()
     private lateinit var activityLauncher: ActivityLauncher
 
     companion object {
@@ -58,7 +59,7 @@ class MapFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activityLauncher = context as ActivityLauncher
-        // TODO note this !!! This is Nino-valid
+        // TODO note this !!! This is Nino-valid, in onAttach() as we get context for free
     }
 
     override fun onCreateView(

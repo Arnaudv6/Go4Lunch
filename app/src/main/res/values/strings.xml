@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Go4Lunch</string>
     <string name="preferences_file">preferences_file</string>
-    <string name="fragment_1_title">"I'm Hungry"</string>
+    <string name="title_hungry">"I'm Hungry!"</string>
+    <string name="title_workmates">"Available workmates"</string>
     <string name="nav_1">Map View</string>
     <string name="nav_2">List View</string>
     <string name="nav_3">Workmates</string>

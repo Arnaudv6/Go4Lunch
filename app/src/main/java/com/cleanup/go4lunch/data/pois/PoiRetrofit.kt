@@ -8,7 +8,6 @@ import retrofit2.http.Query
 interface PoiRetrofit {
     companion object {
         private const val SEARCH_IN_BOX = "search"
-        private const val SEARCH_DETAILS = "details"
     }
 
 // https://nominatim.openstreetmap.org/search?viewbox=-0.91187%2C46.74362%2C6.06445%2C44.99200&format=json&q=[restaurant]&limit=20&bounded=1

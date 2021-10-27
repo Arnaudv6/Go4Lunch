@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.main
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -83,6 +84,7 @@ class MainActivity :
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                setTitle(if (position == 2) R.string.title_workmates else R.string.title_hungry)
                 viewPager.isUserInputEnabled = position != 0
                 navBar.menu.findItem(
                     when (position) {
@@ -167,6 +169,11 @@ class MainActivity :
 
     override fun launch(intent: Intent) {
         this.startActivity(intent)
+    }
+
+    override fun getCaller(): Activity {
+        // todo Nino, là je leak, ou pas?
+        return this
     }
 }
 

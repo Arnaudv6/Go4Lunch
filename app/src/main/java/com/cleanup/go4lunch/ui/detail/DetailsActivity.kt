@@ -8,6 +8,7 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +21,9 @@ class DetailsActivity : AppCompatActivity() {
     private val viewModel: DetailsViewModel by viewModels()
 
     companion object {
+
         private const val OSM_ID = "osm_id"
+
         fun navigate(caller: Activity, osmId: Long): Intent {
             val intent = Intent(caller, DetailsActivity::class.java)
             intent.putExtra(OSM_ID, osmId)
@@ -44,6 +47,7 @@ class DetailsActivity : AppCompatActivity() {
 
         viewModel.getViewState(intent.getLongExtra(OSM_ID, 0))
         viewModel.viewStateLiveData.observe(this) {
+            Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
             likes.rating = it.likes.toFloat()
             address.text = it.address

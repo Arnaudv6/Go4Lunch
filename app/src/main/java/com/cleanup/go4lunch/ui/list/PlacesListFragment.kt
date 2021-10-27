@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.main.ActivityLauncher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -41,7 +42,7 @@ class PlacesListFragment : Fragment() {
             DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
         )
 
-        val adapter = PlacesListAdapter()
+        val adapter = PlacesListAdapter(activity as ActivityLauncher)
         recyclerView.adapter = adapter
 
         viewModel.viewActionLiveData.observe(viewLifecycleOwner) {

@@ -11,9 +11,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.ui.detail.DetailsActivity
+import com.cleanup.go4lunch.ui.main.ActivityLauncher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-
-class PlacesListAdapter :
+@ExperimentalCoroutinesApi
+class PlacesListAdapter(
+    private val activityLauncher: ActivityLauncher
+) :
     ListAdapter<PlacesListViewState, PlacesListAdapter.ViewHolder>(PlacesDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -24,10 +29,11 @@ class PlacesListAdapter :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        if (item != null) holder.bind(item)
+        if (item != null) holder.bind(activityLauncher, item)
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
         private val name: TextView = itemView.findViewById(R.id.list_item_name)
         private val distance: TextView = itemView.findViewById(R.id.list_item_distance)
         private val address: TextView = itemView.findViewById(R.id.list_item_address)
@@ -36,7 +42,12 @@ class PlacesListAdapter :
         private val likes: RatingBar = itemView.findViewById(R.id.list_item_likes)
         private val image: AppCompatImageView = itemView.findViewById(R.id.list_item_image)
 
-        fun bind(viewState: PlacesListViewState) {
+        fun bind(activityLauncher: ActivityLauncher, viewState: PlacesListViewState) {
+            itemView.setOnClickListener {
+                activityLauncher.launch(
+                    DetailsActivity.navigate((activityLauncher.getCaller()), viewState.id)
+                )
+            }
             name.text = viewState.name
             distance.text = viewState.distanceText
             address.text = viewState.address

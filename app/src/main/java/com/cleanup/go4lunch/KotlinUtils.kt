@@ -4,9 +4,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -30,8 +27,6 @@ inline fun <T> Flow<T>.collectWithLifecycle(
  */
 val <T> T.exhaustive: T
     get() = this
-
-
 
 
 // write a good generic debounce. bellow code is crappy and fails with mutliple parrallel debouncers...

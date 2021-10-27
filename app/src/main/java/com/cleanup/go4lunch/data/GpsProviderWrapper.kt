@@ -50,7 +50,7 @@ class GpsProviderWrapper @Inject constructor(
     // CONSUMER IMyLocationConsumer
     override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
         location?.let {
-            Log.e("wrapper", "onLocationChanged: nouvelle position")
+            Log.d(GpsProviderWrapper::class.qualifiedName, "onLocationChanged: new position")
             mutableLocationFlow.value = it
         }
         @Suppress("DEPRECATION")
