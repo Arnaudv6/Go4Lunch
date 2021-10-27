@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
+import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class DetailsViewModel
 @Inject constructor(
     private val poiRepository: PoiRepository,
-    private val usersRepository: UsersRepository
+    private val usersRepository: UsersRepository,
+    private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
 
     private val viewStateMutableLiveData = MutableLiveData<DetailsViewState>()
@@ -30,7 +32,7 @@ class DetailsViewModel
                 name = poi.name,
                 goAtNoon = usersRepository.goingAtNoon() == poi.id,
                 likes = usersRepository.likes(poi.id),
-                address = poi.cuisineAndAddress(),
+                address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
                 bigImageUrl = poi.imageUrl.removeSuffix("/preview"),
                 call = poi.phone,
                 callActive = poi.phone.isNotEmpty(),

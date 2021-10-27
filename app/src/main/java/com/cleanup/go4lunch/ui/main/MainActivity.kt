@@ -12,16 +12,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.exhaustive
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -64,11 +61,12 @@ class MainActivity :
 
         // supportFragmentManager retainedFragments is incompatible with Hilt.
         viewPager = findViewById(R.id.view_pager)
-        lifecycleScope.launch(Dispatchers.Main) {
-            viewPager.currentItem = viewModel.getNavNum()
+
+        viewModel.navNumLivedata.observe(this) {
+            viewPager.currentItem = it
         }
 
-        val adapter = MainPagerAdapter(this, this)
+        val adapter = MainPagerAdapter(this)
         viewPager.adapter = adapter
 
         /*

@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.ui.list
 
-import android.annotation.SuppressLint
-import android.content.Context
+import android.app.Application
 import android.graphics.Color
 import android.location.Location
 import android.util.Log
@@ -19,7 +18,6 @@ import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.leonard.OpeningHoursEvaluator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,22 +31,20 @@ import javax.inject.Inject
 @FlowPreview
 @ExperimentalCoroutinesApi
 @HiltViewModel
-// todo application instead
-@SuppressLint("StaticFieldLeak")
 class PlacesListViewModel @Inject constructor(
     poiRepository: PoiRepository,
     gpsProviderWrapper: GpsProviderWrapper,
     private val usersRepository: UsersRepository,
     ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext val appContext: Context,
-    private val poiMapperDelegate : PoiMapperDelegate
+    private val application: Application,
+    private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
     val viewActionLiveData = SingleLiveEvent<PlacesListViewAction>()
     // This would have been a channel, in pure kotlin/flow terms, but livedata fits better the view.
 
-    // todo : what's not the right way (this fails and uses default value)
+    // todo : once Colors have night quantifier, simplify this
     private val colorOnSecondary =
-        MaterialColors.getColor(appContext, R.attr.colorOnSecondary, Color.parseColor("#888888"))
+        MaterialColors.getColor(application, R.attr.colorOnSecondary, Color.parseColor("#888888"))
 
     private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
 
@@ -126,12 +122,12 @@ class PlacesListViewModel @Inject constructor(
                 "Open (closes ${
                     fuzzyInstant(OpeningHoursEvaluator.isOpenUntil(now, rules).get(), now)
                 })",
-                ContextCompat.getColor(appContext, R.color.green)
+                ContextCompat.getColor(application, R.color.green)
             )
             val opens = OpeningHoursEvaluator.isOpenNext(now, rules)
             if (opens.isPresent) return Pair(
                 "Closed, opens ${fuzzyInstant(opens.get(), now)}",
-                ContextCompat.getColor(appContext, R.color.orange_darker)
+                ContextCompat.getColor(application, R.color.orange_darker)
             )
             return Pair(
                 "Closed indefinitely",

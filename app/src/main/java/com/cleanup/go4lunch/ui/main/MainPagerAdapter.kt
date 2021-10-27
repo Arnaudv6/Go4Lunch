@@ -13,8 +13,7 @@ import kotlinx.coroutines.FlowPreview
 @ExperimentalCoroutinesApi
 @FlowPreview
 class MainPagerAdapter(
-    fragmentActivity: FragmentActivity,
-    private val activityLauncher: ActivityLauncher
+    fragmentActivity: FragmentActivity
 ) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int = 3

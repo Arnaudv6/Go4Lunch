@@ -48,6 +48,7 @@ class PlacesListFragment : Fragment() {
             when (it) {
                 PlacesListViewAction.ScrollToTop ->
                     (recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPosition(0)
+                // mind the ? on as operator !
                 else -> Unit
             }.exhaustive
         }

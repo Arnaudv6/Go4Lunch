@@ -20,7 +20,6 @@ import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.main.ActivityLauncher
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
@@ -48,7 +47,7 @@ class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView // init in onCreateView, not constructor...
 
-    private lateinit var activityLauncher : ActivityLauncher
+    private lateinit var activityLauncher: ActivityLauncher
 
     companion object {
         fun newInstance(): MapFragment {
@@ -58,8 +57,8 @@ class MapFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
         activityLauncher = context as ActivityLauncher
+        // TODO note this !!! This is Nino-valid
     }
 
     override fun onCreateView(
@@ -141,11 +140,10 @@ class MapFragment : Fragment() {
                     poiMarker.snippet = pin.colleagues
                     poiMarker.position = pin.location
                     poiMarker.setPanToView(true)  // onClick, animate to map center?
-                    poiMarker.setInfoWindow(  // set this to null to disable
-                        MyMarkerInfoWindow(requireActivity(), pin.id, map)
-                    )
+                    poiMarker.setInfoWindow(MyMarkerInfoWindow(pin.id, map))  // null to disable
                     poiMarker.icon =
                         ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
+                    // don't inject appContext here in Fragment : we're not injecting for instrumented tests.
                     // don't worry about the loop: getDrawable is cached by Android
                     poiMarkers.add(poiMarker)
                 }
@@ -188,7 +186,7 @@ class MapFragment : Fragment() {
                         Snackbar.LENGTH_LONG
                     )
                     .setAction("Dismiss") {}.show() // empty action will dismiss.
-                else -> {}
+                else -> Unit // better notation than {}
             }.exhaustive
         }
     }
