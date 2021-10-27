@@ -32,9 +32,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_drawing_l"
                 app:layout_collapseMode="parallax"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_drawing_l"
+                tools:tint="@color/grey" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -110,6 +111,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/details_place">
 
+                <!-- image button is crap https://stackoverflow.com/questions/4457030/ -->
                 <TextView
                     android:id="@+id/details_call"
                     android:layout_width="0dp"
@@ -161,7 +163,6 @@
                     app:layout_constraintStart_toEndOf="@id/details_like"
                     app:layout_constraintTop_toTopOf="parent" />
 
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -169,10 +170,11 @@
                 android:layout_height="wrap_content"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/details_menu" />
+                app:layout_constraintTop_toBottomOf="@id/details_menu"
+                tools:itemCount="3"
+                tools:listitem="@layout/fragment_neighbour_item" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     </androidx.core.widget.NestedScrollView>
 

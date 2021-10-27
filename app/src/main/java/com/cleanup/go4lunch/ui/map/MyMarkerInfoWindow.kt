@@ -2,7 +2,6 @@ package com.cleanup.go4lunch.ui.map
 
 import android.app.Activity
 import android.util.Log
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.cleanup.go4lunch.R
@@ -11,7 +10,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 
 class MyMarkerInfoWindow(
-    val activity: Activity,
+    private val activity: Activity,
     private val osmId: Long,
     mapView: MapView,
     layoutResId: Int = org.osmdroid.library.R.layout.bonuspack_bubble
@@ -21,11 +20,12 @@ class MyMarkerInfoWindow(
     override fun onOpen(item: Any?) {
         super.onOpen(item)
         if (mView == null) return
-        (mView.findViewById<ImageView>(R.id.bubble_image).parent as LinearLayout).setOnClickListener {
+        // to avoid getting parent's parent, have to replace bonuspack_bubble with own layout
+        (mView.findViewById<TextView>(R.id.bubble_title).parent.parent as LinearLayout).setOnClickListener {
             activity.startActivity(DetailsActivity.navigate(activity, osmId))
 
-            // todo Nino : je peux injecter appContext et startActivity() depuis, ou c'est mal ?
-            Log.e("TAG", "onOpen: ", )
+            // todo Nino : je peux injecter appContext et m'en servir pour startActivity(), ou c'est mal ?
+            Log.e("TAG", "onOpen: ")
         }
 
     }

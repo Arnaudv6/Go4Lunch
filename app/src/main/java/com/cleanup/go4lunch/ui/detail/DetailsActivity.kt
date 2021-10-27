@@ -15,18 +15,16 @@ class DetailsActivity : AppCompatActivity() {
     companion object {
         private const val OSM_ID = "osm_id"
         fun navigate(caller: Activity, osmId: Long): Intent {
-            val intent = Intent(caller, this::class.java)
+            val intent = Intent(caller, DetailsActivity::class.java)
             intent.putExtra(OSM_ID, osmId)
             return intent
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_restaurant)
-
-
 
     }
 

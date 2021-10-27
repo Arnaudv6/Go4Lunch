@@ -13,12 +13,15 @@
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.22135416666666666" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/drawable/poi_green.xml" value="0.3828125" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/activity_restaurant.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/activity_restaurant.xml" value="0.3542094455852156" />
+        <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/activity_settings.xml" value="0.1796875" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/drawer_header.xml" value="0.33" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/fragment_list.xml" value="0.33" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/fragment_list_item.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/fragment_map.xml" value="0.33" />
+        <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/fragment_neighbour_item.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/landing_activity.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/neighbour_list_item.xml" value="0.1796875" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/layout/side_nav_panel_header.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/menu/bottom_nav_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/AVALLETTEDOSIA/Desktop/P7_Vallette-d-Osia_Arnaud/Go4Lunch/app/src/main/res/menu/details_menu.xml" value="0.36666666666666664" />
