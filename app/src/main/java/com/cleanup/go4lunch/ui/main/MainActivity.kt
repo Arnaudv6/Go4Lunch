@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +19,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.exhaustive
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -58,6 +61,15 @@ class MainActivity :
         drawerLayout.addDrawerListener(toggle)
         drawerLayout.setScrimColor(ContextCompat.getColor(this, android.R.color.transparent))
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+
+        findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.logout -> viewModel.onDisconnectClicked()
+
+            } // todo .exhaustive
+            true
+        }
+
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true)
 
         // supportFragmentManager retainedFragments is incompatible with Hilt.

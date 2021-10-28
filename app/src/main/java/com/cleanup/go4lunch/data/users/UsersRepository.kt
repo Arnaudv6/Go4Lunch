@@ -5,13 +5,29 @@ import javax.inject.Singleton
 import kotlin.random.Random
 
 @Singleton
-class UsersRepository @Inject constructor() {
+class UsersRepository @Inject constructor(
+    private val userRetrofit: UserRetrofit,
+) {
 
-    fun usersGoing(osmId: Long): List<User> {
-        return if (osmId % 2 == 0L) listOf(
-            User(1, "Kevin","McNolan","",135465),
-            User(2,"Sasha","VanViktor","",952473)
-            ) else emptyList()
+    suspend fun usersGoing(osmId: Long): List<User> {
+        // todo implement
+        return getUsers()
+    }
+
+    suspend fun getUsers(): List<User> {
+        return userRetrofit.getUsers().map {
+            User(it.id, it.firstName, it.lastName, it.avatarUrl, it.goingAtNoon)
+        }
+    }
+
+    suspend fun insertUser(user: User) {
+        userRetrofit.insertUser(
+            user.id,
+            user.firstName,
+            user.lastName,
+            user.avatarUrl,
+            user.goingAtNoon
+        )
     }
 
     fun likes(restaurantId: Long): Int {

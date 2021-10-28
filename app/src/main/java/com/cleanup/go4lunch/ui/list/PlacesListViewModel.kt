@@ -100,7 +100,8 @@ class PlacesListViewModel @Inject constructor(
                 dist > 1_000 -> "${"%.1f".format(dist / 1000.0)}km"
                 else -> "${dist}m"
             },
-            colleagues = "(${usersRepository.usersGoing(poi.id).size})",
+            colleagues = "(2)",
+            // colleagues = "(${usersRepository.usersGoing(poi.id).size})",
             image = poi.imageUrl,
             hours = coloredHours.first,
             hoursColor = coloredHours.second,

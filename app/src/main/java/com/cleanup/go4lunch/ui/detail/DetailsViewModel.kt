@@ -44,10 +44,11 @@ class DetailsViewModel
         }
     }
 
-    private fun getNeighbourList(osmId: Long): List<DetailsViewState.Neighbour> {
+    private suspend fun getNeighbourList(osmId: Long): List<DetailsViewState.Neighbour> {
         return usersRepository.usersGoing(osmId).map {
             DetailsViewState.Neighbour(it.avatarUrl, it.firstName)
         }
     }
+
 }
 

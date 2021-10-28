@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.cleanup.go4lunch.data.pois.PoiDao
 import com.cleanup.go4lunch.data.pois.PoiRetrofit
 import com.cleanup.go4lunch.data.settings.SettingsDao
+import com.cleanup.go4lunch.data.users.UserRetrofit
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -53,7 +54,8 @@ class DataModule {
     }
 
     companion object {
-        private const val BASE_URL: String = "https://nominatim.openstreetmap.org/"
+        private const val BASE_URL_NOMINATIM: String = "https://nominatim.openstreetmap.org/"
+        private const val BASE_URL_USERS: String = "http://192.168.1.79:22280/"
     }
 
     @Provides
@@ -63,10 +65,26 @@ class DataModule {
         val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BASE_URL_NOMINATIM)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create()))
             .build()
             .create(PoiRetrofit::class.java)
     }
+
+    @Provides
+    fun provideUsersRetrofit(): UserRetrofit {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL_USERS)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create()))
+            .build()
+            .create(UserRetrofit::class.java)
+    }
+
 }
+

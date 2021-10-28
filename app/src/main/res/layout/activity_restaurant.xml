@@ -107,6 +107,7 @@
                 app:layout_constraintTop_toBottomOf="@id/details_place">
 
                 <!-- image button is crap https://stackoverflow.com/questions/4457030/ -->
+                <!-- todo Nino là, bottomNavBar, j'utilise pas à cause de "bottom"... j'ai tort? -->
                 <TextView
                     android:id="@+id/details_call"
                     android:layout_width="0dp"
