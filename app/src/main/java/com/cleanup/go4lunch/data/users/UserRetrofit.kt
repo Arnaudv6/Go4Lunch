@@ -23,7 +23,7 @@ interface UserRetrofit {
 
     @Headers(
         "Prefer: resolution=merge-duplicates",
-        "Content-Type: application/x-www-form-urlencoded"
+        // "Content-Type: application/x-www-form-urlencoded"
     )
     @POST(USERS)
     suspend fun insertUser(@Body userBody: UserBody)

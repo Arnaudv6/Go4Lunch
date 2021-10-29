@@ -32,8 +32,7 @@ class PlacesListAdapter(
         if (item != null) holder.bind(activityLauncher, item)
     }
 
-    class ViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name: TextView = itemView.findViewById(R.id.list_item_name)
         private val distance: TextView = itemView.findViewById(R.id.list_item_distance)
         private val address: TextView = itemView.findViewById(R.id.list_item_address)

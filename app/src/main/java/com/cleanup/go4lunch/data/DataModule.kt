@@ -83,20 +83,7 @@ class DataModule {
             // todo remove that cleartext crap
             .connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
             .addInterceptor(httpLoggingInterceptor)
-            .addNetworkInterceptor(object : Interceptor {
-                @Throws(IOException::class)
-                override fun intercept(chain: Interceptor.Chain): Response {
-                    val request: Request = chain.request()
-                        // https://github.com/PostgREST/postgrest/issues/1857#issuecomment-853623076
-                        .newBuilder()
-                        .removeHeader("Accept-Encoding")
-                        .removeHeader("User-Agent")
-                        .removeHeader("Content-Type")
-                        .removeHeader("Content-Length")
-                        .build()
-                    return chain.proceed(request)
-                }
-            }).build()
+            .build()
 
         return Retrofit.Builder()
             .client(client)

@@ -48,23 +48,20 @@ class MainViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     fun onDisconnectClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (usersRepository.getUsers().isEmpty()) {
-                poiRepository.poisFromCache.first {
-                    true
-                }.also {
-                    val ids = it.map { poiEntity -> poiEntity.id }
-                    for (i: Int in 1..12) {
-                        usersRepository.insertUser(
-                            User(
-                                i.toLong(),
-                                "Agatha$i",
-                                "Christie$i",
-                                // "https://i.pravatar.cc/150?u=$i",
-                                "$i",
-                                ids[i] // will crash if <12 POIs
-                            )
+            poiRepository.poisFromCache.first {
+                true
+            }.also {
+                val ids = it.map { poiEntity -> poiEntity.id }
+                for (i: Int in 1..12) {
+                    usersRepository.insertUser(
+                        User(
+                            i.toLong(),
+                            "Agatha$i",
+                            "Christie$i",
+                            "https://i.pravatar.cc/150?u=$i",
+                            ids[i] // will crash if <12 POIs
                         )
-                    }
+                    )
                 }
             }
         }

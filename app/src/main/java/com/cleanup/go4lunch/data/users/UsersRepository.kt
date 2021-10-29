@@ -10,8 +10,9 @@ class UsersRepository @Inject constructor(
 ) {
 
     suspend fun usersGoing(osmId: Long): List<User> {
-        // todo implement
-        return getUsers()
+        return getUsers().filter {
+            it.goingAtNoon == osmId
+        }
     }
 
     suspend fun getUsers(): List<User> {

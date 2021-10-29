@@ -41,6 +41,7 @@ class MapViewModel @Inject constructor(
 
     val viewStateLiveData: LiveData<MapViewState> = poiRepository.poisFromCache.map { poiList ->
         MapViewState(poiList.map {
+            // todo : off this race-condition
             val going = usersRepository.usersGoing(it.id).map { user -> user.firstName }
             MapViewState.Pin(
                 id = it.id,

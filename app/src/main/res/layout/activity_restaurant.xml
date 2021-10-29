@@ -169,7 +169,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/details_menu"
                 tools:itemCount="3"
-                tools:listitem="@layout/fragment_neighbour_item" />
+                tools:listitem="@layout/fragment_mates_item" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

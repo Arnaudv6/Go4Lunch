@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,11 +29,14 @@ class MatesFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_mates, container, false)
 
-        val textView: TextView = view.findViewById(R.id.text_notifications)
+        val recycler: RecyclerView = view.findViewById(R.id.mates_recycler_view)
+        val adapter = MatesAdapter()
+        recycler.adapter = adapter
 
-        viewModel.text.observe(viewLifecycleOwner, {
-            textView.text = it
-        })
+        viewModel.refreshMatesList()
+        viewModel.matesListLiveData.observe(viewLifecycleOwner){
+            adapter.submitList(it)
+        }
 
         return view
     }

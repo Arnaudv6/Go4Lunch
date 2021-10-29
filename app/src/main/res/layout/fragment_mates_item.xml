@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/neighbour_item_image"
+        android:id="@+id/mates_item_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_margin="10dp"
@@ -16,13 +16,13 @@
         tools:src="@drawable/ic_baseline_image_24" />
 
     <TextView
-        android:id="@+id/neighbour_item_text"
+        android:id="@+id/mates_item_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/neighbour_item_image"
-        app:layout_constraintStart_toEndOf="@id/neighbour_item_image"
-        app:layout_constraintTop_toTopOf="@id/neighbour_item_image"
+        app:layout_constraintBottom_toBottomOf="@id/mates_item_image"
+        app:layout_constraintStart_toEndOf="@id/mates_item_image"
+        app:layout_constraintTop_toTopOf="@id/mates_item_image"
         tools:text="@tools:sample/first_names" />
 </androidx.constraintlayout.widget.ConstraintLayout>
