@@ -14,7 +14,7 @@ import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val poiRepository: PoiRepository,
-    private val usersRepository: UsersRepository,
+    usersRepository: UsersRepository,
     private val settingsRepository: SettingsRepository,
     private val ioDispatcher: CoroutineDispatcher,
     private val gpsProviderWrapper: GpsProviderWrapper
@@ -39,26 +39,29 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    val viewStateLiveData: LiveData<MapViewState> = poiRepository.poisFromCache.map { poiList ->
-        MapViewState(poiList.map {
-            // todo : off this race-condition
-            val going = usersRepository.usersGoing(it.id).map { user -> user.firstName }
-            MapViewState.Pin(
-                id = it.id,
-                name = it.name,
-                colleagues = if (going.isNotEmpty()) going.joinToString(
-                    separator = ", ",
-                    prefix = "going: "
-                ) else "",
-                icon = if (going.isEmpty()) {
-                    R.drawable.poi_orange
-                } else {
-                    R.drawable.poi_green
-                },
-                location = GeoPoint(it.latitude, it.longitude)
-            )
-        })
-    }.asLiveData()
+    val viewStateLiveData: LiveData<MapViewState> =
+        poiRepository.poisFromCache.combine(usersRepository.matesListStateFlow) { poiList, usersList ->
+            MapViewState(
+                poiList.map {
+                    val going = usersList.filter { user ->
+                        user.goingAtNoon == it.id
+                    }.map { user -> user.firstName }
+                    MapViewState.Pin(
+                        id = it.id,
+                        name = it.name,
+                        colleagues = if (going.isNotEmpty()) going.joinToString(
+                            separator = ", ",
+                            prefix = "going: "
+                        ) else "",
+                        icon = if (going.isEmpty()) {
+                            R.drawable.poi_orange
+                        } else {
+                            R.drawable.poi_green
+                        },
+                        location = GeoPoint(it.latitude, it.longitude)
+                    )
+                })
+        }.asLiveData()
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(ioDispatcher) {

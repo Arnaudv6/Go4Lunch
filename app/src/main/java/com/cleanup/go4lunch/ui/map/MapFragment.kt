@@ -133,23 +133,21 @@ class MapFragment : Fragment() {
         map.overlays.add(0, poiMarkers)
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
-            if (it.pinList.isNotEmpty()) {
-                poiMarkers.items?.clear()
-                for (pin in it.pinList) {
-                    val poiMarker = Marker(map)
-                    poiMarker.title = pin.name
-                    poiMarker.snippet = pin.colleagues
-                    poiMarker.position = pin.location
-                    poiMarker.setPanToView(true)  // onClick, animate to map center?
-                    poiMarker.setInfoWindow(MyMarkerInfoWindow(pin.id, map))  // null to disable
-                    poiMarker.icon =
-                        ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
-                    // don't inject appContext here in Fragment : we're not injecting for instrumented tests.
-                    // don't worry about the loop: getDrawable is cached by Android
-                    poiMarkers.add(poiMarker)
-                }
-                map.postInvalidate()  // force a redraw
+            poiMarkers.items?.clear()
+            for (pin in it.pinList) {
+                val poiMarker = Marker(map)
+                poiMarker.title = pin.name
+                poiMarker.snippet = pin.colleagues
+                poiMarker.position = pin.location
+                poiMarker.setPanToView(true)  // onClick, animate to map center?
+                poiMarker.setInfoWindow(MyMarkerInfoWindow(pin.id, map))  // null to disable
+                poiMarker.icon =
+                    ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
+                // don't inject appContext here in Fragment : we're not injecting for instrumented tests.
+                // don't worry about the loop: getDrawable is cached by Android
+                poiMarkers.add(poiMarker)
             }
+            map.postInvalidate()  // force a redraw
         }
 
         // add scale bar

@@ -49,8 +49,6 @@ class MainViewModel @Inject constructor(
     fun onDisconnectClicked() {
         viewModelScope.launch(Dispatchers.IO) {
             poiRepository.poisFromCache.first {
-                true
-            }.also {
                 val ids = it.map { poiEntity -> poiEntity.id }
                 for (i: Int in 1..12) {
                     usersRepository.insertUser(
@@ -63,6 +61,7 @@ class MainViewModel @Inject constructor(
                         )
                     )
                 }
+                true
             }
         }
     }

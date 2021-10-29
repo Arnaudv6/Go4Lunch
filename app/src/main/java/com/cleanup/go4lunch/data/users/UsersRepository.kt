@@ -1,5 +1,7 @@
 package com.cleanup.go4lunch.data.users
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
@@ -9,15 +11,24 @@ class UsersRepository @Inject constructor(
     private val userRetrofit: UserRetrofit,
 ) {
 
-    suspend fun usersGoing(osmId: Long): List<User> {
-        return getUsers().filter {
-            it.goingAtNoon == osmId
-        }
+    private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
+    val matesListStateFlow: StateFlow<List<User>> = matesListMutableStateFlow
+
+    suspend fun requestMatesRefresh() {
+        matesListMutableStateFlow.tryEmit(userRetrofit.getUsers().map {
+            User(
+                id = it.id,
+                firstName = it.firstName,
+                lastName = it.lastName,
+                avatarUrl = it.avatarUrl,
+                goingAtNoon = it.goingAtNoon
+            )
+        })
     }
 
-    suspend fun getUsers(): List<User> {
-        return userRetrofit.getUsers().map {
-            User(it.id, it.firstName, it.lastName, it.avatarUrl, it.goingAtNoon)
+    fun usersGoing(osmId: Long): List<User> {
+        return matesListMutableStateFlow.value.filter {
+            it.goingAtNoon == osmId
         }
     }
 

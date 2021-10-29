@@ -12,8 +12,8 @@ data class UserBody (
     val lastName: String,
 
     @SerializedName("avatarurl")
-    val avatarUrl: String,
+    val avatarUrl: String?,
 
     @SerializedName("goingatnoon")
-    val goingAtNoon: Long
+    val goingAtNoon: Long?
 )

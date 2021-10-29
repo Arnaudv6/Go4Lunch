@@ -46,7 +46,7 @@ class DetailsViewModel
 
     private suspend fun getNeighbourList(osmId: Long): List<DetailsViewState.Neighbour> {
         return usersRepository.usersGoing(osmId).map {
-            DetailsViewState.Neighbour(it.avatarUrl, it.firstName)
+            DetailsViewState.Neighbour(it.avatarUrl?:"", it.firstName)
         }
     }
 
