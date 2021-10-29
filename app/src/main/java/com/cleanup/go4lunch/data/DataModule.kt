@@ -14,8 +14,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
-import okhttp3.OkHttpClient
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import okio.IOException
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -67,21 +68,42 @@ class DataModule {
         return Retrofit.Builder()
             .baseUrl(BASE_URL_NOMINATIM)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create()))
+            .addConverterFactory(
+                GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create())
+            )
             .build()
             .create(PoiRetrofit::class.java)
     }
 
     @Provides
     fun provideUsersRetrofit(): UserRetrofit {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+        val httpLoggingInterceptor = HttpLoggingInterceptor()
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        val client = OkHttpClient.Builder()
+            // todo remove that cleartext crap
+            .connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
+            .addInterceptor(httpLoggingInterceptor)
+            .addNetworkInterceptor(object : Interceptor {
+                @Throws(IOException::class)
+                override fun intercept(chain: Interceptor.Chain): Response {
+                    val request: Request = chain.request()
+                        // https://github.com/PostgREST/postgrest/issues/1857#issuecomment-853623076
+                        .newBuilder()
+                        .removeHeader("Accept-Encoding")
+                        .removeHeader("User-Agent")
+                        .removeHeader("Content-Type")
+                        .removeHeader("Content-Length")
+                        .build()
+                    return chain.proceed(request)
+                }
+            }).build()
 
         return Retrofit.Builder()
-            .baseUrl(BASE_URL_USERS)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create()))
+            .baseUrl(BASE_URL_USERS)
+            .addConverterFactory(
+                GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create())
+            )
             .build()
             .create(UserRetrofit::class.java)
     }

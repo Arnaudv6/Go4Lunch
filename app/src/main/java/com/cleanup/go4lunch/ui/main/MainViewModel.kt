@@ -59,7 +59,8 @@ class MainViewModel @Inject constructor(
                                 i.toLong(),
                                 "Agatha$i",
                                 "Christie$i",
-                                "https://i.pravatar.cc/150?u=$i",
+                                // "https://i.pravatar.cc/150?u=$i",
+                                "$i",
                                 ids[i] // will crash if <12 POIs
                             )
                         )

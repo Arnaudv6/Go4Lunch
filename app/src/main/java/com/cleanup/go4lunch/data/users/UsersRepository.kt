@@ -22,11 +22,13 @@ class UsersRepository @Inject constructor(
 
     suspend fun insertUser(user: User) {
         userRetrofit.insertUser(
-            user.id,
-            user.firstName,
-            user.lastName,
-            user.avatarUrl,
-            user.goingAtNoon
+            UserBody(
+                id = user.id,
+                firstName = user.firstName,
+                lastName = user.lastName,
+                avatarUrl = user.avatarUrl,
+                goingAtNoon = user.goingAtNoon
+            )
         )
     }
 
