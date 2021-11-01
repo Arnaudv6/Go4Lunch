@@ -1,14 +1,17 @@
 package com.cleanup.go4lunch.data.users
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.cleanup.go4lunch.data.settings.SettingsRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.coroutineContext
 import kotlin.random.Random
 
 @Singleton
 class UsersRepository @Inject constructor(
     private val userRetrofit: UserRetrofit,
+    private val settingsRepository: SettingsRepository,
 ) {
 
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
@@ -26,7 +29,13 @@ class UsersRepository @Inject constructor(
         })
     }
 
-    fun usersGoing(osmId: Long): List<User> {
+    // Todo Nino : comment je fais du stateIn dans le repo?
+    val sessionUserFlow: StateFlow<User?> =
+        matesListStateFlow.combine(settingsRepository.idStateFlow) { users, id ->
+            users.find { it.id == id }
+        }
+
+    fun usersGoingAtPlaceId(osmId: Long): List<User> {
         return matesListMutableStateFlow.value.filter {
             it.goingAtNoon == osmId
         }
@@ -46,11 +55,13 @@ class UsersRepository @Inject constructor(
 
     fun likes(restaurantId: Long): Int {
         return Random.nextInt(3)
-        // todo make this code relevant (notes de google par exemple)
+        // todo make this code relevant (google ratings?)
     }
 
-    fun goingAtNoon(): Long = 135423
-
-    fun like(osmId: Long): Boolean = osmId % 2 == 0L
+    /** this is tricky, we update user online, and locally, to avoid full refresh */
+    fun like(osmId: Long){
+        sessionUserFlow.
+        userRetrofit.insertUser()
+    }
 
 }

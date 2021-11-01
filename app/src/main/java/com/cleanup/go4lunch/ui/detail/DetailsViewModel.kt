@@ -1,15 +1,18 @@
 package com.cleanup.go4lunch.ui.detail
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.asLiveData
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
+import com.cleanup.go4lunch.ui.mates.Mate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -21,16 +24,19 @@ class DetailsViewModel
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
 
-    private val viewStateMutableLiveData = MutableLiveData<DetailsViewState>()
-    val viewStateLiveData: LiveData<DetailsViewState> = viewStateMutableLiveData
+    private val placeIdMutableStateFlow = MutableStateFlow<Long?>(null)
 
-    fun getViewState(osmId: Long) {
+    fun onCreate(osmId: Long) {
+        placeIdMutableStateFlow.tryEmit(osmId)
+    }
 
-        viewModelScope.launch {
-            val poi = poiRepository.getPoiById(osmId) ?: return@launch
-            viewStateMutableLiveData.value = DetailsViewState(
+    val viewStateLiveData: LiveData<DetailsViewState> =
+        placeIdMutableStateFlow.filterNotNull().map {
+            poiRepository.getPoiById(it)
+        }.filterNotNull().combine(usersRepository.sessionUserFlow.filterNotNull()) { poi, user ->
+            DetailsViewState(
                 name = poi.name,
-                goAtNoon = usersRepository.goingAtNoon() == poi.id,
+                goAtNoon = user.goingAtNoon == poi.id,
                 likes = usersRepository.likes(poi.id),
                 address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
                 bigImageUrl = poi.imageUrl.removeSuffix("/preview"),
@@ -41,12 +47,11 @@ class DetailsViewModel
                 websiteActive = poi.site.isNotEmpty(),
                 neighbourList = getNeighbourList(poi.id)
             )
-        }
-    }
+        }.asLiveData()
 
-    private suspend fun getNeighbourList(osmId: Long): List<DetailsViewState.Neighbour> {
-        return usersRepository.usersGoing(osmId).map {
-            DetailsViewState.Neighbour(it.avatarUrl?:"", it.firstName)
+    private fun getNeighbourList(osmId: Long): List<Mate> {
+        return usersRepository.usersGoingAtPlaceId(osmId).map {
+            Mate(id = it.id, imageUrl = it.avatarUrl ?: "", text = it.firstName)
         }
     }
 

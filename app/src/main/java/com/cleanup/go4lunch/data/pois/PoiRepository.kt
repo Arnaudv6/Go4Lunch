@@ -15,11 +15,18 @@ class PoiRepository @Inject constructor(
 ) {
     // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
-    // todo
-    //  deBounce with 1_500 delay
+    val cachedPOIsListFlow: Flow<List<PoiEntity>> = poiDao.getPoiEntities()
+
+    suspend fun getPoiById(osmId: Long): PoiEntity? {
+        return poiDao.getPoiById(osmId)
+    }
+
+    // todo ensure 1_500ms delay
+
+    // todo Nino : tu m'avais mis ça pour faciliter les tests: est-ce toujours valide?
     //  CONSIDER REFACTORING THIS INTO A FLOW EMITTING PoiEntity
     //  fun getPOIsInBox(boundingBox: BoundingBox) = flow {
-    suspend fun getPOIsInBox(boundingBox: BoundingBox): Int =
+    suspend fun fetchPOIsInBox(boundingBox: BoundingBox): Int =
         try {
             poiRetrofit.getPoiInBox(  // getPOICloseTo() also exists
                 viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
@@ -30,12 +37,12 @@ class PoiRepository @Inject constructor(
             e.printStackTrace()
             emptyList()
         }.mapNotNull {
-            poiEntityFromResult(it)
+            toPoiEntity(it)
         }.onEach {
             poiDao.insertPoi(it)
         }.size
 
-    private fun poiEntityFromResult(result: PoiInBoxResult): PoiEntity? {
+    private fun toPoiEntity(result: PoiInBoxResult): PoiEntity? {
         if (
             result.category != "amenity"
             || result.type != "restaurant"
@@ -50,7 +57,7 @@ class PoiRepository @Inject constructor(
             result.address.amenity,
             result.lat,
             result.lon,
-            addressFromDisplayName(result.address),
+            toFuzzyAddress(result.address),
             result.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: "",
             PoiImages.getImageUrl(),
             result.extraTags?.phone ?: "",
@@ -59,17 +66,11 @@ class PoiRepository @Inject constructor(
         )
     }
 
-    suspend fun getPoiById(osmId: Long): PoiEntity? {
-        return poiDao.getPoiById(osmId)
-    }
-
-    private fun addressFromDisplayName(address: PoiInBoxResult.Address): String {
+    private fun toFuzzyAddress(address: PoiInBoxResult.Address): String {
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)
         ) return "address unknown"
         return "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
     }
-
-    val poisFromCache: Flow<List<PoiEntity>> = poiDao.getPoiEntities()
 }
 

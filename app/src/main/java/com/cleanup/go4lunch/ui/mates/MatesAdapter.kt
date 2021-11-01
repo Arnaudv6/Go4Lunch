@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
 
-class MatesAdapter : ListAdapter<MatesViewState, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
+class MatesAdapter : ListAdapter<Mate, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
@@ -28,21 +28,20 @@ class MatesAdapter : ListAdapter<MatesViewState, MatesAdapter.ViewHolder>(MatesD
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
         private val textView: TextView = itemView.findViewById(R.id.mates_item_text)
 
-        fun bind(viewState: MatesViewState) {
+        fun bind(viewState: Mate) {
             textView.text = viewState.text
             Glide.with(itemView).load(viewState.imageUrl).into(image)
         }
     }
 
-    class MatesDiffCallBack : DiffUtil.ItemCallback<MatesViewState>() {
-        override fun areItemsTheSame(oldItem: MatesViewState, newItem: MatesViewState): Boolean {
+    class MatesDiffCallBack : DiffUtil.ItemCallback<Mate>() {
+        override fun areItemsTheSame(oldItem: Mate, newItem: Mate): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: MatesViewState, newItem: MatesViewState): Boolean {
+        override fun areContentsTheSame(oldItem: Mate, newItem: Mate): Boolean {
             return oldItem == newItem
         }
-
     }
 
 }

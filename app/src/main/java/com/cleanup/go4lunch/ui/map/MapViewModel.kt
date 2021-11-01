@@ -40,7 +40,7 @@ class MapViewModel @Inject constructor(
     }
 
     val viewStateLiveData: LiveData<MapViewState> =
-        poiRepository.poisFromCache.combine(usersRepository.matesListStateFlow) { poiList, usersList ->
+        poiRepository.cachedPOIsListFlow.combine(usersRepository.matesListStateFlow) { poiList, usersList ->
             MapViewState(
                 poiList.map {
                     val going = usersList.filter { user ->
@@ -65,7 +65,7 @@ class MapViewModel @Inject constructor(
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(ioDispatcher) {
-            val numberOfPoi = MapViewAction.PoiRetrieval(poiRepository.getPOIsInBox(boundingBox))
+            val numberOfPoi = MapViewAction.PoiRetrieval(poiRepository.fetchPOIsInBox(boundingBox))
             withContext(Dispatchers.Main) {
                 viewActionLiveEvent.value = numberOfPoi
             }

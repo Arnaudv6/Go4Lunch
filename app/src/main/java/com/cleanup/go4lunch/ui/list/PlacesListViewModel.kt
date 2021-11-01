@@ -49,7 +49,7 @@ class PlacesListViewModel @Inject constructor(
     private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
 
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
-        poiRepository.poisFromCache.combine(gpsProviderWrapper.locationFlow) { list, location ->
+        poiRepository.cachedPOIsListFlow.combine(gpsProviderWrapper.locationFlow) { list, location ->
             list.sortedBy { poiEntity ->
                 distanceBetween(  // todo remove double with line 90
                     geoPoint1 = GeoPoint(poiEntity.latitude, poiEntity.longitude),

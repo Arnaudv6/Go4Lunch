@@ -48,7 +48,7 @@ class MainViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     fun onDisconnectClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            poiRepository.poisFromCache.first {
+            poiRepository.cachedPOIsListFlow.first {
                 val ids = it.map { poiEntity -> poiEntity.id }
                 for (i: Int in 1..12) {
                     usersRepository.insertUser(

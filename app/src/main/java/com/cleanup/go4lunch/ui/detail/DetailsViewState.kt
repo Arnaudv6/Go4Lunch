@@ -1,5 +1,7 @@
 package com.cleanup.go4lunch.ui.detail
 
+import com.cleanup.go4lunch.ui.mates.MatesViewState
+
 data class DetailsViewState(
     val name: String,
     val goAtNoon: Boolean,
@@ -13,10 +15,5 @@ data class DetailsViewState(
     val website: String,
     val websiteActive: Boolean,
 
-    val neighbourList: List<Neighbour>
-) {
-    data class Neighbour(
-        val imageUrl: String,
-        val text: String
-    )
-}
+    val neighbourList: List<MatesViewState>
+)

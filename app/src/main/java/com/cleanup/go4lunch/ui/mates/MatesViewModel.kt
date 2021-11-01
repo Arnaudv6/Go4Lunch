@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
@@ -22,10 +21,10 @@ class MatesViewModel @Inject constructor(
     private val poiRepository: PoiRepository
 ) : ViewModel() {
 
-    val matesListLiveData: LiveData<List<MatesViewState>> =
+    val matesListLiveData: LiveData<List<Mate>> =
         usersRepository.matesListStateFlow.mapNotNull {
             it.map { user ->
-                MatesViewState(
+                Mate(
                     id = user.id,
                     imageUrl = user.avatarUrl ?: "",
                     text = getText(user)

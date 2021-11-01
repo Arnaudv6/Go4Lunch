@@ -3,13 +3,13 @@ package com.cleanup.go4lunch.ui.detail
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.RatingBar
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.ui.mates.MatesAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,8 +44,12 @@ class DetailsActivity : AppCompatActivity() {
         val like: TextView = findViewById(R.id.details_like)
         val website: TextView = findViewById(R.id.details_website)
         val button: FloatingActionButton = findViewById(R.id.details_floatingActionButton)
+        val recycler: RecyclerView = findViewById(R.id.details_recycler_view)
 
-        viewModel.getViewState(intent.getLongExtra(OSM_ID, 0))
+        val adapter = MatesAdapter()
+        recycler.adapter=adapter
+
+        viewModel.onCreate(intent.getLongExtra(OSM_ID, 0))
         viewModel.viewStateLiveData.observe(this) {
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
@@ -61,7 +65,10 @@ class DetailsActivity : AppCompatActivity() {
                 // intent on it.website
             }
             button.isClickable = it.goAtNoon
+
+            adapter.submitList(it.neighbourList)
         }
+
     }
 }
 

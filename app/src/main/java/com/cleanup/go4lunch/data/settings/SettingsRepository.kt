@@ -2,10 +2,14 @@ package com.cleanup.go4lunch.data.settings
 
 import android.app.Application
 import android.content.Context
+import androidx.annotation.WorkerThread
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.MyLocationUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
@@ -42,7 +46,14 @@ class SettingsRepository @Inject constructor(
         Context.MODE_PRIVATE
     )
 
+    @WorkerThread
     fun getNavNum(): Int = preferences.getInt(NAV_NUM, 0)
 
+    @WorkerThread
     fun setNavNum(num: Int) = preferences.edit().putInt(NAV_NUM, num).apply()
+
+    // todo make this code relevant
+    private val idMutableStateFlow = MutableStateFlow<Long?>(null)
+
+    val idStateFlow: StateFlow<Long?> = idMutableStateFlow
 }
