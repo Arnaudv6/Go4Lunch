@@ -19,7 +19,6 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
-@FlowPreview
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class MapViewModel @Inject constructor(

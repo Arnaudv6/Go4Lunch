@@ -22,9 +22,9 @@ data class PoiEntity(
     val cuisine: String,
     @ColumnInfo(name = "image_url")
     val imageUrl: String,
-    val phone: String,
-    val site: String,
-    val hours: String
+    val phone: String?,
+    val site: String?,
+    val hours: String?
     // https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification
     // https://wiki.openstreetmap.org/wiki/Key:opening_hours#Java
 )

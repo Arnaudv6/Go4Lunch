@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
-import com.cleanup.go4lunch.ui.main.ActivityLauncher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi

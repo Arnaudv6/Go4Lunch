@@ -1,12 +1,8 @@
 package com.cleanup.go4lunch.ui.main
 
 import android.Manifest
-import android.app.Activity
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.MenuItem
-import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +14,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.viewpager2.widget.ViewPager2
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.detail.DetailsActivity
+import com.cleanup.go4lunch.ui.map.OnMarkerInfoWindowClicked
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,7 +28,7 @@ import kotlinx.coroutines.FlowPreview
 class MainActivity :
     AppCompatActivity(),
     ActivityCompat.OnRequestPermissionsResultCallback,
-    ActivityLauncher {
+    OnMarkerInfoWindowClicked {
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 44
     }
@@ -63,7 +61,7 @@ class MainActivity :
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
 
         findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.logout -> viewModel.onDisconnectClicked()
 
             } // todo .exhaustive
@@ -179,13 +177,8 @@ class MainActivity :
         )
     }
 
-    override fun launch(intent: Intent) {
-        this.startActivity(intent)
-    }
-
-    override fun getCaller(): Activity {
-        // todo Nino, là je leak, ou pas?
-        return this
+    override fun onClicked(osmId: Long) {
+        startActivity(DetailsActivity.navigate(this, osmId))
     }
 }
 

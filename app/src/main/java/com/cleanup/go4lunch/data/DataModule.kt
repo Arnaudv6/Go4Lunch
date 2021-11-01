@@ -14,9 +14,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
-import okhttp3.*
+import okhttp3.ConnectionSpec
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import okio.IOException
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -26,6 +26,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class DataModule {
+
+    companion object {
+        private const val BASE_URL_NOMINATIM: String = "https://nominatim.openstreetmap.org/"
+        private const val BASE_URL_USERS: String = "http://192.168.1.79:22280/"
+    }
 
     @Provides
     @Singleton
@@ -44,26 +49,25 @@ class DataModule {
             .fallbackToDestructiveMigration()
             .build()
 
+    @Singleton
     @Provides
-    fun provideSettingsDao(appDatabase: AppDatabase): SettingsDao {
-        return appDatabase.settingsDao
+    fun provideSettingsDao(appDatabase: AppDatabase): SettingsDao = appDatabase.settingsDao
+
+    @Singleton
+    @Provides
+    fun providePoiDao(appDatabase: AppDatabase): PoiDao = appDatabase.poiDao
+
+
+    @Singleton
+    @Provides
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
+        setLevel(HttpLoggingInterceptor.Level.BODY)
     }
 
+    @Singleton
     @Provides
-    fun providePoiDao(appDatabase: AppDatabase): PoiDao {
-        return appDatabase.poiDao
-    }
-
-    companion object {
-        private const val BASE_URL_NOMINATIM: String = "https://nominatim.openstreetmap.org/"
-        private const val BASE_URL_USERS: String = "http://192.168.1.79:22280/"
-    }
-
-    @Provides
-    fun provideNominatimRetrofit(): PoiRetrofit {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+    fun provideNominatimRetrofit(httpLoggingInterceptor: HttpLoggingInterceptor): PoiRetrofit {
+        val client = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build()
 
         return Retrofit.Builder()
             .baseUrl(BASE_URL_NOMINATIM)
@@ -75,10 +79,9 @@ class DataModule {
             .create(PoiRetrofit::class.java)
     }
 
+    @Singleton
     @Provides
-    fun provideUsersRetrofit(): UserRetrofit {
-        val httpLoggingInterceptor = HttpLoggingInterceptor()
-        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideUsersRetrofit(httpLoggingInterceptor: HttpLoggingInterceptor): UserRetrofit {
         val client = OkHttpClient.Builder()
             // todo remove that cleartext crap
             .connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))

@@ -9,7 +9,7 @@ data class DetailsViewState(
     val address: String,
     val bigImageUrl: String,
 
-    val call: String,
+    val call: String?,
     val callActive: Boolean,
     val likeActive: Boolean,
     val website: String,

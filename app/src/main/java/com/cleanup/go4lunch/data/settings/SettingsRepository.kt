@@ -7,6 +7,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.MyLocationUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,5 +56,5 @@ class SettingsRepository @Inject constructor(
     // todo make this code relevant
     private val idMutableStateFlow = MutableStateFlow<Long?>(null)
 
-    val idStateFlow: StateFlow<Long?> = idMutableStateFlow
+    val idStateFlow: Flow<Long?> = idMutableStateFlow.asStateFlow()
 }

@@ -22,10 +22,6 @@ class PoiRepository @Inject constructor(
     }
 
     // todo ensure 1_500ms delay
-
-    // todo Nino : tu m'avais mis ça pour faciliter les tests: est-ce toujours valide?
-    //  CONSIDER REFACTORING THIS INTO A FLOW EMITTING PoiEntity
-    //  fun getPOIsInBox(boundingBox: BoundingBox) = flow {
     suspend fun fetchPOIsInBox(boundingBox: BoundingBox): Int =
         try {
             poiRetrofit.getPoiInBox(  // getPOICloseTo() also exists
@@ -42,17 +38,18 @@ class PoiRepository @Inject constructor(
             poiDao.insertPoi(it)
         }.size
 
-    private fun toPoiEntity(result: PoiInBoxResult): PoiEntity? {
-        if (
-            result.category != "amenity"
-            || result.type != "restaurant"
-            || result.osmId == null
-            || result.address == null
-            || result.address.amenity == null
-            || result.lat == null
-            || result.lon == null
-        ) return null
-        return PoiEntity(
+    private fun toPoiEntity(result: PoiInBoxResult): PoiEntity? = if (
+        result.category != "amenity"
+        || result.type != "restaurant"
+        || result.osmId == null
+        || result.address == null
+        || result.address.amenity == null
+        || result.lat == null
+        || result.lon == null
+    ) {
+        null
+    } else {
+        PoiEntity(
             result.osmId,
             result.address.amenity,
             result.lat,
@@ -60,17 +57,19 @@ class PoiRepository @Inject constructor(
             toFuzzyAddress(result.address),
             result.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: "",
             PoiImages.getImageUrl(),
-            result.extraTags?.phone ?: "",
+            result.extraTags?.phone,
             result.extraTags?.website ?: "",
             result.extraTags?.hours ?: ""
         )
     }
 
-    private fun toFuzzyAddress(address: PoiInBoxResult.Address): String {
+    private fun toFuzzyAddress(address: PoiInBoxResult.Address): String =
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)
-        ) return "address unknown"
-        return "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
-    }
+        ) {
+            "address unknown"
+        } else {
+            "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
+        }
 }
 

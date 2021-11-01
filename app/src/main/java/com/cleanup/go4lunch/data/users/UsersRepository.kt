@@ -14,6 +14,7 @@ class UsersRepository @Inject constructor(
     private val settingsRepository: SettingsRepository,
 ) {
 
+    // TODO Still necessary ?
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListStateFlow: StateFlow<List<User>> = matesListMutableStateFlow
 
@@ -29,11 +30,17 @@ class UsersRepository @Inject constructor(
         })
     }
 
-    // Todo Nino : comment je fais du stateIn dans le repo?
-    val sessionUserFlow: StateFlow<User?> =
-        matesListStateFlow.combine(settingsRepository.idStateFlow) { users, id ->
-            users.find { it.id == id }
+    val sessionUserFlow: Flow<User?> =  settingsRepository.idStateFlow.map { userId ->
+        userRetrofit.getUsers().find { it.id == userId }?.let {
+            User(
+                id = it.id,
+                firstName = it.firstName,
+                lastName = it.lastName,
+                avatarUrl = it.avatarUrl,
+                goingAtNoon = it.goingAtNoon
+            )
         }
+    }
 
     fun usersGoingAtPlaceId(osmId: Long): List<User> {
         return matesListMutableStateFlow.value.filter {

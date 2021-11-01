@@ -31,9 +31,7 @@ class DetailsViewModel
     }
 
     val viewStateLiveData: LiveData<DetailsViewState> =
-        placeIdMutableStateFlow.filterNotNull().map {
-            poiRepository.getPoiById(it)
-        }.filterNotNull().combine(usersRepository.sessionUserFlow.filterNotNull()) { poi, user ->
+        combine(getPoiListFlow(), usersRepository.sessionUserFlow.filterNotNull()) { poi, user ->
             DetailsViewState(
                 name = poi.name,
                 goAtNoon = user.goingAtNoon == poi.id,
@@ -48,6 +46,10 @@ class DetailsViewModel
                 neighbourList = getNeighbourList(poi.id)
             )
         }.asLiveData()
+
+    private fun getPoiListFlow() = placeIdMutableStateFlow.filterNotNull().map {
+        poiRepository.getPoiById(it)
+    }.filterNotNull()
 
     private fun getNeighbourList(osmId: Long): List<Mate> {
         return usersRepository.usersGoingAtPlaceId(osmId).map {

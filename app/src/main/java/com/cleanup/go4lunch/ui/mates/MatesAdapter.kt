@@ -13,15 +13,12 @@ import com.cleanup.go4lunch.R
 
 class MatesAdapter : ListAdapter<Mate, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.fragment_mates_item, parent, false)
-        return ViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
+        LayoutInflater.from(parent.context).inflate(R.layout.fragment_mates_item, parent, false)
+    )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-        if (item != null) holder.bind(item)
+        holder.bind(getItem(position))
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -35,14 +32,9 @@ class MatesAdapter : ListAdapter<Mate, MatesAdapter.ViewHolder>(MatesDiffCallBac
     }
 
     class MatesDiffCallBack : DiffUtil.ItemCallback<Mate>() {
-        override fun areItemsTheSame(oldItem: Mate, newItem: Mate): Boolean {
-            return oldItem.id == newItem.id
-        }
+        override fun areItemsTheSame(oldItem: Mate, newItem: Mate) = oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: Mate, newItem: Mate): Boolean {
-            return oldItem == newItem
-        }
+        override fun areContentsTheSame(oldItem: Mate, newItem: Mate) = oldItem == newItem
     }
-
 }
 
