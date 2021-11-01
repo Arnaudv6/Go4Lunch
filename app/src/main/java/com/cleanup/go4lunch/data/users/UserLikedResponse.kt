@@ -2,7 +2,7 @@ package com.cleanup.go4lunch.data.users
 
 import com.google.gson.annotations.SerializedName
 
-data class UserLikedResult(
+data class UserLikedResponse(
 
     @SerializedName("likedid")
     val id: Long,

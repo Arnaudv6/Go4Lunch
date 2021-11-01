@@ -24,5 +24,5 @@ interface PoiRetrofit {
         @Query("addressdetails") addressDetails: Int = 1,
         @Query("extratags") extraTags: Int = 1,
         // @Query("email") email: String = EMAIL,
-    ): List<PoiInBoxResult>
+    ): List<PoiInBoxResponse>
 }

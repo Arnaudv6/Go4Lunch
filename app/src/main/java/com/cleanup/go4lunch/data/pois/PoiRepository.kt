@@ -38,32 +38,32 @@ class PoiRepository @Inject constructor(
             poiDao.insertPoi(it)
         }.size
 
-    private fun toPoiEntity(result: PoiInBoxResult): PoiEntity? = if (
-        result.category != "amenity"
-        || result.type != "restaurant"
-        || result.osmId == null
-        || result.address == null
-        || result.address.amenity == null
-        || result.lat == null
-        || result.lon == null
+    private fun toPoiEntity(response: PoiInBoxResponse): PoiEntity? = if (
+        response.category != "amenity"
+        || response.type != "restaurant"
+        || response.osmId == null
+        || response.address == null
+        || response.address.amenity == null
+        || response.lat == null
+        || response.lon == null
     ) {
         null
     } else {
         PoiEntity(
-            result.osmId,
-            result.address.amenity,
-            result.lat,
-            result.lon,
-            toFuzzyAddress(result.address),
-            result.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: "",
+            response.osmId,
+            response.address.amenity,
+            response.lat,
+            response.lon,
+            toFuzzyAddress(response.address),
+            response.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: "",
             PoiImages.getImageUrl(),
-            result.extraTags?.phone,
-            result.extraTags?.website ?: "",
-            result.extraTags?.hours ?: ""
+            response.extraTags?.phone,
+            response.extraTags?.website ?: "",
+            response.extraTags?.hours ?: ""
         )
     }
 
-    private fun toFuzzyAddress(address: PoiInBoxResult.Address): String =
+    private fun toFuzzyAddress(address: PoiInBoxResponse.Address): String =
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)
         ) {

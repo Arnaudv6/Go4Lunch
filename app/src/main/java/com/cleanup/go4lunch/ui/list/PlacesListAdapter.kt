@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.ui.detail.DetailsActivity
+import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 class PlacesListAdapter(
-    private val activityLauncher: ActivityLauncher
+    private val activityLauncher: DetailsActivityLauncher
 ) :
     ListAdapter<PlacesListViewState, PlacesListAdapter.ViewHolder>(PlacesDiffCallback()) {
 
@@ -40,12 +40,8 @@ class PlacesListAdapter(
         private val likes: RatingBar = itemView.findViewById(R.id.list_item_likes)
         private val image: AppCompatImageView = itemView.findViewById(R.id.list_item_image)
 
-        fun bind(activityLauncher: ActivityLauncher, viewState: PlacesListViewState) {
-            itemView.setOnClickListener {
-                activityLauncher.launch(
-                    DetailsActivity.navigate((activityLauncher.getCaller()), viewState.id)
-                )
-            }
+        fun bind(activityLauncher: DetailsActivityLauncher, viewState: PlacesListViewState) {
+            itemView.setOnClickListener { activityLauncher.onClicked(viewState.id) }
             name.text = viewState.name
             distance.text = viewState.distanceText
             address.text = viewState.address

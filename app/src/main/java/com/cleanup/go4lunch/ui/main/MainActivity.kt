@@ -15,7 +15,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
-import com.cleanup.go4lunch.ui.map.OnMarkerInfoWindowClicked
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +27,7 @@ import kotlinx.coroutines.FlowPreview
 class MainActivity :
     AppCompatActivity(),
     ActivityCompat.OnRequestPermissionsResultCallback,
-    OnMarkerInfoWindowClicked {
+    DetailsActivityLauncher {
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 44
     }

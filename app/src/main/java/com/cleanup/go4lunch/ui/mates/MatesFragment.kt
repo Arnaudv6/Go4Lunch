@@ -35,7 +35,7 @@ class MatesFragment : Fragment() {
         recycler.adapter = adapter
 
         viewModel.refreshMatesList()
-        viewModel.matesListLiveData.observe(viewLifecycleOwner) {
+        viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 

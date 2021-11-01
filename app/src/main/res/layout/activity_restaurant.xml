@@ -106,7 +106,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/details_place">
 
-                <!-- image button is crap https://stackoverflow.com/questions/4457030/ -->
+                <!--
+                bottomNavBar is not perfect fit: DO NOT force it in.
+                image button is crap https://stackoverflow.com/questions/4457030/
+                -->
                 <TextView
                     android:id="@+id/details_call"
                     android:layout_width="0dp"

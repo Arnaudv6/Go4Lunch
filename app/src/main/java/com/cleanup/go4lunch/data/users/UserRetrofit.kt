@@ -13,13 +13,13 @@ interface UserRetrofit {
     }
 
     @GET(USERS)
-    suspend fun getUsers(): List<UserResult>
+    suspend fun getUsers(): List<UserResponse>
 
     @GET(VISITED)
-    suspend fun getVisited(): List<UserVisitedResult>
+    suspend fun getVisited(): List<UserVisitedResponse>
 
     @GET(LIKED)
-    suspend fun getLiked(): List<UserLikedResult>
+    suspend fun getLiked(): List<UserLikedResponse>
 
     @Headers(
         "Prefer: resolution=merge-duplicates",
@@ -27,5 +27,14 @@ interface UserRetrofit {
     )
     @POST(USERS)
     suspend fun insertUser(@Body userBody: UserBody)
+
+    // todo
+    suspend fun toggleLiked(userId: Long, osmId: Long)
+
+    // todo
+    suspend fun setGoingAtNoon(userId: Long, osmId: Long)
+
+    // todo
+    suspend fun addVisited(userId: Long, osmId: Long)
 
 }

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
 
-class MatesAdapter : ListAdapter<Mate, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
+class MatesAdapter : ListAdapter<MatesViewStateItem, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.fragment_mates_item, parent, false)
@@ -25,16 +25,16 @@ class MatesAdapter : ListAdapter<Mate, MatesAdapter.ViewHolder>(MatesDiffCallBac
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
         private val textView: TextView = itemView.findViewById(R.id.mates_item_text)
 
-        fun bind(viewState: Mate) {
+        fun bind(viewState: MatesViewStateItem) {
             textView.text = viewState.text
             Glide.with(itemView).load(viewState.imageUrl).into(image)
         }
     }
 
-    class MatesDiffCallBack : DiffUtil.ItemCallback<Mate>() {
-        override fun areItemsTheSame(oldItem: Mate, newItem: Mate) = oldItem.id == newItem.id
+    class MatesDiffCallBack : DiffUtil.ItemCallback<MatesViewStateItem>() {
+        override fun areItemsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) = oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: Mate, newItem: Mate) = oldItem == newItem
+        override fun areContentsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) = oldItem == newItem
     }
 }
 

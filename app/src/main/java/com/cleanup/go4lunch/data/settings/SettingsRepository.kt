@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
@@ -20,6 +19,10 @@ class SettingsRepository @Inject constructor(
     private val settingsDao: SettingsDao,
     private val ioDispatcher: CoroutineDispatcher
 ) {
+
+    companion object {
+        private const val NAV_NUM: String = "NAV_NUM"
+    }
 
     suspend fun getInitialBox(): BoundingBox = run {
         val box = settingsDao.getBox()
@@ -36,10 +39,6 @@ class SettingsRepository @Inject constructor(
         CoroutineScope(ioDispatcher).launch {
             settingsDao.setBox(boxEntity)
         }
-    }
-
-    companion object {
-        private const val NAV_NUM: String = "NAV_NUM"
     }
 
     private val preferences = application.getSharedPreferences(

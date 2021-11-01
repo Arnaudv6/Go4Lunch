@@ -105,7 +105,7 @@ class PlacesListViewModel @Inject constructor(
             image = poi.imageUrl,
             hours = coloredHours.first,
             hoursColor = coloredHours.second,
-            likes = usersRepository.likes(poi.id).toFloat()
+            likes = usersRepository.getPlaceRating(poi.id).toFloat()
         )
     }
 

@@ -39,7 +39,7 @@ class MapViewModel @Inject constructor(
     }
 
     val viewStateLiveData: LiveData<MapViewState> =
-        poiRepository.cachedPOIsListFlow.combine(usersRepository.matesListStateFlow) { poiList, usersList ->
+        poiRepository.cachedPOIsListFlow.combine(usersRepository.matesListFlow) { poiList, usersList ->
             MapViewState(
                 poiList.map {
                     val going = usersList.filter { user ->

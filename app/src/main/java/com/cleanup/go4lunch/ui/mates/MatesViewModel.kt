@@ -21,10 +21,10 @@ class MatesViewModel @Inject constructor(
     private val poiRepository: PoiRepository
 ) : ViewModel() {
 
-    val matesListLiveData: LiveData<List<Mate>> =
-        usersRepository.matesListStateFlow.mapNotNull {
+    val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
+        usersRepository.matesListFlow.mapNotNull {
             it.map { user ->
-                Mate(
+                MatesViewStateItem(
                     id = user.id,
                     imageUrl = user.avatarUrl ?: "",
                     text = getText(user)
@@ -34,7 +34,7 @@ class MatesViewModel @Inject constructor(
 
     fun refreshMatesList() {
         viewModelScope.launch(Dispatchers.IO) {
-            usersRepository.requestMatesRefresh()
+            usersRepository.requestDataRefresh()
         }
     }
 

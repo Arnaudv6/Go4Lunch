@@ -17,6 +17,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,6 +34,7 @@ import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.lang.ref.WeakReference
 import java.util.Locale.getDefault
 import javax.inject.Inject
 
@@ -45,9 +47,7 @@ class MapFragment : Fragment() {
     lateinit var gpsProviderWrapper: GpsProviderWrapper
     private val viewModel: MapViewModel by viewModels()
     private lateinit var map: MapView // init in onCreateView, not constructor...
-
-    // todo remove if we don't hand it to MyMarkerInfoWindow()
-    private lateinit var activityLauncher: ActivityLauncher
+    private lateinit var mClickInterface: WeakReference<DetailsActivityLauncher>
 
     companion object {
         fun newInstance(): MapFragment {
@@ -57,8 +57,8 @@ class MapFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activityLauncher = context as ActivityLauncher
-        // TODO note this !!! This is Nino-valid, in onAttach() as we get context for free
+        mClickInterface = WeakReference(context as DetailsActivityLauncher)
+        // TODO understand this is OK: in onAttach() as we get context for free
     }
 
     override fun onCreateView(
@@ -139,7 +139,7 @@ class MapFragment : Fragment() {
                 poiMarker.snippet = pin.colleagues
                 poiMarker.position = pin.location
                 poiMarker.setPanToView(true)  // onClick, animate to map center?
-                poiMarker.setInfoWindow(MyMarkerInfoWindow(pin.id, map))  // null to disable
+                poiMarker.setInfoWindow(MyMarkerInfoWindow(pin.id, map, mClickInterface))  // null to disable
                 poiMarker.icon =
                     ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
                 // don't inject appContext here in Fragment : we're not injecting for instrumented tests.

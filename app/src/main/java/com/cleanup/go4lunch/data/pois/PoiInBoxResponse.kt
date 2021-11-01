@@ -2,7 +2,7 @@ package com.cleanup.go4lunch.data.pois
 
 import com.google.gson.annotations.SerializedName
 
-data class PoiInBoxResult(
+data class PoiInBoxResponse(
     @SerializedName("place_id")
     val placeId: Long?,
 
