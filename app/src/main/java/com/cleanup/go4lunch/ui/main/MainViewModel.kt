@@ -1,18 +1,21 @@
 package com.cleanup.go4lunch.ui.main
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cleanup.go4lunch.MainApplication
+import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.UseCase
-import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.users.User
-import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,28 +23,36 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,
-    private val settingsRepository: SettingsRepository,
-    private val usersRepository: UsersRepository,
-    private val poiRepository: PoiRepository,
-    useCase: UseCase,
+    private val useCase: UseCase,
+    @ApplicationContext appContext: Context,
 ) : ViewModel() {
-    val navNumLivedata: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
+    val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
 
-    val viewStateFlow: Flow<MainViewState?> = useCase.sessionUserFlow.map {
-        MainViewState(
-            it?.user?.avatarUrl,
-            it?.user?.firstName,
-            it?.user?.lastName,
-            it?.connectedThrough
+    val viewStateFlow: Flow<MainViewState> = useCase.sessionUserFlow.map {
+        if (it==null) MainViewState(
+            null,
+            appContext.getString(R.string.not_connected),
+            appContext.getString(R.string.not_connected)
+        )
+        else MainViewState(
+            it.user.avatarUrl,
+            listOfNotNull(it.user.firstName ,it.user.lastName.uppercase()).joinToString(separator = " "),
+            it.connectedThrough
         )
     }
 
     init {
-        navNumLivedata.value = settingsRepository.getNavNum()
+        navNumSingleLiveEvent.value = useCase.getNavNum()
+    }
+
+    fun onCreate() {
+        viewModelScope.launch(Dispatchers.IO) {
+            useCase.updateUsers()
+        }
     }
 
     fun onDestroy(num: Int) {
-        settingsRepository.setNavNum(num)
+        useCase.setNavNum(num)
         gpsProviderWrapper.destroyWrapper()
     }
 
@@ -60,10 +71,10 @@ class MainViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     fun onDisconnectClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            poiRepository.cachedPOIsListFlow.first {
+            useCase.cachedPOIsListFlow.first {
                 val ids = it.map { poiEntity -> poiEntity.id }
                 for (i: Int in 1..12) {
-                    usersRepository.insertUser(
+                    useCase.insertUser(
                         User(
                             i.toLong(),
                             "Agatha$i",

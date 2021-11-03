@@ -3,6 +3,8 @@ package com.cleanup.go4lunch.ui.main
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +14,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -41,12 +46,14 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.onCreate()
+
         setContentView(R.layout.activity_main)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         drawerLayout = findViewById(R.id.drawer_layout)
-        navBar = findViewById(R.id.nav_view)
+        navBar = findViewById(R.id.bottom_nav_view)
 
         toggle = ActionBarDrawerToggle(
             this,
@@ -58,6 +65,17 @@ class MainActivity :
         drawerLayout.addDrawerListener(toggle)
         drawerLayout.setScrimColor(ContextCompat.getColor(this, android.R.color.transparent))
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+
+        val headerView = findViewById<NavigationView>(R.id.side_nav).getHeaderView(0)
+
+        viewModel.viewStateFlow.collectWithLifecycle(this) {
+            if (it.avatarUrl != null) Glide.with(baseContext).load(it.avatarUrl)
+                .apply(RequestOptions.circleCropTransform()).into(
+                headerView.findViewById<ImageView>(R.id.drawer_avatar)
+            )
+            headerView.findViewById<TextView>(R.id.drawer_user_name).text = it.name
+            headerView.findViewById<TextView>(R.id.drawer_user_email).text = it.connectedVia
+        }
 
         findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {
             when (it.itemId) {
@@ -72,7 +90,7 @@ class MainActivity :
         // supportFragmentManager retainedFragments is incompatible with Hilt.
         viewPager = findViewById(R.id.view_pager)
 
-        viewModel.navNumLivedata.observe(this) {
+        viewModel.navNumSingleLiveEvent.observe(this) {
             viewPager.currentItem = it
         }
 

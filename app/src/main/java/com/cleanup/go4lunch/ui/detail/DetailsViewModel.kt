@@ -3,15 +3,18 @@ package com.cleanup.go4lunch.ui.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.UseCase
+import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.mates.MatesViewStateItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -22,17 +25,18 @@ class DetailsViewModel
     private val useCase: UseCase
 ) : ViewModel() {
 
-    private val placeIdMutableStateFlow = MutableStateFlow<Long?>(null)
-
-    private val placePoiEntityFlow = placeIdMutableStateFlow
-        .filterNotNull().map { useCase.getPoiById(it) }.filterNotNull()
+    private val poiEntityStateFlow = MutableStateFlow<PoiEntity?>(null)
 
     fun onCreate(osmId: Long) {
-        placeIdMutableStateFlow.tryEmit(osmId)
+        // todo inject Dispatchers.IO
+        // todo Nino why not synchronous?
+        viewModelScope.launch(Dispatchers.IO) {
+            poiEntityStateFlow.tryEmit(useCase.getPoiById(osmId))
+        }
     }
 
     val viewStateLiveData: LiveData<DetailsViewState> =
-        combine(placePoiEntityFlow, useCase.sessionUserFlow) { poi, session ->
+        combine(poiEntityStateFlow.filterNotNull(), useCase.sessionUserFlow) { poi, session ->
             DetailsViewState(
                 name = poi.name,
                 goAtNoon = session?.user?.goingAtNoon == poi.id,

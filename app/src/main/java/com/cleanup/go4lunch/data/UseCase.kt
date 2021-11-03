@@ -76,6 +76,12 @@ class UseCase
 
     fun setMapBox(boxEntity: BoxEntity) = settingsRepository.setMapBox(boxEntity)
 
+    suspend fun insertUser(user: User) = usersRepository.insertUser(user)
+
+    fun getNavNum(): Int = settingsRepository.getNavNum()
+
+    fun setNavNum(num: Int) = settingsRepository.setNavNum(num)
+
 }
 
 

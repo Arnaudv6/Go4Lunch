@@ -11,6 +11,7 @@ interface UserRetrofit {
         private const val LIKED_BY_ID = "likedplaces?select="
     }
 
+    @Headers("Accept: application/vnd.pgrst.object")
     @GET(USERS)
     suspend fun getUserById(
         @Query("id") userId: EqualId

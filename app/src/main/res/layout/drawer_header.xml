@@ -11,11 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:adjustViewBounds="true"
-        android:contentDescription="@string/app_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/shutterstock_649359244_" />
+        app:srcCompat="@drawable/shutterstock_649359244_"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/drawer_title"

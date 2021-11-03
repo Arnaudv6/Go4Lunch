@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.cleanup.go4lunch.R
 
 class MatesAdapter : ListAdapter<MatesViewStateItem, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
@@ -27,14 +28,17 @@ class MatesAdapter : ListAdapter<MatesViewStateItem, MatesAdapter.ViewHolder>(Ma
 
         fun bind(viewState: MatesViewStateItem) {
             textView.text = viewState.text
-            Glide.with(itemView).load(viewState.imageUrl).into(image)
+            Glide.with(itemView).load(viewState.imageUrl)
+                .apply(RequestOptions.circleCropTransform()).into(image)
         }
     }
 
     class MatesDiffCallBack : DiffUtil.ItemCallback<MatesViewStateItem>() {
-        override fun areItemsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) = oldItem.id == newItem.id
+        override fun areItemsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) =
+            oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) = oldItem == newItem
+        override fun areContentsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) =
+            oldItem == newItem
     }
 }
 
