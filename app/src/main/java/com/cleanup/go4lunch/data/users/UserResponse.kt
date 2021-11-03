@@ -4,18 +4,18 @@ import com.google.gson.annotations.SerializedName
 
 data class UserResponse(
 
-    val id: Long,
+    val id: Long?,
 
     @SerializedName("firstname")
-    val firstName: String,
+    val firstName: String?,
 
     @SerializedName("lastname")
-    val lastName: String,
+    val lastName: String?,
 
     @SerializedName("avatarurl")
-    val avatarUrl: String,
+    val avatarUrl: String?,
 
     @SerializedName("goingatnoon")
-    val goingAtNoon: Long
+    val goingAtNoon: Long?
 
 )

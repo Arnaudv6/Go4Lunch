@@ -4,9 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.users.User
-import com.cleanup.go4lunch.data.users.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,12 +16,18 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class MatesViewModel @Inject constructor(
-    private val usersRepository: UsersRepository,
-    private val poiRepository: PoiRepository
+    private val useCase: UseCase,
 ) : ViewModel() {
 
+    fun swipeRefresh() {
+        viewModelScope.launch(Dispatchers.IO){
+            useCase.updateUsers()
+
+        }
+    }
+
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
-        usersRepository.matesListFlow.mapNotNull {
+        useCase.matesListFlow.mapNotNull {
             it.map { user ->
                 MatesViewStateItem(
                     id = user.id,
@@ -32,15 +37,9 @@ class MatesViewModel @Inject constructor(
             }
         }.asLiveData()
 
-    fun refreshMatesList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            usersRepository.requestDataRefresh()
-        }
-    }
-
     private suspend fun getText(user: User): String {
         if (user.goingAtNoon == null) return "${user.firstName} has not decided yet"
-        val restaurant = poiRepository.getPoiById(user.goingAtNoon)
+        val restaurant = useCase.getPoiById(user.goingAtNoon)
             ?: return "${user.firstName}: chose restaurant id ${user.goingAtNoon}"
         if (restaurant.cuisine.isEmpty()) return "${user.firstName} is eating at ${restaurant.name}"
         return "${user.firstName} is eating ${restaurant.cuisine} (${restaurant.name})"

@@ -24,7 +24,8 @@ data class PoiEntity(
     val imageUrl: String,
     val phone: String?,
     val site: String?,
-    val hours: String?
+    val hours: String?,
+    val rating: Float?
     // https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification
     // https://wiki.openstreetmap.org/wiki/Key:opening_hours#Java
 )

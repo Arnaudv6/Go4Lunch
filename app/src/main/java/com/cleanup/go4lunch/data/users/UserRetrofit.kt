@@ -1,30 +1,34 @@
 package com.cleanup.go4lunch.data.users
 
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Headers
-import retrofit2.http.POST
+import retrofit2.Response
+import retrofit2.http.*
 
 interface UserRetrofit {
     companion object {
         private const val USERS = "users"
         private const val VISITED = "visited_places"
         private const val LIKED = "likedplaces"
+        private const val LIKED_BY_ID = "likedplaces?select="
     }
 
     @GET(USERS)
-    suspend fun getUsers(): List<UserResponse>
+    suspend fun getUserById(
+        @Query("id") userId: EqualId
+    ): Response<UserResponse>
+
+    @GET(USERS)
+    suspend fun getUsers(): List<UserResponse> // todo Nino : utiliser des Response meme pour les listes?
 
     @GET(VISITED)
-    suspend fun getVisited(): List<UserVisitedResponse>
+    suspend fun getVisitedPlaceIds(): List<Long>
 
     @GET(LIKED)
-    suspend fun getLiked(): List<UserLikedResponse>
+    suspend fun getLikedPlaceIds(): List<Long>
 
-    @Headers(
-        "Prefer: resolution=merge-duplicates",
-        // "Content-Type: application/x-www-form-urlencoded"
-    )
+    @GET(LIKED_BY_ID)
+    suspend fun getLikedById(@Query("id") userId: EqualId): List<Long>
+
+    @Headers("Prefer: resolution=merge-duplicates")
     @POST(USERS)
     suspend fun insertUser(@Body userBody: UserBody)
 
@@ -36,5 +40,9 @@ interface UserRetrofit {
 
     // todo
     suspend fun addVisited(userId: Long, osmId: Long)
+
+    data class EqualId(val id: Long) {
+        override fun toString() = "eq.$id"
+    }
 
 }

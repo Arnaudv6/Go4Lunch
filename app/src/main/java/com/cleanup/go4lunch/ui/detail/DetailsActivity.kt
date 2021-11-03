@@ -3,7 +3,9 @@ package com.cleanup.go4lunch.ui.detail
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.*
+import android.widget.ImageView
+import android.widget.RatingBar
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -47,13 +49,13 @@ class DetailsActivity : AppCompatActivity() {
         val recycler: RecyclerView = findViewById(R.id.details_recycler_view)
 
         val adapter = MatesAdapter()
-        recycler.adapter=adapter
+        recycler.adapter = adapter
 
         viewModel.onCreate(intent.getLongExtra(OSM_ID, 0))
         viewModel.viewStateLiveData.observe(this) {
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
-            likes.rating = it.likes.toFloat()
+            if (it.rating != null) likes.rating = it.rating
             address.text = it.address
             call.isClickable = it.callActive
             call.setOnClickListener {

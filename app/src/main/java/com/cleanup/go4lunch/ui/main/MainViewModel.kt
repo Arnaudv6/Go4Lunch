@@ -3,6 +3,7 @@ package com.cleanup.go4lunch.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.users.User
@@ -11,18 +12,29 @@ import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val settingsRepository: SettingsRepository,
     private val usersRepository: UsersRepository,
     private val poiRepository: PoiRepository,
+    useCase: UseCase,
 ) : ViewModel() {
     val navNumLivedata: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
+
+    val viewStateFlow: Flow<MainViewState?> = useCase.sessionUserFlow.map {
+        MainViewState(
+            it?.user?.avatarUrl,
+            it?.user?.firstName,
+            it?.user?.lastName,
+            it?.connectedThrough
+        )
+    }
 
     init {
         navNumLivedata.value = settingsRepository.getNavNum()

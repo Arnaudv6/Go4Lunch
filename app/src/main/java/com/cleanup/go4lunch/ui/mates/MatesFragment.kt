@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class MatesFragment : Fragment() {
+class MatesFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val viewModel: MatesViewModel by viewModels()
 
@@ -34,11 +35,14 @@ class MatesFragment : Fragment() {
         val adapter = MatesAdapter()
         recycler.adapter = adapter
 
-        viewModel.refreshMatesList()
         viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
         return view
+    }
+
+    override fun onRefresh() {
+        viewModel.swipeRefresh()
     }
 }

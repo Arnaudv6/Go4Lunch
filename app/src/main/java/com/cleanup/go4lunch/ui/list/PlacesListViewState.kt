@@ -12,6 +12,6 @@ data class PlacesListViewState(
     val hours: String,
     @ColorInt
     val hoursColor: Int,
-    val likes: Float
+    val rating: Float?
 )
 

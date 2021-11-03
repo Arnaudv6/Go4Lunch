@@ -3,9 +3,7 @@ package com.cleanup.go4lunch.ui.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.data.settings.SettingsRepository
-import com.cleanup.go4lunch.data.users.UsersRepository
+import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.mates.MatesViewStateItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,41 +18,43 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel
 @Inject constructor(
-    private val poiRepository: PoiRepository,
-    private val usersRepository: UsersRepository,
-    private val settingsRepository: SettingsRepository,
-    private val poiMapperDelegate: PoiMapperDelegate
+    private val poiMapperDelegate: PoiMapperDelegate,
+    private val useCase: UseCase
 ) : ViewModel() {
 
     private val placeIdMutableStateFlow = MutableStateFlow<Long?>(null)
+
+    private val placePoiEntityFlow = placeIdMutableStateFlow
+        .filterNotNull().map { useCase.getPoiById(it) }.filterNotNull()
 
     fun onCreate(osmId: Long) {
         placeIdMutableStateFlow.tryEmit(osmId)
     }
 
     val viewStateLiveData: LiveData<DetailsViewState> =
-        combine(getPlacePoiFlow(), usersRepository.sessionUserFlow.filterNotNull()) { poi, user ->
+        combine(placePoiEntityFlow, useCase.sessionUserFlow) { poi, session ->
             DetailsViewState(
                 name = poi.name,
-                goAtNoon = user.goingAtNoon == poi.id,
-                likes = usersRepository.getPlaceRating(poi.id),
+                goAtNoon = session?.user?.goingAtNoon == poi.id,
+                rating = poi.rating,
                 address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
                 bigImageUrl = poi.imageUrl.removeSuffix("/preview"),
                 call = poi.phone,
-                callActive = poi.phone.isNotEmpty(),
-                likeActive = usersRepository.toggleLiked(user.id, poi.id),
-                website = poi.site,
-                websiteActive = poi.site.isNotEmpty(),
+                callActive = true, // poi.phone.isNotEmpty(),
+                likeActive = true, // usersRepository.toggleLiked(user.id, poi.id),
+                website = "", // poi.site,
+                websiteActive = true, //poi.site.isNotEmpty(),
                 neighbourList = getNeighbourList(poi.id)
             )
         }.asLiveData()
 
-    private fun getPlacePoiFlow() = placeIdMutableStateFlow
-        .filterNotNull().map { poiRepository.getPoiById(it) }.filterNotNull()
-
     private fun getNeighbourList(osmId: Long): List<MatesViewStateItem> {
-        return usersRepository.usersGoingThere(osmId).map {
-            MatesViewStateItem(id = it.id, imageUrl = it.avatarUrl ?: "", text = it.firstName)
+        return useCase.usersGoingThere(osmId).map {
+            MatesViewStateItem(
+                id = it.id,
+                imageUrl = it.avatarUrl ?: "",
+                text = it.firstName
+            )
         }
     }
 

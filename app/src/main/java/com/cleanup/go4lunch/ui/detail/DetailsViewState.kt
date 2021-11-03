@@ -4,7 +4,7 @@ import com.cleanup.go4lunch.ui.mates.MatesViewStateItem
 data class DetailsViewState(
     val name: String,
     val goAtNoon: Boolean,
-    val likes: Int,
+    val rating: Float?,
     val address: String,
     val bigImageUrl: String,
 

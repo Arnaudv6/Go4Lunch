@@ -48,7 +48,7 @@ class PlacesListAdapter(
             colleagues.text = viewState.colleagues
             hours.text = viewState.hours
             hours.setTextColor(viewState.hoursColor)
-            likes.rating = viewState.likes
+            if (viewState.rating != null) likes.rating = viewState.rating
             Glide.with(itemView).load(viewState.image).into(image)
         }
     }

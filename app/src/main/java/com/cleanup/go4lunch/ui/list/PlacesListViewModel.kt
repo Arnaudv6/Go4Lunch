@@ -11,9 +11,8 @@ import androidx.lifecycle.viewModelScope
 import ch.poole.openinghoursparser.OpeningHoursParser
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.pois.PoiEntity
-import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.google.android.material.color.MaterialColors
@@ -32,9 +31,8 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
-    poiRepository: PoiRepository,
+    private val useCase: UseCase,
     gpsProviderWrapper: GpsProviderWrapper,
-    private val usersRepository: UsersRepository,
     ioDispatcher: CoroutineDispatcher,
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
@@ -49,7 +47,7 @@ class PlacesListViewModel @Inject constructor(
     private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
 
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
-        poiRepository.cachedPOIsListFlow.combine(gpsProviderWrapper.locationFlow) { list, location ->
+        combine(useCase.cachedPOIsListFlow, gpsProviderWrapper.locationFlow) { list, location ->
             list.sortedBy { poiEntity ->
                 distanceBetween(  // todo remove double with line 90
                     geoPoint1 = GeoPoint(poiEntity.latitude, poiEntity.longitude),
@@ -89,7 +87,7 @@ class PlacesListViewModel @Inject constructor(
             geoPoint1 = GeoPoint(poi.latitude, poi.longitude),
             geoPoint2 = GeoPoint(location)
         )
-        val coloredHours = fuzzyHours(poi.hours.trim())
+        val coloredHours = fuzzyHours(poi.hours.orEmpty().trim())
 
         return PlacesListViewState(
             id = poi.id,
@@ -100,12 +98,11 @@ class PlacesListViewModel @Inject constructor(
                 dist > 1_000 -> "${"%.1f".format(dist / 1000.0)}km"
                 else -> "${dist}m"
             },
-            colleagues = "(2)",
-            // colleagues = "(${usersRepository.usersGoing(poi.id).size})",
+            colleagues = "(${useCase.usersGoingThere(poi.id).size})",
             image = poi.imageUrl,
             hours = coloredHours.first,
             hoursColor = coloredHours.second,
-            likes = usersRepository.getPlaceRating(poi.id).toFloat()
+            rating = poi.rating
         )
     }
 

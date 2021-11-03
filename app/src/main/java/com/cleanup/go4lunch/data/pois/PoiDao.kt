@@ -19,4 +19,6 @@ interface PoiDao {
     @Query("SELECT * FROM poi_pins WHERE id=:osmId LIMIT 1")
     suspend fun getPoiById(osmId: Long): PoiEntity?
 
+    @Query("UPDATE poi_pins SET rating=:rating WHERE id = :osmId")
+    suspend fun updatePoiRating(osmId: Long, rating: Int)
 }

@@ -22,7 +22,7 @@ class PoiRepository @Inject constructor(
     }
 
     // todo ensure 1_500ms delay
-    suspend fun fetchPOIsInBox(boundingBox: BoundingBox): Int =
+    suspend fun fetchPOIsInBoundingBox(boundingBox: BoundingBox): Int =
         try {
             poiRetrofit.getPoiInBox(  // getPOICloseTo() also exists
                 viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
@@ -50,16 +50,17 @@ class PoiRepository @Inject constructor(
         null
     } else {
         PoiEntity(
-            response.osmId,
-            response.address.amenity,
-            response.lat,
-            response.lon,
-            toFuzzyAddress(response.address),
-            response.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: "",
-            PoiImages.getImageUrl(),
-            response.extraTags?.phone,
-            response.extraTags?.website ?: "",
-            response.extraTags?.hours ?: ""
+            id = response.osmId,
+            name = response.address.amenity,
+            latitude = response.lat,
+            longitude = response.lon,
+            address = toFuzzyAddress(response.address),
+            cuisine = response.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: "",
+            imageUrl = PoiImages.getImageUrl(),
+            phone = response.extraTags?.phone,
+            site = response.extraTags?.website,
+            hours = response.extraTags?.hours,
+            rating = null
         )
     }
 
@@ -71,5 +72,9 @@ class PoiRepository @Inject constructor(
         } else {
             "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
         }
+
+    suspend fun updatePoiRating(osmId:Long, rating:Int){
+        poiDao.updatePoiRating(osmId, rating)
+    }
 }
 
