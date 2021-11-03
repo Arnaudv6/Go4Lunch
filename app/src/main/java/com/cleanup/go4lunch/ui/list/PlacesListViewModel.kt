@@ -7,22 +7,19 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import ch.poole.openinghoursparser.OpeningHoursParser
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
-import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -33,19 +30,14 @@ import javax.inject.Inject
 class PlacesListViewModel @Inject constructor(
     private val useCase: UseCase,
     gpsProviderWrapper: GpsProviderWrapper,
-    ioDispatcher: CoroutineDispatcher,
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
-    val viewActionLiveData = SingleLiveEvent<PlacesListViewAction>()
-    // This would have been a channel, in pure kotlin/flow terms, but livedata fits better the view.
-
     // todo : once Colors have night quantifier, simplify this
     private val colorOnSecondary =
         MaterialColors.getColor(application, R.attr.colorOnSecondary, Color.parseColor("#888888"))
 
-    private val recyclerViewStabilizedMutableSharedFlow = MutableSharedFlow<Unit>(replay = 1)
-
+    // todo : en soi, là, je dépend aussi de l'heure et des collegues.
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
         combine(useCase.cachedPOIsListFlow, gpsProviderWrapper.locationFlow) { list, location ->
             list.sortedBy { poiEntity ->
@@ -59,28 +51,6 @@ class PlacesListViewModel @Inject constructor(
         }
 
     val viewStateListLiveData = viewStateListFlow.asLiveData()
-
-    init {
-        viewModelScope.launch(ioDispatcher) {
-            combine(
-                recyclerViewStabilizedMutableSharedFlow.sample(1_000).onEach {
-                    Log.d(
-                        "Nino",
-                        "recyclerViewStabilizedMutableSharedFlow.sample() called"
-                    )
-                },
-                viewStateListFlow.debounce(200).onEach {
-                    Log.d(
-                        "Nino",
-                        "newPoiExposedMutableSharedFlow.debounce() called"
-                    )
-                }
-            ) { _, _ ->
-                Log.d("Nino", "combine() called, emitting scrollToTop")
-                viewActionLiveData.value = PlacesListViewAction.ScrollToTop
-            }
-        }
-    }
 
     private fun viewStateFromPoi(poi: PoiEntity, location: Location): PlacesListViewState {
         val dist = distanceBetween(
@@ -145,8 +115,4 @@ class PlacesListViewModel @Inject constructor(
 
     private fun distanceBetween(geoPoint1: GeoPoint, geoPoint2: GeoPoint): Int =
         geoPoint1.distanceToAsDouble(geoPoint2).toInt()
-
-    fun onRecyclerViewIdle() {
-        recyclerViewStabilizedMutableSharedFlow.tryEmit(Unit)
-    }
 }

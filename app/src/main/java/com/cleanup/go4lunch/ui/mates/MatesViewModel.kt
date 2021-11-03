@@ -3,14 +3,11 @@ package com.cleanup.go4lunch.ui.mates
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.users.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -19,12 +16,7 @@ class MatesViewModel @Inject constructor(
     private val useCase: UseCase,
 ) : ViewModel() {
 
-    fun swipeRefresh() {
-        viewModelScope.launch(Dispatchers.IO){
-            useCase.updateUsers()
-
-        }
-    }
+    suspend fun swipeRefresh() = useCase.updateUsers()
 
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
         useCase.matesListFlow.mapNotNull {

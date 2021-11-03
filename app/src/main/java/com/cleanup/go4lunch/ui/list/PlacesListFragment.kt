@@ -45,23 +45,6 @@ class PlacesListFragment : Fragment() {
         val adapter = PlacesListAdapter(activity as DetailsActivityLauncher)
         recyclerView.adapter = adapter
 
-        viewModel.viewActionLiveData.observe(viewLifecycleOwner) {
-            when (it) {
-                PlacesListViewAction.ScrollToTop ->
-                    (recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPosition(0)
-                // mind the ? on as operator !
-                else -> Unit
-            }.exhaustive
-        }
-
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == SCROLL_STATE_IDLE) {
-                    viewModel.onRecyclerViewIdle()
-                }
-            }
-        })
-
         viewModel.viewStateListLiveData.observe(viewLifecycleOwner) { adapter.submitList(it) }
 
         return view

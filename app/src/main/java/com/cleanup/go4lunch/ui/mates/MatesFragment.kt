@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cleanup.go4lunch.R
@@ -14,7 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class MatesFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
+class MatesFragment : Fragment() {
 
     private val viewModel: MatesViewModel by viewModels()
 
@@ -39,10 +40,14 @@ class MatesFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             adapter.submitList(it)
         }
 
-        return view
-    }
+        val swipe: SwipeRefreshLayout = view.findViewById(R.id.mates_swipe_refresh_layout)
+        swipe.setOnRefreshListener {
+            lifecycleScope.launchWhenStarted {
+                viewModel.swipeRefresh()
+                swipe.isRefreshing = false
+            }
+        }
 
-    override fun onRefresh() {
-        viewModel.swipeRefresh()
+        return view
     }
 }
