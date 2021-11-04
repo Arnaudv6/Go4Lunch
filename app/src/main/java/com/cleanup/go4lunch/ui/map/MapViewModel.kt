@@ -22,7 +22,7 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val useCase: UseCase,
     private val ioDispatcher: CoroutineDispatcher,
-    private val gpsProviderWrapper: GpsProviderWrapper
+    private val gpsProviderWrapper: GpsProviderWrapper  // todo move to usecase?
 ) : ViewModel() {
 
     private val boundingBoxMutableStateFlow = MutableStateFlow(BoundingBox())

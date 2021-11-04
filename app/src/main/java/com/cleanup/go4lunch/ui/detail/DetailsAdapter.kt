@@ -1,4 +1,4 @@
-package com.cleanup.go4lunch.ui.mates
+package com.cleanup.go4lunch.ui.detail
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,37 +11,35 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 
-class MatesAdapter(private val activityLauncher: DetailsActivityLauncher) :
-    ListAdapter<MatesViewStateItem, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
+class DetailsAdapter :
+    ListAdapter<DetailsViewState.Item, DetailsAdapter.ViewHolder>(ItemDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.fragment_mates_item, parent, false)
     )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(activityLauncher, getItem(position))
+        holder.bind(getItem(position))
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
         private val textView: TextView = itemView.findViewById(R.id.mates_item_text)
 
-        fun bind(activityLauncher: DetailsActivityLauncher, viewState: MatesViewStateItem) {
+        fun bind(viewState: DetailsViewState.Item) {
             textView.text = viewState.text
             Glide.with(itemView).load(viewState.imageUrl)
                 .apply(RequestOptions.circleCropTransform()).into(image)
-            if (viewState.placeId != null)
-                itemView.setOnClickListener { activityLauncher.onClicked(viewState.placeId) }
         }
     }
 
-    class MatesDiffCallBack : DiffUtil.ItemCallback<MatesViewStateItem>() {
-        override fun areItemsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) =
+    class ItemDiffCallBack : DiffUtil.ItemCallback<DetailsViewState.Item>() {
+        override fun areItemsTheSame(oldItem: DetailsViewState.Item, newItem: DetailsViewState.Item) =
             oldItem.mateId == newItem.mateId
 
-        override fun areContentsTheSame(oldItem: MatesViewStateItem, newItem: MatesViewStateItem) =
+        override fun areContentsTheSame(oldItem: DetailsViewState.Item, newItem: DetailsViewState.Item) =
             oldItem == newItem
     }
 }
+

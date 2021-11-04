@@ -29,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
     private val useCase: UseCase,
-    gpsProviderWrapper: GpsProviderWrapper,
+    gpsProviderWrapper: GpsProviderWrapper, // todo move to usecase ?
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {

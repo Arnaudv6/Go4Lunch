@@ -10,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.ui.detail.DetailsAdapter
+import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -33,7 +35,7 @@ class MatesFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_mates, container, false)
 
         val recycler: RecyclerView = view.findViewById(R.id.mates_recycler_view)
-        val adapter = MatesAdapter()
+        val adapter = MatesAdapter(activity as DetailsActivityLauncher)
         recycler.adapter = adapter
 
         viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {

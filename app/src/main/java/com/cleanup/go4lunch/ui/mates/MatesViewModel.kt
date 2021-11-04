@@ -22,7 +22,8 @@ class MatesViewModel @Inject constructor(
         useCase.matesListFlow.mapNotNull {
             it.map { user ->
                 MatesViewStateItem(
-                    id = user.id,
+                    mateId = user.id,
+                    placeId = user.goingAtNoon,
                     imageUrl = user.avatarUrl ?: "",
                     text = getText(user)
                 )

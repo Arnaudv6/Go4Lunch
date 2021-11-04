@@ -59,6 +59,8 @@ class GpsProviderWrapper @Inject constructor(
 
     // IMyLocationProvider
     fun startLocationProvider(): Boolean {
+        // todo  java.lang.NullPointerException: Attempt to invoke virtual method
+        //  'java.util.List android.location.LocationManager.getProviders(boolean)' on a null object reference
         return provider.startLocationProvider(this)
     }
 

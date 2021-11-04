@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.main
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.MainApplication
@@ -22,13 +23,14 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val gpsProviderWrapper: GpsProviderWrapper,
+    private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
     private val useCase: UseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
 
     val viewStateFlow: Flow<MainViewState> = useCase.sessionUserFlow.map {
+        Log.e(this.javaClass.canonicalName, "sessionUser: $it" )
         if (it==null) MainViewState(
             null,
             appContext.getString(R.string.not_connected),

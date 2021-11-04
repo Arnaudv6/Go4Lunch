@@ -33,7 +33,7 @@ class UseCase
             if (user == null) null
             else SessionUser(
                 user,
-                usersRepository.getLikedById(it).toLongArray(),
+                longArrayOf(),// todo usersRepository.getLikedById(it).toLongArray(),
                 settingsRepository.getConnectionType()
             )
         }
@@ -46,7 +46,7 @@ class UseCase
         matesListMutableStateFlow.tryEmit(usersRepository.getUsersList())
     }
 
-    // todo Nino : on fait passe-plat pour tout ? les VM ne parlent plus aux repo?
+    // todo Nino : le UseCase fait passe-plat pour tout ? les VM ne parlent plus aux repo?
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiRepository.getPoiById(osmId)
 
     val cachedPOIsListFlow: Flow<List<PoiEntity>> = poiRepository.cachedPOIsListFlow

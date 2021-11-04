@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
-import com.cleanup.go4lunch.ui.mates.MatesViewStateItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,10 +51,10 @@ class DetailsViewModel
             )
         }.asLiveData()
 
-    private fun getNeighbourList(osmId: Long): List<MatesViewStateItem> {
+    private fun getNeighbourList(osmId: Long): List<DetailsViewState.Item> {
         return useCase.usersGoingThere(osmId).map {
-            MatesViewStateItem(
-                id = it.id,
+            DetailsViewState.Item(
+                mateId = it.id,
                 imageUrl = it.avatarUrl ?: "",
                 text = it.firstName
             )

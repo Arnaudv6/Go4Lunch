@@ -31,7 +31,7 @@ class UsersRepository @Inject constructor(
 
     suspend fun getSessionUser(userId: Long): User? {
         val response = userRetrofit.getUserById(UserRetrofit.EqualId(userId))
-        if (response.isSuccessful) return null
+        if (!response.isSuccessful) return null
         return toUser(response.body())
     }
 

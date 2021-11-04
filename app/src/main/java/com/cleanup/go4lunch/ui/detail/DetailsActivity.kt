@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.ui.mates.MatesAdapter
+import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,7 +48,7 @@ class DetailsActivity : AppCompatActivity() {
         val button: FloatingActionButton = findViewById(R.id.details_floatingActionButton)
         val recycler: RecyclerView = findViewById(R.id.details_recycler_view)
 
-        val adapter = MatesAdapter()
+        val adapter = DetailsAdapter()
         recycler.adapter = adapter
 
         viewModel.onCreate(intent.getLongExtra(OSM_ID, 0))
