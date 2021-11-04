@@ -87,21 +87,11 @@ class DataModule {
         httpLoggingInterceptor: HttpLoggingInterceptor,
         @ApplicationContext context: Context
     ): UserRetrofit {
-        val clientCertificates = HandshakeCertificates.Builder()
-            .addPlatformTrustedCertificates()
-            .addInsecureHost(BASE_DOMAIN_USERS)
-            .build()
-
-        // pin is easier than PEM file in context.resources.openRawResource(R.raw.arnaud)
         val certificatePinner = CertificatePinner.Builder()
-            .add(BASE_DOMAIN_USERS, "sha256/siPA0fWSc2epRP1Q3E3Mgxxj0Re0vBzhBUgpt95lGng=")
+            .add(BASE_DOMAIN_USERS, "sha256/dW/tJSIXIW90ICQWo6Ib02vc5/YqcHeg8wxbyWU6rtI=")
             .build()
 
         val client = OkHttpClient.Builder()
-            .sslSocketFactory(
-                clientCertificates.sslSocketFactory(),
-                clientCertificates.trustManager
-            )
             .certificatePinner(certificatePinner)
             .addInterceptor(httpLoggingInterceptor)
             .build()
