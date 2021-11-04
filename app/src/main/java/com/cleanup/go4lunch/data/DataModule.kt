@@ -14,9 +14,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
-import okhttp3.ConnectionSpec
+import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.tls.HandshakeCertificates
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -29,7 +30,8 @@ class DataModule {
 
     companion object {
         private const val BASE_URL_NOMINATIM: String = "https://nominatim.openstreetmap.org/"
-        private const val BASE_URL_USERS: String = "http://192.168.1.79:22280/"
+        private const val BASE_DOMAIN_USERS: String = "192.168.1.79"
+        private const val BASE_URL_USERS: String = "https://192.168.1.79:22280/"
     }
 
     @Provides
@@ -81,10 +83,26 @@ class DataModule {
 
     @Singleton
     @Provides
-    fun provideUsersRetrofit(httpLoggingInterceptor: HttpLoggingInterceptor): UserRetrofit {
+    fun provideUsersRetrofit(
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        @ApplicationContext context: Context
+    ): UserRetrofit {
+        val clientCertificates = HandshakeCertificates.Builder()
+            .addPlatformTrustedCertificates()
+            .addInsecureHost(BASE_DOMAIN_USERS)
+            .build()
+
+        // pin is easier than PEM file in context.resources.openRawResource(R.raw.arnaud)
+        val certificatePinner = CertificatePinner.Builder()
+            .add(BASE_DOMAIN_USERS, "sha256/siPA0fWSc2epRP1Q3E3Mgxxj0Re0vBzhBUgpt95lGng=")
+            .build()
+
         val client = OkHttpClient.Builder()
-            // todo remove that cleartext crap
-            .connectionSpecs(listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT))
+            .sslSocketFactory(
+                clientCertificates.sslSocketFactory(),
+                clientCertificates.trustManager
+            )
+            .certificatePinner(certificatePinner)
             .addInterceptor(httpLoggingInterceptor)
             .build()
 
