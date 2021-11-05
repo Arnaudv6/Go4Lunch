@@ -54,7 +54,6 @@ class SettingsRepository @Inject constructor(
 
     fun getConnectionType(): String = "gmail"
 
-    // todo make this code relevant
     private val idMutableStateFlow = MutableStateFlow<Long?>(1) // todo replace 1 with null
 
     val idStateFlow: Flow<Long?> = idMutableStateFlow.asStateFlow()

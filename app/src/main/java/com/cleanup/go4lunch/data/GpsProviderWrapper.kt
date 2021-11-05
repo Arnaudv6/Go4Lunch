@@ -17,7 +17,7 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     IMyLocationConsumer, // to pass "this" to GpsMyLocationProvider here
     IMyLocationProvider  // to pass "this" to MyLocationNewOverlay in MapFragment
 {
-    // todo Nino : la, je stocke une chaine dans mon bytecode, qui ne sert qu'au linter...?
+    // todo Nino : la, je stocke une chaine dans mon bytecode, qui ne sert qu'au linter...t'as mieux?
     companion object {
         private const val DEPRECATION = "Only here for MyLocationNewOverlay's use."
     }
@@ -26,7 +26,7 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     private var myLocationNewOverlayListener: IMyLocationConsumer? = null
 
     private val mutableLocationFlow = MutableStateFlow(
-        Location("repository").apply {  // todo this concept I could use in other places.
+        Location("repository").apply {  // todo this "apply" concept I could use in other places.
             latitude = MyLocationUtils.EIFFEL_TOWER.latitude
             longitude = MyLocationUtils.EIFFEL_TOWER.longitude
             altitude = MyLocationUtils.EIFFEL_TOWER.altitude

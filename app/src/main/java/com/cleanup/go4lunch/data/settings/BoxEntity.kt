@@ -24,7 +24,7 @@ class BoxEntity {
         this.east = east
     }
 
-    // todo Nino: proper warning removal?
+    // todo Nino: how to remove this warning the right way?
     @Deprecated("Don't set key: single-row table")
     constructor(north: Double, south: Double, west: Double, east: Double, key: Int) {
         this.north = north
