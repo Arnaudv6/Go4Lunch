@@ -1,13 +1,11 @@
 package com.cleanup.go4lunch.data.pois
 
 import android.util.Log
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@ExperimentalCoroutinesApi
 @Singleton
 class PoiRepository @Inject constructor(
     private val poiRetrofit: PoiRetrofit,
@@ -17,9 +15,7 @@ class PoiRepository @Inject constructor(
 
     val cachedPOIsListFlow: Flow<List<PoiEntity>> = poiDao.getPoiEntities()
 
-    suspend fun getPoiById(osmId: Long): PoiEntity? {
-        return poiDao.getPoiById(osmId)
-    }
+    suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
     // todo ensure 1_500ms delay
     suspend fun fetchPOIsInBoundingBox(boundingBox: BoundingBox): Int =
@@ -73,8 +69,7 @@ class PoiRepository @Inject constructor(
             "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
         }
 
-    suspend fun updatePoiRating(osmId:Long, rating:Int){
-        poiDao.updatePoiRating(osmId, rating)
-    }
+    suspend fun updatePoiRating(osmId: Long, rating: Int) = poiDao.updatePoiRating(osmId, rating)
+
 }
 

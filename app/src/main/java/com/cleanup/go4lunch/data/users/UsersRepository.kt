@@ -4,9 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UsersRepository @Inject constructor(
-    private val userRetrofit: UserRetrofit,
-) {
+class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit) {
 
     // todo decorator java.net.ConnectException
     suspend fun insertUser(user: User) {

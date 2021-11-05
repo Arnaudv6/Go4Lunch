@@ -10,16 +10,13 @@ data class PoiInBoxResponse(
     val osmId: Long?,
 
     val lat: Double?,
-
     val lon: Double?,
-
     val address: Address?,
 
     @SerializedName("extratags")
     val extraTags: ExtraTags?,
 
     val category: String?, // amenity
-
     val type: String // restaurant
 ) {
     data class Address(
@@ -29,9 +26,7 @@ data class PoiInBoxResponse(
         val number: String?,
 
         val road: String?,
-
         val municipality: String?,
-
         val postcode: String?
     )
 

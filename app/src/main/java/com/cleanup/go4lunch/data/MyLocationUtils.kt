@@ -8,14 +8,11 @@ import javax.inject.Singleton
 @Singleton
 class MyLocationUtils @Inject constructor() {
 
+    // todo Nino : make this an object?
     companion object {
         // Eiffel Tower, @5m above the WGS 84: real Paris is 35m above sea: limiting false positives
-        const val fallbackLatitude = 48.8583
-        const val fallbackLongitude = 2.2944
-        const val fallbackAltitude = 5.0
-        val FRANCE_BOX : BoundingBox = BoundingBox(51.404, 8.341, 42.190, -4.932)
-        val fallbackGeoPoint = GeoPoint(fallbackLatitude, fallbackLongitude, fallbackAltitude)
+        val EIFFEL_TOWER = GeoPoint(48.8583, 2.2944, 5.0)
+        val FRANCE_BOX = BoundingBox(51.404, 8.341, 42.190, -4.932)
     }
-
 }
 

@@ -10,8 +10,7 @@ interface PoiRetrofit {
         private const val SEARCH_IN_BOX = "search"
     }
 
-// https://nominatim.openstreetmap.org/search?viewbox=-0.91187%2C46.74362%2C6.06445%2C44.99200&format=json&q=[restaurant]&limit=20&bounded=1
-
+    // https://nominatim.openstreetmap.org/search?viewbox=-0.91187%2C46.74362%2C6.06445%2C44.99200&format=json&q=[restaurant]&limit=20&bounded=1
     @Headers("User-Agent: ${BuildConfig.APPLICATION_ID}")
     @GET(SEARCH_IN_BOX)
     suspend fun getPoiInBox(
@@ -23,6 +22,7 @@ interface PoiRetrofit {
         @Query("accept-language") lang: String = "EN",  // "fr"
         @Query("addressdetails") addressDetails: Int = 1,
         @Query("extratags") extraTags: Int = 1,
+        // have to specify either a mail, or User-Agent Header
         // @Query("email") email: String = EMAIL,
     ): List<PoiInBoxResponse>
 }

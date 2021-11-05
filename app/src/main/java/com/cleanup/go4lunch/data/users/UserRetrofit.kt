@@ -18,7 +18,8 @@ interface UserRetrofit {
     ): Response<UserResponse>
 
     @GET(USERS)
-    suspend fun getUsers(): List<UserResponse> // todo Nino : utiliser des Response meme pour les listes?
+    suspend fun getUsers(): List<UserResponse>
+    // todo Nino : utiliser des Response meme pour les listes?
 
     @GET(VISITED)
     suspend fun getVisitedPlaceIds(): List<Long>

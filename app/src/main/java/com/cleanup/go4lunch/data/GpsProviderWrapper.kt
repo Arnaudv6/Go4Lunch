@@ -13,12 +13,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GpsProviderWrapper @Inject constructor(
-    private val provider: GpsMyLocationProvider
-) : IMyLocationConsumer, IMyLocationProvider {
-    // IMyLocationConsumer interface implemented to pass "this" to GpsMyLocationProvider here
-    // IMyLocationProvider interface implemented to pass "this" to MyLocationNewOverlay in MapFragment
-
+class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocationProvider) :
+    IMyLocationConsumer, // to pass "this" to GpsMyLocationProvider here
+    IMyLocationProvider  // to pass "this" to MyLocationNewOverlay in MapFragment
+{
+    // todo Nino : la, je stocke une chaine dans mon bytecode, qui ne sert qu'au linter...?
     companion object {
         private const val DEPRECATION = "Only here for MyLocationNewOverlay's use."
     }
@@ -27,10 +26,10 @@ class GpsProviderWrapper @Inject constructor(
     private var myLocationNewOverlayListener: IMyLocationConsumer? = null
 
     private val mutableLocationFlow = MutableStateFlow(
-        Location("repository").apply {
-            latitude = MyLocationUtils.fallbackLatitude
-            longitude = MyLocationUtils.fallbackLongitude
-            altitude = MyLocationUtils.fallbackAltitude
+        Location("repository").apply {  // todo this concept I could use in other places.
+            latitude = MyLocationUtils.EIFFEL_TOWER.latitude
+            longitude = MyLocationUtils.EIFFEL_TOWER.longitude
+            altitude = MyLocationUtils.EIFFEL_TOWER.altitude
         }
     )
     val locationFlow: StateFlow<Location> = mutableLocationFlow.asStateFlow()
