@@ -7,11 +7,7 @@ import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.list.PlacesListFragment
 import com.cleanup.go4lunch.ui.map.MapFragment
 import com.cleanup.go4lunch.ui.mates.MatesFragment
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 class MainPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int = 3

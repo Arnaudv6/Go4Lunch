@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cleanup.go4lunch.MainApplication
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.UseCase
@@ -13,14 +12,12 @@ import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
@@ -30,15 +27,18 @@ class MainViewModel @Inject constructor(
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
 
     val viewStateFlow: Flow<MainViewState> = useCase.sessionUserFlow.map {
-        Log.e(this.javaClass.canonicalName, "sessionUser: $it" )
-        if (it==null) MainViewState(
+        Log.e(this.javaClass.canonicalName, "sessionUser: $it")
+        if (it == null) MainViewState(
             null,
             appContext.getString(R.string.not_connected),
             appContext.getString(R.string.not_connected)
         )
         else MainViewState(
             it.user.avatarUrl,
-            listOfNotNull(it.user.firstName ,it.user.lastName.uppercase()).joinToString(separator = " "),
+            listOfNotNull(
+                it.user.firstName,
+                it.user.lastName.uppercase()
+            ).joinToString(separator = " "),
             it.connectedThrough
         )
     }
@@ -70,7 +70,6 @@ class MainViewModel @Inject constructor(
         gpsProviderWrapper.locationPermissionUpdate(fine, coarse)
     }
 
-    @ExperimentalCoroutinesApi
     fun onDisconnectClicked() {
         viewModelScope.launch(Dispatchers.IO) {
             useCase.cachedPOIsListFlow.first {

@@ -8,7 +8,6 @@ import com.cleanup.go4lunch.data.users.SessionUser
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.exhaustive
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +16,6 @@ import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@ExperimentalCoroutinesApi
 @Singleton
 class UseCase
 @Inject constructor(

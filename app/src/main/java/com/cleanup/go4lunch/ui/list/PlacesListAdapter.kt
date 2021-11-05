@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
     ListAdapter<PlacesListViewState, PlacesListAdapter.ViewHolder>(PlacesDiffCallback()) {
 

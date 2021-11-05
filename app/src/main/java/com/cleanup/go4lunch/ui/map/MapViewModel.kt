@@ -10,14 +10,16 @@ import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val useCase: UseCase,

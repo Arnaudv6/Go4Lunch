@@ -4,12 +4,10 @@ import android.graphics.Paint
 import android.widget.TextView
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import java.lang.ref.WeakReference
 
-@ExperimentalCoroutinesApi
 class MyMarkerInfoWindow(
     private val osmId: Long,
     mapView: MapView,

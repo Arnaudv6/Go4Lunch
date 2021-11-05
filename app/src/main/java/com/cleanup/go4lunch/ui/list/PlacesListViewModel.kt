@@ -16,16 +16,12 @@ import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
     private val useCase: UseCase,

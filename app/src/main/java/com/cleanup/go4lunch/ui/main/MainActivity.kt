@@ -23,11 +23,7 @@ import com.cleanup.go4lunch.ui.detail.DetailsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity :
     AppCompatActivity(),
@@ -71,8 +67,8 @@ class MainActivity :
         viewModel.viewStateFlow.collectWithLifecycle(this) {
             if (it.avatarUrl != null) Glide.with(baseContext).load(it.avatarUrl)
                 .apply(RequestOptions.circleCropTransform()).into(
-                headerView.findViewById<ImageView>(R.id.drawer_avatar)
-            )
+                    headerView.findViewById<ImageView>(R.id.drawer_avatar)
+                )
             headerView.findViewById<TextView>(R.id.drawer_user_name).text = it.name
             headerView.findViewById<TextView>(R.id.drawer_user_email).text = it.connectedVia
         }

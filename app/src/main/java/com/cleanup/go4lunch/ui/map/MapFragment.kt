@@ -20,8 +20,6 @@ import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -38,9 +36,6 @@ import java.lang.ref.WeakReference
 import java.util.Locale.getDefault
 import javax.inject.Inject
 
-
-@FlowPreview
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MapFragment : Fragment() {
     @Inject
@@ -139,7 +134,13 @@ class MapFragment : Fragment() {
                 poiMarker.snippet = pin.colleagues
                 poiMarker.position = pin.location
                 poiMarker.setPanToView(true)  // onClick, animate to map center?
-                poiMarker.setInfoWindow(MyMarkerInfoWindow(pin.id, map, mClickInterface))  // null to disable
+                poiMarker.setInfoWindow(
+                    MyMarkerInfoWindow(
+                        osmId = pin.id,
+                        mapView = map,
+                        detailsActivityLauncher = mClickInterface
+                    )
+                )  // null to disable
                 poiMarker.icon =
                     ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
                 // don't inject appContext here in Fragment : we're not injecting for instrumented tests.

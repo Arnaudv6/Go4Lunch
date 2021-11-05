@@ -10,12 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.ui.detail.DetailsAdapter
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MatesFragment : Fragment() {
 

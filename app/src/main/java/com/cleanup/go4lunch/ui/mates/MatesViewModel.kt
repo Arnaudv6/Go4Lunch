@@ -6,15 +6,11 @@ import androidx.lifecycle.asLiveData
 import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.users.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 @HiltViewModel
-class MatesViewModel @Inject constructor(
-    private val useCase: UseCase,
-) : ViewModel() {
+class MatesViewModel @Inject constructor(private val useCase: UseCase) : ViewModel() {
 
     suspend fun swipeRefresh() = useCase.updateUsers()
 
