@@ -5,6 +5,7 @@
             <certificates src="@raw/my_cert" />
             <certificates src="system" />
             <certificates src="user" />
+            <!-- todo Nino, pas spur de moi là -->
         </trust-anchors>
     </base-config>
     <domain-config>

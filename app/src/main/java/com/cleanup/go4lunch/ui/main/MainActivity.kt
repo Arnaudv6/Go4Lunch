@@ -3,7 +3,6 @@ package com.cleanup.go4lunch.ui.main
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -66,9 +65,8 @@ class MainActivity :
 
         viewModel.viewStateFlow.collectWithLifecycle(this) {
             if (it.avatarUrl != null) Glide.with(baseContext).load(it.avatarUrl)
-                .apply(RequestOptions.circleCropTransform()).into(
-                    headerView.findViewById<ImageView>(R.id.drawer_avatar)
-                )
+                .apply(RequestOptions.circleCropTransform())
+                .into(headerView.findViewById(R.id.drawer_avatar))
             headerView.findViewById<TextView>(R.id.drawer_user_name).text = it.name
             headerView.findViewById<TextView>(R.id.drawer_user_email).text = it.connectedVia
         }
