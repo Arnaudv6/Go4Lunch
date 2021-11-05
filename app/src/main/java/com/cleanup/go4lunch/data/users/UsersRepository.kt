@@ -7,6 +7,8 @@ import javax.inject.Singleton
 class UsersRepository @Inject constructor(
     private val userRetrofit: UserRetrofit,
 ) {
+
+    // todo decorator java.net.ConnectException
     suspend fun insertUser(user: User) {
         userRetrofit.insertUser(
             UserBody(
@@ -34,8 +36,6 @@ class UsersRepository @Inject constructor(
         if (!response.isSuccessful) return null
         return toUser(response.body())
     }
-
-    suspend fun getLikedById(userId: Long) = userRetrofit.getLikedById(UserRetrofit.EqualId(userId))
 
     private fun toUser(userResponse: UserResponse?): User? =
         if (

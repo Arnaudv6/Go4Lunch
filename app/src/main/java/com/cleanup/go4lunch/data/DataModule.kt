@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import okhttp3.tls.HandshakeCertificates
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -68,15 +67,21 @@ class DataModule {
 
     @Singleton
     @Provides
-    fun provideNominatimRetrofit(httpLoggingInterceptor: HttpLoggingInterceptor): PoiRetrofit {
+    fun provideGsonConverterFactory(): GsonConverterFactory = GsonConverterFactory
+        .create(GsonBuilder().setLenient().serializeNulls().create())
+
+    @Singleton
+    @Provides
+    fun provideNominatimRetrofit(
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        gsonConverterFactory: GsonConverterFactory,
+    ): PoiRetrofit {
         val client = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build()
 
         return Retrofit.Builder()
             .baseUrl(BASE_URL_NOMINATIM)
             .client(client)
-            .addConverterFactory(
-                GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create())
-            )
+            .addConverterFactory(gsonConverterFactory)
             .build()
             .create(PoiRetrofit::class.java)
     }
@@ -85,6 +90,7 @@ class DataModule {
     @Provides
     fun provideUsersRetrofit(
         httpLoggingInterceptor: HttpLoggingInterceptor,
+        gsonConverterFactory: GsonConverterFactory,
         @ApplicationContext context: Context
     ): UserRetrofit {
         val certificatePinner = CertificatePinner.Builder()
@@ -99,9 +105,7 @@ class DataModule {
         return Retrofit.Builder()
             .client(client)
             .baseUrl(BASE_URL_USERS)
-            .addConverterFactory(
-                GsonConverterFactory.create(GsonBuilder().setLenient().serializeNulls().create())
-            )
+            .addConverterFactory(gsonConverterFactory)
             .build()
             .create(UserRetrofit::class.java)
     }
