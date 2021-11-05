@@ -1,25 +1,25 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme. -->c
     <style name="Theme.Go4Lunch" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/orange</item>
-        <item name="colorPrimaryVariant">@color/orange_lighter</item>
-        <item name="android:windowBackground">@color/white</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
         <!-- Secondary brand color. I use them on buttons -->
-        <item name="colorSecondary">@color/white</item>
-        <item name="colorSecondaryVariant">@color/orange_lighter</item>
+        <item name="colorSecondary">@color/colorPrimary</item>
+        <item name="colorSecondaryVariant">@color/colorPrimaryVariant</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
 
-        <item name="colorSurface">@color/orange</item>
+        <item name="colorSurface">@color/colorSurface</item>
         <item name="colorOnSurface">@color/white</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/orange_darker</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/androidStatusBarColor</item>
         <item name="android:colorEdgeEffect">@color/orange</item>
         <!-- SearchView Widget cursor color -->
         <item name="colorAccent">@color/white</item>
         <!-- Customize your theme here. -->
-        <item name="android:listDivider">@color/grey</item>
+        <item name="android:listDivider">@color/androidListDivider</item>
 
         <item name="colorControlNormal">@color/white</item>
         <item name="android:editTextColor">@color/white</item>
@@ -27,7 +27,7 @@
     </style>
 
     <style name="Theme.Go4Lunch.drawer" parent="Theme.Go4Lunch">
-        <item name="colorSurface">@color/orange_lighter</item>
+        <item name="colorSurface">@color/drawerSurface</item>
         <item name="colorOnSurface">@color/white</item>
         <item name="android:textColor">@color/white</item>
     </style>

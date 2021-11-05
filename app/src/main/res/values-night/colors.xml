@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--
+
+
+
+
+       white space for readability against colors (version without quantifier)
+
+
+
+
+    -->
+    <color name="colorPrimary">@color/brown</color>
+    <color name="colorPrimaryVariant">@color/orange_darker</color>
     <color name="colorOnSecondary">@color/white</color>
+    <color name="colorSurface">@color/brown</color>
+    <color name="androidStatusBarColor">@color/black</color>
+    <color name="androidListDivider">@color/brown_lighter</color>
+    <color name="drawerSurface">@color/brown_lighter</color>
 </resources>

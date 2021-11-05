@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.ui.list
 
 import android.app.Application
-import android.graphics.Color
 import android.location.Location
 import android.util.Log
 import androidx.core.content.ContextCompat
@@ -13,7 +12,6 @@ import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
-import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
 import kotlinx.coroutines.flow.Flow
@@ -29,9 +27,8 @@ class PlacesListViewModel @Inject constructor(
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
-    // todo : once Colors have night quantifier, simplify this
-    private val colorOnSecondary =
-        MaterialColors.getColor(application, R.attr.colorOnSecondary, Color.parseColor("#888888"))
+    // todo : check all colors, and those of hours in particular
+    private val colorOnSecondary = ContextCompat.getColor(application, R.color.colorOnSecondary)
 
     // todo : en soi, là, je dépend aussi de l'heure et des collegues.
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
