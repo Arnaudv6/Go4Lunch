@@ -36,9 +36,6 @@ class UseCase
         }
     }
 
-    // todo Nino: réseau : on n'a pas le choix de guérir, faut-il aussi prévenir ?
-    //  du coup on fait un repo "état du réseau?"
-
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
 
@@ -47,7 +44,6 @@ class UseCase
         matesListMutableStateFlow.tryEmit(usersRepository.getUsersList())
     }
 
-    // todo Nino : le UseCase fait passe-plat pour tout ? les VM ne parlent plus aux repo?
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiRepository.getPoiById(osmId)
 
     val cachedPOIsListFlow: Flow<List<PoiEntity>> = poiRepository.cachedPOIsListFlow

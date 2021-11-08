@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
@@ -17,19 +18,18 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     IMyLocationConsumer, // to pass "this" to GpsMyLocationProvider here
     IMyLocationProvider  // to pass "this" to MyLocationNewOverlay in MapFragment
 {
-    // todo Nino : la, je stocke une chaine dans mon bytecode, qui ne sert qu'au linter...t'as mieux?
+
     companion object {
-        private const val DEPRECATION = "Only here for MyLocationNewOverlay's use."
+        private val EIFFEL_TOWER = GeoPoint(48.8583, 2.2944, 5.0)
     }
 
-    @Deprecated(DEPRECATION)
     private var myLocationNewOverlayListener: IMyLocationConsumer? = null
 
     private val mutableLocationFlow = MutableStateFlow(
         Location("repository").apply {  // todo this "apply" concept I could use in other places.
-            latitude = MyLocationUtils.EIFFEL_TOWER.latitude
-            longitude = MyLocationUtils.EIFFEL_TOWER.longitude
-            altitude = MyLocationUtils.EIFFEL_TOWER.altitude
+            latitude = EIFFEL_TOWER.latitude
+            longitude = EIFFEL_TOWER.longitude
+            altitude = EIFFEL_TOWER.altitude
         }
     )
     val locationFlow: StateFlow<Location> = mutableLocationFlow.asStateFlow()
@@ -64,7 +64,6 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     }
 
     // IMyLocationProvider
-    @Deprecated(DEPRECATION + "Use flow instead")
     override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
         @Suppress("DEPRECATION")
         myLocationNewOverlayListener = myLocationConsumer
@@ -76,10 +75,7 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     }
 
     // IMyLocationProvider
-    @Deprecated(DEPRECATION)
-    override fun stopLocationProvider() {
-        return
-    }
+    override fun stopLocationProvider() = Unit
 
     // IMyLocationProvider
     override fun getLastKnownLocation(): Location? {
@@ -87,7 +83,6 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     }
 
     // IMyLocationProvider
-    @Deprecated(DEPRECATION)
     override fun destroy() {
         return
     }

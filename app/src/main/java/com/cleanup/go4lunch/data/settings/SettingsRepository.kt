@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import androidx.annotation.WorkerThread
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.data.MyLocationUtils
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +21,8 @@ class SettingsRepository @Inject constructor(
 
     companion object {
         private const val NAV_NUM: String = "NAV_NUM"
+
+        private val FRANCE_BOX = BoundingBox(51.404, 8.341, 42.190, -4.932)
     }
 
     suspend fun getInitialBox(): BoundingBox = run {
