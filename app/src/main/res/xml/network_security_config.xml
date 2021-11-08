@@ -9,6 +9,7 @@
         </trust-anchors>
     </base-config>
     <domain-config>
+        <!-- todo add a section for nominatim? comme mes rétrofit ne marchent pas sur téléphone -->
         <domain includeSubdomains="true">192.168.1.79</domain>
         <trust-anchors>
             <certificates src="@raw/my_cert" />

@@ -165,6 +165,7 @@ class MapFragment : Fragment() {
         // bind updatePoiPins button
         val updatePoiPins = view.findViewById<AppCompatImageButton>(R.id.update_poi_pins)
         updatePoiPins.setOnClickListener { viewModel.requestPoiPins(map.boundingBox) }
+        // todo use swipe-to-refresh busy spindle.
         // map.addMapListener(object : MapListener {    override onScroll() and onZoom()    })
 
         return view

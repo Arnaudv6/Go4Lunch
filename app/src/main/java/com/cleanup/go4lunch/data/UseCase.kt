@@ -36,6 +36,9 @@ class UseCase
         }
     }
 
+    // todo Nino: réseau : on n'a pas le choix de guérir, faut-il aussi prévenir ?
+    //  du coup on fait un repo "état du réseau?"
+
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
 
