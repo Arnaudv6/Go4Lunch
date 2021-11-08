@@ -19,9 +19,8 @@ class DetailsAdapter :
         LayoutInflater.from(parent.context).inflate(R.layout.fragment_mates_item, parent, false)
     )
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.bind(getItem(position))
-    }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
@@ -35,11 +34,15 @@ class DetailsAdapter :
     }
 
     class ItemDiffCallBack : DiffUtil.ItemCallback<DetailsViewState.Item>() {
-        override fun areItemsTheSame(oldItem: DetailsViewState.Item, newItem: DetailsViewState.Item) =
-            oldItem.mateId == newItem.mateId
+        override fun areItemsTheSame(
+            oldItem: DetailsViewState.Item,
+            newItem: DetailsViewState.Item
+        ) = oldItem.mateId == newItem.mateId
 
-        override fun areContentsTheSame(oldItem: DetailsViewState.Item, newItem: DetailsViewState.Item) =
-            oldItem == newItem
+        override fun areContentsTheSame(
+            oldItem: DetailsViewState.Item,
+            newItem: DetailsViewState.Item
+        ) = oldItem == newItem
     }
 }
 

@@ -20,9 +20,8 @@ class MatesAdapter(private val activityLauncher: DetailsActivityLauncher) :
         LayoutInflater.from(parent.context).inflate(R.layout.fragment_mates_item, parent, false)
     )
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.bind(activityLauncher, getItem(position))
-    }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)

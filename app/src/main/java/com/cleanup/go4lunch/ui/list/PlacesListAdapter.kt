@@ -16,11 +16,9 @@ import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
     ListAdapter<PlacesListViewState, PlacesListAdapter.ViewHolder>(PlacesDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.fragment_list_item, parent, false)
-        return ViewHolder(view)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
+        LayoutInflater.from(parent.context).inflate(R.layout.fragment_list_item, parent, false)
+    )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
@@ -53,15 +51,11 @@ class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
         override fun areItemsTheSame(
             oldItem: PlacesListViewState,
             newItem: PlacesListViewState
-        ): Boolean {
-            return oldItem.id == newItem.id
-        }
+        ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
             oldItem: PlacesListViewState,
             newItem: PlacesListViewState
-        ): Boolean {
-            return oldItem == newItem
-        }
+        ): Boolean = oldItem == newItem
     }
 }
