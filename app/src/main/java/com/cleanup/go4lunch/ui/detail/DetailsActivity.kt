@@ -21,7 +21,7 @@ class DetailsActivity : AppCompatActivity() {
 
     companion object {
 
-        private const val OSM_ID = "osm_id"
+        const val OSM_ID = "osm_id"
 
         fun navigate(caller: Activity, osmId: Long): Intent {
             val intent = Intent(caller, DetailsActivity::class.java)
@@ -48,7 +48,6 @@ class DetailsActivity : AppCompatActivity() {
         val adapter = DetailsAdapter()
         recycler.adapter = adapter
 
-        viewModel.onCreate(intent.getLongExtra(OSM_ID, 0))
         viewModel.viewStateLiveData.observe(this) {
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name

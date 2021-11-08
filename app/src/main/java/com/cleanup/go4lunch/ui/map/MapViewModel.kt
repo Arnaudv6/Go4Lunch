@@ -87,10 +87,10 @@ class MapViewModel @Inject constructor(
         if (boundingBox != BoundingBox()) {
             useCase.setMapBox(
                 BoxEntity(
-                    boundingBox.latNorth,
-                    boundingBox.latSouth,
-                    boundingBox.lonWest,
-                    boundingBox.lonEast
+                    north = boundingBox.latNorth,
+                    south = boundingBox.latSouth,
+                    west = boundingBox.lonWest,
+                    east = boundingBox.lonEast
                 )
             )
         }

@@ -1,13 +1,14 @@
 package com.cleanup.go4lunch.data.users
 
+import java.io.IOException
+import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit) {
 
-    // todo Nino decorator to catch java.net.ConnectException?
-    suspend fun insertUser(user: User) {
+    suspend fun insertUser(user: User) : Boolean = try {
         userRetrofit.insertUser(
             UserBody(
                 id = user.id,
@@ -17,10 +18,18 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
                 goingAtNoon = user.goingAtNoon
             )
         )
+
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
     }
 
-    suspend fun getUsersList(): List<User> {
-        return userRetrofit.getUsers().mapNotNull { toUser(it) }
+    suspend fun getUsersList(): List<User>? = try {
+        userRetrofit.getUsers().mapNotNull { toUser(it) }
+    } catch (e : IOException) {
+        e.printStackTrace()
+        null
     }
 
     suspend fun toggleLiked(userId: Long, osmId: Long) =

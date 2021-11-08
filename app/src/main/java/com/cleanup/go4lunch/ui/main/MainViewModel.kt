@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.UpdateUserUseCase
 import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.ui.SingleLiveEvent
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
     private val useCase: UseCase,
+    private val updateUserUseCase: UpdateUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
@@ -49,7 +51,7 @@ class MainViewModel @Inject constructor(
 
     fun onCreate() {
         viewModelScope.launch(Dispatchers.IO) {
-            useCase.updateUsers()
+            updateUserUseCase()
         }
     }
 
@@ -72,10 +74,14 @@ class MainViewModel @Inject constructor(
 
     fun onDisconnectClicked() {
         viewModelScope.launch(Dispatchers.IO) {
+
+            // TODO ARNAUD USE IT
+            var allGood = true
+
             useCase.cachedPOIsListFlow.first {
                 val ids = it.map { poiEntity -> poiEntity.id }
                 for (i: Int in 1..12) {
-                    useCase.insertUser(
+                    if (!useCase.insertUser(
                         User(
                             i.toLong(),
                             "Agatha$i",
@@ -83,7 +89,9 @@ class MainViewModel @Inject constructor(
                             "https://i.pravatar.cc/150?u=$i",
                             ids[i] // will crash if <12 POIs
                         )
-                    )
+                    )) {
+                        allGood = false
+                    }
                 }
                 true
             }
