@@ -2,6 +2,7 @@ package com.cleanup.go4lunch.ui.detail
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.RatingBar
@@ -23,17 +24,14 @@ class DetailsActivity : AppCompatActivity() {
 
         const val OSM_ID = "osm_id"
 
-        fun navigate(caller: Activity, osmId: Long): Intent {
-            val intent = Intent(caller, DetailsActivity::class.java)
-            intent.putExtra(OSM_ID, osmId)
-            return intent
-        }
+        fun navigate(caller: Activity, osmId: Long): Intent =
+            Intent(caller, DetailsActivity::class.java).apply { putExtra(OSM_ID, osmId) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_restaurant)
+        setContentView(R.layout.activity_details)
 
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -55,18 +53,41 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.viewStateLiveData.observe(this) {
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
+            // todo Nino : ce if là ne peut que rester?
             if (it.rating != null) likes.rating = it.rating
             address.text = it.address
-            call.isClickable = it.callActive
-            call.setOnClickListener {
-                // intent on it.call
+
+            call.compoundDrawablesRelative.filterNotNull()[0].setTint(it.callColor)
+            call.setTextColor(it.callColor)
+            // isClickable works not, setAllowClickWhenDisabled() is API 31+
+            // Todo Nino: là faut que je pass le click au VM pour dégager le if?
+            call.setOnClickListener { _ ->
+                if (it.callActive) startActivity(
+                    Intent(
+                        Intent.ACTION_DIAL,
+                        Uri.fromParts("tel", it.call, null)
+                    )
+                )
+                // todo click sounds even when inactive. return false?
             }
+            like.compoundDrawablesRelative.filterNotNull()[0].setTint(it.likeColor)
+            like.setTextColor(it.likeColor)
             like.isClickable = it.likeActive
+            website.compoundDrawablesRelative.filterNotNull()[0].setTint(it.websiteColor)
+            website.setTextColor(it.websiteColor)
             website.isClickable = it.websiteActive
-            website.setOnClickListener {
-                // intent on it.website
+            website.setOnClickListener { _ ->
+                if (it.websiteActive) startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(it.website)
+                    )
+                )
             }
-            button.isClickable = it.goAtNoon
+            button.setColorFilter(it.goAtNoonColor)
+            button.setOnClickListener {
+                viewModel.goingAtNoonClicked()
+            }
 
             adapter.submitList(it.neighbourList)
         }

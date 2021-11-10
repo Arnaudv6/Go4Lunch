@@ -28,6 +28,7 @@ class MatesViewModel @Inject constructor(
                     text = getText(user)
                 )
             }
+            // todo filter myself out? (and do so in detailsVM?)
         }.asLiveData()
 
     private suspend fun getText(user: User): String {

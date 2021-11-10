@@ -61,7 +61,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/details_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="@sample/restaurants.json/data/name" />
 
-                <RatingBar
+                <androidx.appcompat.widget.AppCompatRatingBar
                     android:id="@+id/details_likes"
                     style="?android:attr/ratingBarStyleSmall"
                     android:layout_width="wrap_content"
@@ -86,7 +86,7 @@
                     app:layout_constraintStart_toEndOf="@id/details_name"
                     tools:rating="@sample/restaurants.json/data/stars" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/details_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
                 bottomNavBar is not perfect fit: DO NOT force it in.
                 image button is crap https://stackoverflow.com/questions/4457030/
                 -->
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/details_call"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -119,7 +119,7 @@
                     android:gravity="center"
                     android:padding="18dp"
                     android:text="@string/call"
-                    android:textColor="?attr/colorOnPrimary"
+                    android:textColor="@color/orange"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:drawableTint="@color/orange"
@@ -128,7 +128,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/details_like"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -136,7 +136,7 @@
                     android:gravity="center"
                     android:padding="18dp"
                     android:text="@string/like"
-                    android:textColor="?attr/colorOnPrimary"
+                    android:textColor="@color/orange"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:drawableTint="@color/orange"
@@ -145,7 +145,7 @@
                     app:layout_constraintStart_toEndOf="@id/details_call"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/details_website"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -153,7 +153,7 @@
                     android:gravity="center"
                     android:padding="18dp"
                     android:text="@string/website"
-                    android:textColor="?attr/colorOnPrimary"
+                    android:textColor="@color/orange"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:drawableTint="@color/orange"
