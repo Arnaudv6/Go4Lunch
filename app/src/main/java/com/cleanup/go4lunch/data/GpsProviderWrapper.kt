@@ -42,9 +42,8 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
 
     private val possibleLocationMutableStateFlow = MutableStateFlow(false)
     val possibleLocation: Flow<Boolean> = possibleLocationMutableStateFlow
-    fun locationPermissionUpdate(fine: Boolean, coarse: Boolean) {
+    fun locationPermissionUpdate(fine: Boolean, coarse: Boolean) =
         possibleLocationMutableStateFlow.tryEmit(fine || coarse)
-    }
 
     // CONSUMER IMyLocationConsumer
     override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
@@ -57,11 +56,9 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     }
 
     // IMyLocationProvider
-    fun startLocationProvider(): Boolean {
-        // todo  java.lang.NullPointerException: Attempt to invoke virtual method
-        //  'java.util.List android.location.LocationManager.getProviders(boolean)' on a null object reference
-        return provider.startLocationProvider(this)
-    }
+    fun startLocationProvider(): Boolean = provider.startLocationProvider(this)
+    // todo  java.lang.NullPointerException: Attempt to invoke virtual method
+    //  'java.util.List android.location.LocationManager.getProviders(boolean)' on a null object reference
 
     // IMyLocationProvider
     override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
@@ -70,25 +67,18 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
         return startLocationProvider()
     }
 
-    fun stopWrapper() {
-        provider.stopLocationProvider()
-    }
+    fun stopWrapper() = provider.stopLocationProvider()
 
     // IMyLocationProvider
     override fun stopLocationProvider() = Unit
 
     // IMyLocationProvider
-    override fun getLastKnownLocation(): Location? {
-        return provider.lastKnownLocation
-    }
+    override fun getLastKnownLocation(): Location? = provider.lastKnownLocation
 
     // IMyLocationProvider
-    override fun destroy() {
-        return
-    }
+    override fun destroy() = Unit
 
-    fun destroyWrapper() {
-        provider.destroy()
-    }
+    fun destroyWrapper() = provider.destroy()
+
 }
 

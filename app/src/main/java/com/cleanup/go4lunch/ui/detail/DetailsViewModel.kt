@@ -4,7 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.cleanup.go4lunch.data.UseCase
+import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
@@ -14,15 +15,23 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel
 @Inject constructor(
+    private val poiRepository: PoiRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
     private val useCase: UseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+
+
+
     val viewStateLiveData: LiveData<DetailsViewState> =
         combine(
             flow {
-                emit(useCase.getPoiById(savedStateHandle.get<Long>(DetailsActivity.OSM_ID)!!))
+                val id = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
+                if (id != null) { // todo Nino : là, je serais tenté de mettre assert()?
+                    val poi = poiRepository.getPoiById(id)
+                    if (poi != null) emit(poi)
+                }
             },
             useCase.sessionUserFlow
         ) { poi, session ->
@@ -50,7 +59,6 @@ class DetailsViewModel
             )
         }
     }
-}
 
 }
 

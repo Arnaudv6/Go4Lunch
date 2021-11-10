@@ -6,8 +6,10 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.data.UseCase
+import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
+import com.cleanup.go4lunch.data.settings.SettingsRepository
+import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,7 +24,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val useCase: UseCase,
+    private val poiRepository: PoiRepository,
+    private val settingsRepository: SettingsRepository,
+    useCase: UseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val gpsProviderWrapper: GpsProviderWrapper  // todo move to usecase?
 ) : ViewModel() {
@@ -32,12 +36,12 @@ class MapViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            viewActionLiveEvent.value = MapViewAction.InitialBox(useCase.getInitialBox())
+            viewActionLiveEvent.value = MapViewAction.InitialBox(settingsRepository.getInitialBox())
         }
     }
 
     val viewStateLiveData: LiveData<MapViewState> =
-        combine(useCase.cachedPOIsListFlow, useCase.matesListFlow) { poiList, usersList ->
+        combine(poiRepository.cachedPOIsListFlow, useCase.matesListFlow) { poiList, usersList ->
             MapViewState(
                 poiList.map {
                     val going = usersList.filter { user ->
@@ -63,7 +67,7 @@ class MapViewModel @Inject constructor(
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(ioDispatcher) {
             val numberOfPoi =
-                MapViewAction.PoiRetrieval(useCase.fetchPOIsInBoundingBox(boundingBox))
+                MapViewAction.PoiRetrieval(poiRepository.fetchPOIsInBoundingBox(boundingBox))
             withContext(Dispatchers.Main) {
                 viewActionLiveEvent.value = numberOfPoi
             }
@@ -85,7 +89,7 @@ class MapViewModel @Inject constructor(
         val boundingBox = boundingBoxMutableStateFlow.value
         // viewActionLiveEvent.value = MapViewAction.InitialBox(boundingBox)
         if (boundingBox != BoundingBox()) {
-            useCase.setMapBox(
+            settingsRepository.setMapBox(
                 BoxEntity(
                     north = boundingBox.latNorth,
                     south = boundingBox.latSouth,

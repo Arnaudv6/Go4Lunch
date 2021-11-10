@@ -1,8 +1,6 @@
-package com.cleanup.go4lunch.data
+package com.cleanup.go4lunch.data.useCase
 
-import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.users.SessionUser
 import com.cleanup.go4lunch.data.users.User
@@ -11,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -41,16 +38,13 @@ class UseCase
 
     // todo: fetch all goingAtNoon POIs?
     suspend fun updateUsers() {
-        matesListMutableStateFlow.tryEmit(usersRepository.getUsersList())
+        val list = usersRepository.getUsersList()
+        if (list != null) matesListMutableStateFlow.tryEmit(list)
     }
 
-    suspend fun getPoiById(osmId: Long): PoiEntity? = poiRepository.getPoiById(osmId)
-
-    val cachedPOIsListFlow: Flow<List<PoiEntity>> = poiRepository.cachedPOIsListFlow
-
     private suspend fun updateRatings() {
-        val visited = usersRepository.getVisitedPlaceIds()
-        val liked = usersRepository.getLikedPlaceIds()
+        val visited = usersRepository.getVisitedPlaceIds().orEmpty()
+        val liked = usersRepository.getLikedPlaceIds().orEmpty()
         for (place in visited.toSet()) {
             val ratio = liked.count { it == place } / visited.count { it == place }.toFloat()
             poiRepository.updatePoiRating(
@@ -65,19 +59,6 @@ class UseCase
 
     fun usersGoingThere(osmId: Long): List<User> = matesListMutableStateFlow
         .value.filter { it.goingAtNoon == osmId }
-
-    suspend fun fetchPOIsInBoundingBox(boundingBox: BoundingBox): Int =
-        poiRepository.fetchPOIsInBoundingBox(boundingBox)
-
-    suspend fun getInitialBox(): BoundingBox = settingsRepository.getInitialBox()
-
-    fun setMapBox(boxEntity: BoxEntity) = settingsRepository.setMapBox(boxEntity)
-
-    suspend fun insertUser(user: User) = usersRepository.insertUser(user)
-
-    fun getNavNum(): Int = settingsRepository.getNavNum()
-
-    fun setNavNum(num: Int) = settingsRepository.setNavNum(num)
 
 }
 

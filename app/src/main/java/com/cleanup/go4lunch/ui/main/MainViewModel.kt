@@ -6,15 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.data.UpdateUserUseCase
-import com.cleanup.go4lunch.data.UseCase
-import com.cleanup.go4lunch.data.users.User
+import com.cleanup.go4lunch.data.settings.SettingsRepository
+import com.cleanup.go4lunch.data.useCase.UpdateUserUseCase
+import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
-    private val useCase: UseCase,
+    private val settingsRepository: SettingsRepository,
+    useCase: UseCase,
     private val updateUserUseCase: UpdateUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
@@ -46,7 +46,7 @@ class MainViewModel @Inject constructor(
     }
 
     init {
-        navNumSingleLiveEvent.value = useCase.getNavNum()
+        navNumSingleLiveEvent.value = settingsRepository.getNavNum()
     }
 
     fun onCreate() {
@@ -56,7 +56,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onDestroy(num: Int) {
-        useCase.setNavNum(num)
+        settingsRepository.setNavNum(num)
         gpsProviderWrapper.destroyWrapper()
     }
 
@@ -72,29 +72,5 @@ class MainViewModel @Inject constructor(
         gpsProviderWrapper.locationPermissionUpdate(fine, coarse)
     }
 
-    fun onDisconnectClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // TODO ARNAUD USE IT
-            var allGood = true
-
-            useCase.cachedPOIsListFlow.first {
-                val ids = it.map { poiEntity -> poiEntity.id }
-                for (i: Int in 1..12) {
-                    if (!useCase.insertUser(
-                        User(
-                            i.toLong(),
-                            "Agatha$i",
-                            "Christie$i",
-                            "https://i.pravatar.cc/150?u=$i",
-                            ids[i] // will crash if <12 POIs
-                        )
-                    )) {
-                        allGood = false
-                    }
-                }
-                true
-            }
-        }
-    }
+    fun onDisconnectClicked() = Unit
 }

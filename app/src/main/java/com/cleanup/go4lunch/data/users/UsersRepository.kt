@@ -1,14 +1,12 @@
 package com.cleanup.go4lunch.data.users
 
-import java.io.IOException
-import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit) {
 
-    suspend fun insertUser(user: User) : Boolean = try {
+    suspend fun insertUser(user: User): Boolean = try {
         userRetrofit.insertUser(
             UserBody(
                 id = user.id,
@@ -25,11 +23,10 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
         false
     }
 
-    suspend fun getUsersList(): List<User>? = try {
-        userRetrofit.getUsers().mapNotNull { toUser(it) }
-    } catch (e : IOException) {
-        e.printStackTrace()
-        null
+    suspend fun getUsersList(): List<User>? {
+        val response = userRetrofit.getUsers()
+        if (!response.isSuccessful) return null
+        return response.body()!!.mapNotNull { toUser(it) }
     }
 
     suspend fun toggleLiked(userId: Long, osmId: Long) =
@@ -57,8 +54,16 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
             goingAtNoon = userResponse.goingAtNoon
         ) else null
 
-    suspend fun getLikedPlaceIds(): List<Long> = userRetrofit.getLikedPlaceIds()
+    suspend fun getLikedPlaceIds(): List<Long>? {
+        val response = userRetrofit.getLikedPlaceIds()
+        if (!response.isSuccessful) return null
+        return response.body()
+    }
 
-    suspend fun getVisitedPlaceIds(): List<Long> = userRetrofit.getVisitedPlaceIds()
+    suspend fun getVisitedPlaceIds(): List<Long>? {
+        val response = userRetrofit.getVisitedPlaceIds()
+        if (!response.isSuccessful) return null
+        return response.body()
+    }
 
 }

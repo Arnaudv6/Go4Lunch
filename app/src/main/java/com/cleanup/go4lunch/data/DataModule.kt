@@ -14,8 +14,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
-import okhttp3.CertificatePinner
-import okhttp3.OkHttpClient
+import okhttp3.*
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
@@ -67,6 +67,24 @@ class DataModule {
 
     @Singleton
     @Provides
+    fun provideSurvivalInterceptor(): Interceptor = Interceptor {
+        // finally: https://stackoverflow.com/questions/58697459
+        try {
+            it.proceed(it.request())
+        } catch (e: Exception) { //IOException, SocketTimeoutException
+            e.printStackTrace()
+            Response.Builder()
+                .request(it.request())
+                .protocol(Protocol.HTTP_1_1)
+                .code(999)
+                .message("something bad happened")
+                .body("{${e}}".toResponseBody())
+                .build()
+        }
+    }
+
+    @Singleton
+    @Provides
     fun provideGsonConverterFactory(): GsonConverterFactory = GsonConverterFactory
         .create(GsonBuilder().setLenient().serializeNulls().create())
 
@@ -75,8 +93,12 @@ class DataModule {
     fun provideNominatimRetrofit(
         httpLoggingInterceptor: HttpLoggingInterceptor,
         gsonConverterFactory: GsonConverterFactory,
+        survivalInterceptor: Interceptor,
     ): PoiRetrofit {
-        val client = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build()
+        val client = OkHttpClient.Builder()
+            .addInterceptor(survivalInterceptor)  // event listener avails not here
+            .addInterceptor(httpLoggingInterceptor)
+            .build()
 
         return Retrofit.Builder()
             .baseUrl(BASE_URL_NOMINATIM)
@@ -91,6 +113,7 @@ class DataModule {
     fun provideUsersRetrofit(
         httpLoggingInterceptor: HttpLoggingInterceptor,
         gsonConverterFactory: GsonConverterFactory,
+        survivalInterceptor: Interceptor,
         @ApplicationContext context: Context
     ): UserRetrofit {
         val certificatePinner = CertificatePinner.Builder()
@@ -98,6 +121,7 @@ class DataModule {
             .build()
 
         val client = OkHttpClient.Builder()
+            .addInterceptor(survivalInterceptor)
             .certificatePinner(certificatePinner)
             .addInterceptor(httpLoggingInterceptor)
             .build()

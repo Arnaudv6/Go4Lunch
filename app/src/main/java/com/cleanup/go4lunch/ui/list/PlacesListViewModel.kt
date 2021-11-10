@@ -9,8 +9,9 @@ import androidx.lifecycle.asLiveData
 import ch.poole.openinghoursparser.OpeningHoursParser
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.data.UseCase
 import com.cleanup.go4lunch.data.pois.PoiEntity
+import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
     private val useCase: UseCase,
+    poiRepository: PoiRepository,
     gpsProviderWrapper: GpsProviderWrapper, // todo move to usecase ?
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
@@ -32,7 +34,10 @@ class PlacesListViewModel @Inject constructor(
 
     // todo : en soi, là, je dépend aussi de l'heure et des collegues.
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
-        combine(useCase.cachedPOIsListFlow, gpsProviderWrapper.locationFlow) { list, location ->
+        combine(
+            poiRepository.cachedPOIsListFlow,
+            gpsProviderWrapper.locationFlow
+        ) { list, location ->
             list.sortedBy { poiEntity ->
                 distanceBetween(  // todo remove double with line 90
                     geoPoint1 = GeoPoint(poiEntity.latitude, poiEntity.longitude),

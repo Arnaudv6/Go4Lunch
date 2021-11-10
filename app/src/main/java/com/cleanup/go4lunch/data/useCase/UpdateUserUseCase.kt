@@ -1,4 +1,4 @@
-package com.cleanup.go4lunch.data
+package com.cleanup.go4lunch.data.useCase
 
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository

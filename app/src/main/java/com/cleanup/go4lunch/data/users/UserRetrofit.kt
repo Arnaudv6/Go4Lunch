@@ -13,21 +13,19 @@ interface UserRetrofit {
 
     @Headers("Accept: application/vnd.pgrst.object")
     @GET(USERS)
-    suspend fun getUserById(
-        @Query("id") userId: EqualId
-    ): Response<UserResponse>
+    suspend fun getUserById(@Query("id") userId: EqualId): Response<UserResponse>
 
     @GET(USERS)
-    suspend fun getUsers(): List<UserResponse>
+    suspend fun getUsers(): Response<List<UserResponse>>
 
     @GET(VISITED)
-    suspend fun getVisitedPlaceIds(): List<Long>
+    suspend fun getVisitedPlaceIds(): Response<List<Long>>
 
     @GET(LIKED)
-    suspend fun getLikedPlaceIds(): List<Long>
+    suspend fun getLikedPlaceIds(): Response<List<Long>>
 
     @GET(LIKED_BY_ID)
-    suspend fun getLikedById(@Query("id") userId: EqualId): List<Long>
+    suspend fun getLikedById(@Query("id") userId: EqualId): Response<List<Long>>
 
     @Headers("Prefer: resolution=merge-duplicates")
     @POST(USERS)

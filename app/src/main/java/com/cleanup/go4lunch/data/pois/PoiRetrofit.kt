@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.data.pois
 
 import com.cleanup.go4lunch.BuildConfig
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
@@ -24,5 +25,5 @@ interface PoiRetrofit {
         @Query("extratags") extraTags: Int = 1,
         // have to specify either a mail, or User-Agent Header
         // @Query("email") email: String = EMAIL,
-    ): List<PoiInBoxResponse>
+    ): Response<List<PoiInBoxResponse>>
 }

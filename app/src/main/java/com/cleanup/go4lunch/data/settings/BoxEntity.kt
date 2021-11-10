@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "box")
-data class BoxEntity @Deprecated("Nope !") constructor(
+data class BoxEntity @Deprecated("Room constructor") constructor(
     @PrimaryKey(autoGenerate = false)
     val key: Int,
     val north: Double,
@@ -12,6 +12,7 @@ data class BoxEntity @Deprecated("Nope !") constructor(
     val west: Double,
     val east: Double,
 ) {
+    @Suppress("DEPRECATION")
     constructor(north: Double, south: Double, west: Double, east: Double) : this(
         0,
         north,
@@ -20,3 +21,4 @@ data class BoxEntity @Deprecated("Nope !") constructor(
         east
     )
 }
+

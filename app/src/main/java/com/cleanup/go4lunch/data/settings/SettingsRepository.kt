@@ -21,13 +21,12 @@ class SettingsRepository @Inject constructor(
 
     companion object {
         private const val NAV_NUM: String = "NAV_NUM"
-
         private val FRANCE_BOX = BoundingBox(51.404, 8.341, 42.190, -4.932)
     }
 
     suspend fun getInitialBox(): BoundingBox = run {
         val box = settingsDao.getBox()
-        if (box == null) MyLocationUtils.FRANCE_BOX
+        if (box == null) FRANCE_BOX
         else BoundingBox(
             box.north,
             box.east,
