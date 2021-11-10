@@ -35,6 +35,10 @@ class DetailsActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_restaurant)
 
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
         val image: ImageView = findViewById(R.id.app_bar_image)
         val name: TextView = findViewById(R.id.details_name)
         val likes: RatingBar = findViewById(R.id.details_likes)

@@ -57,8 +57,6 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
 
     // IMyLocationProvider
     fun startLocationProvider(): Boolean = provider.startLocationProvider(this)
-    // todo  java.lang.NullPointerException: Attempt to invoke virtual method
-    //  'java.util.List android.location.LocationManager.getProviders(boolean)' on a null object reference
 
     // IMyLocationProvider
     override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
@@ -78,7 +76,9 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     // IMyLocationProvider
     override fun destroy() = Unit
 
-    fun destroyWrapper() = provider.destroy()
-
+    fun destroyWrapper() = Unit
+    // provider.destroy()
+    // this produces  java.lang.NullPointerException: Attempt to invoke virtual method
+    //  'java.util.List android.location.LocationManager.getProviders(boolean)' on a null object reference
 }
 

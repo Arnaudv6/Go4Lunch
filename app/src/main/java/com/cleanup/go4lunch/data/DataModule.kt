@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.data
 
-import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.cleanup.go4lunch.data.pois.PoiDao
@@ -40,8 +39,8 @@ class DataModule {
     @Provides
     @Singleton
     fun provideGpsMyLocationProvider(
-        application: Application
-    ): GpsMyLocationProvider = GpsMyLocationProvider(application)
+        @ApplicationContext appContext: Context
+    ): GpsMyLocationProvider = GpsMyLocationProvider(appContext)
 
     @Provides
     @Singleton
