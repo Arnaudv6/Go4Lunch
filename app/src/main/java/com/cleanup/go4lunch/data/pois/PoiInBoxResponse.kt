@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class PoiInBoxResponse(
     // serialized_name needed everywhere for minified releases
+    // todo step back if it does not avail
     @SerializedName("place_id")
     val placeId: Long?,
 

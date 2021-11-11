@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# todo remove if this does not avail.
+-dontnote okhttp3.**, okio.**, retrofit2.**
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
