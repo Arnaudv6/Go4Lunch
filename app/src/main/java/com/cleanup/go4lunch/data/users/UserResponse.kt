@@ -1,7 +1,9 @@
 package com.cleanup.go4lunch.data.users
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class UserResponse(
     // serialized_name needed everywhere for minified releases
     @SerializedName("id")

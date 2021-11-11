@@ -1,7 +1,9 @@
 package com.cleanup.go4lunch.data.pois
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 data class PoiInBoxResponse(
     // serialized_name needed everywhere for minified releases
     // todo step back if it does not avail
