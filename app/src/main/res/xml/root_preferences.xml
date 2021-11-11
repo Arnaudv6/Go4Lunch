@@ -2,12 +2,14 @@
 
     <!-- <PreferenceCategory app:title="@string/messages_header"> -->
     <Preference
+        app:icon="@drawable/ic_baseline_my_location_24"
         app:key="gps"
         app:summary="@string/preferences_gps_text"
         app:title="@string/preferences_gps_title"
         app:useSimpleSummaryProvider="true" />
 
     <Preference
+        app:icon="@drawable/ic_baseline_group_24"
         app:key="login"
         app:summary="@string/preferences_login_text"
         app:title="@string/preferences_login_title"
@@ -17,11 +19,13 @@
         app:defaultValue="system"
         app:entries="@array/theme_entries"
         app:entryValues="@array/theme_values"
+        app:icon="@drawable/ic_baseline_image_24"
         app:key="theme"
         app:title="@string/preferences_theme_title"
         app:useSimpleSummaryProvider="true" />
 
     <Preference
+        app:icon="@drawable/ic_baseline_delete_24"
         app:key="clear_cache"
         app:summary="@string/preferences_clear_cache_description"
         app:title="@string/preferences_clear_cache_caption"
