@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/orange"
     android:theme="@style/Theme.Go4Lunch.preferences">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/orange"
+            android:background="@color/colorSurface"
             android:theme="@style/Theme.Go4Lunch.titleBar"
             app:layout_constraintTop_toTopOf="parent"
             app:titleTextColor="@color/white" />

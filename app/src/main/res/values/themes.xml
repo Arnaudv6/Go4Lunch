@@ -49,6 +49,7 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorSecondary">@color/white_ish</item>
         <item name="android:tint">@color/white</item>
+        <item name="android:windowBackground">@color/colorSurface</item>
     </style>
 
 </resources>
