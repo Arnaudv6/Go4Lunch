@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.main
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.TextView
@@ -19,6 +20,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
+import com.cleanup.go4lunch.ui.settings.SettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,6 +39,7 @@ class MainActivity :
     private lateinit var navBar: BottomNavigationView
     private lateinit var viewPager: ViewPager2
     private val viewModel: MainViewModel by viewModels()
+    private var goingAtNoon: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,13 +72,21 @@ class MainActivity :
                 .into(headerView.findViewById(R.id.drawer_avatar))
             headerView.findViewById<TextView>(R.id.drawer_user_name).text = it.name
             headerView.findViewById<TextView>(R.id.drawer_user_email).text = it.connectedVia
+            goingAtNoon = it.goingAtNoon
         }
 
         findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.logout -> viewModel.onDisconnectClicked()
-
-            } // todo .exhaustive
+                R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
+                R.id.your_lunch -> if (goingAtNoon != null) startActivity(
+                    DetailsActivity.navigate(
+                        this,
+                        goingAtNoon!!
+                    )
+                ) else Unit
+                else -> Unit
+            }.exhaustive
             true
         }
 

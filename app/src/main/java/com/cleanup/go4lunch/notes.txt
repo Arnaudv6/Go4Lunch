@@ -1,19 +1,12 @@
 Notes:
-  - my usage of nominatim is borderline. autocompletion is unacceptable use
+  - my usage of nominatim is borderline. search-autocompletion is unacceptable use
   - distances are calculated by GPS coordinates, not taking routes into account
-  - restaurants images are not really related to their restaurants
+  - restaurants images are not linked to actual restaurants they're attached to
   - map scale is erratic non-sense
 
 todo
     some pins should come from server, or app should make sure to download
     PoiPins, with their list-source: colleagues or mapBox
-
-
-mises à jour responsive:
-   compte de l'utilisateur
-   coordonées GPS
-   notes des restaus : utilisateurs qui l'ont en favori / utilisateurs ayant été * 3
-   distances des restaus
 
 valider un déjeuner quand l'uilisateur se trouve entre 11h30 et 14h à 10m du restau qu'il a annoncé
    ajouter le restau dans la liste visitée de l'user

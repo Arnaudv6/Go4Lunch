@@ -33,7 +33,8 @@ class MainViewModel @Inject constructor(
         if (it == null) MainViewState(
             null,
             appContext.getString(R.string.not_connected),
-            appContext.getString(R.string.not_connected)
+            appContext.getString(R.string.not_connected),
+            null
         )
         else MainViewState(
             it.user.avatarUrl,
@@ -41,7 +42,8 @@ class MainViewModel @Inject constructor(
                 it.user.firstName,
                 it.user.lastName.uppercase()
             ).joinToString(separator = " "),
-            it.connectedThrough
+            it.connectedThrough,
+            it.user.goingAtNoon
         )
     }
 

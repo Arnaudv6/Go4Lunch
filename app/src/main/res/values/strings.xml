@@ -6,7 +6,6 @@
     <string name="nav_1">Map View</string>
     <string name="nav_2">List View</string>
     <string name="nav_3">Workmates</string>
-    <string name="search_title">Search</string>
     <string name="open_the_drawer">open the drawer</string>
     <string name="close_the_drawer">close the drawer</string>
     <string name="logout">LOGOUT</string>
@@ -15,14 +14,19 @@
     <string name="center_on_me">Center on me</string>
     <string name="credits_text">© OpenStreetMap contributors\n(openstreetmap.org, nominatim.org)</string>
     <string name="credits">Credits:</string>
-    <string name="login_text">to share meals with your colleagues</string>
-    <string name="permissions_button">Request GPS permission</string>
-    <string name="login_button">Login</string>
     <string name="going_at_noon">Going at noon</string>
     <string name="call">CALL</string>
     <string name="like">LIKE</string>
     <string name="website">WEBSITE</string>
     <string name="not_connected">Not Connected</string>
-    <string name="permissions_text">to appear on map and use\n\"center on me\" button.</string>
+
+    <!-- Messages Preferences -->
+    <string name="preferences_theme_title">Application theme</string>
+    <string name="preferences_login_text">to share meals with your colleagues</string>
+    <string name="preferences_login_title">Login</string>
+    <string name="preferences_gps_title">Request GPS permission</string>
+    <string name="preferences_gps_text">to appear on map and use \"center on me\" button.</string>
+    <string name="preferences_clear_cache_description">use only if application feels slow</string>
+    <string name="preferences_clear_cache_caption">Clear cache</string>
 </resources>
 
