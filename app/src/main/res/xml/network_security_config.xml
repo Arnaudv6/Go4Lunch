@@ -6,14 +6,7 @@
             <certificates src="system" />
         </trust-anchors>
     </base-config>
-    <domain-config>
-        <!-- todo remove if it makes not retrofit work on device -->
-        <domain includeSubdomains="true">nominatim.openstreetmap.org</domain>
-        <trust-anchors>
-            <certificates src="system" />
-        </trust-anchors>
-    </domain-config>
-
+    <!-- no need for a section to declare nominatim.openstreetmap.org -->
     <domain-config>
         <domain includeSubdomains="true">192.168.1.79</domain>
         <trust-anchors>

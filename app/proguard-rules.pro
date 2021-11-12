@@ -20,7 +20,18 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# todo remove if this does not avail.
--dontnote okhttp3.**, okio.**, retrofit2.**
--dontwarn retrofit2.**
--keep class retrofit2.** { *; }
+# https://github.com/square/retrofit/blob/master/retrofit/src/main/resources/META-INF/proguard/retrofit2.pro
+
+-keepclassmembers class com.cleanup.go4lunch.data.** { <fields>; }
+
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+-keepclassmembernames interface * {
+    @retrofit2.http.* <methods>;
+}
+
+# GSON Annotations
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
