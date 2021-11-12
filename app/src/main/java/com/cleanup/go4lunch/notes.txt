@@ -5,8 +5,6 @@ Notes:
   - map scale is erratic non-sense
 
 todo
-    some pins should come from server, or app should make sure to download
-    PoiPins, with their list-source: colleagues or mapBox
     validate a lunch when user is in 20m range from announced restaurant between 11h30 and 14h?
     then remove place from goingAtNoon
 
@@ -32,6 +30,8 @@ alternatives:
         https://github.com/eclipse/paho.mqtt.android
         https://www.eclipse.org/paho/index.php?page=clients/android/index.php
         https://www.eclipse.org/paho/index.php?page=downloads.php
+    Paho in system programming language:
+        https://github.com/eclipse/paho.mqtt.c
     server-side:
         https://github.com/appleboy/gorush
         https://github.com/tuliomagalhaes/PushSender

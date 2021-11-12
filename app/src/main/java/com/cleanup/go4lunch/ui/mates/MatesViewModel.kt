@@ -20,6 +20,9 @@ class MatesViewModel @Inject constructor(
 
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
         useCase.matesListFlow.mapNotNull {
+            poiRepository.fetchPOIsInList(it.mapNotNull { user -> user.goingAtNoon })
+            // todo snackBar :p
+
             it.map { user ->
                 MatesViewStateItem(
                     mateId = user.id,

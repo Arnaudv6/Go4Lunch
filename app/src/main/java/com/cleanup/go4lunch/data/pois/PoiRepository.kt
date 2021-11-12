@@ -18,7 +18,7 @@ class PoiRepository @Inject constructor(
 
     // todo ensure 1_500ms delay
     suspend fun fetchPOIsInBoundingBox(boundingBox: BoundingBox): Int {
-        val response = poiRetrofit.getPoiInBox(  // getPOICloseTo() also exists
+        val response = poiRetrofit.getPoiInBoundingBox(  // getPOICloseTo() also exists
             viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
             limit = 30
         )
@@ -28,6 +28,25 @@ class PoiRepository @Inject constructor(
         }.onEach {
             poiDao.insertPoi(it)
         }.size
+    }
+
+    suspend fun fetchPOIsInList(ids: List<Long>): Int {
+        var number = 0
+        // API allows to request up to 50 IDs at a time
+        for (ids_chunk in ids.chunked(50)) {
+            val response = poiRetrofit.getPOIsInList(
+                idsLongArray = PoiRetrofit.IdsLongArray(ids_chunk.toLongArray())
+            )
+            if (!response.isSuccessful) continue
+
+            number += response.body()!!
+                .mapNotNull {  // todo Nino : double bang : je peux faire mieux?
+                    toPoiEntity(it)
+                }.onEach {
+                    poiDao.insertPoi(it)
+                }.size
+        }
+        return number
     }
 
     private fun toPoiEntity(response: PoiInBoxResponse): PoiEntity? = if (
@@ -47,8 +66,7 @@ class PoiRepository @Inject constructor(
             latitude = response.lat,
             longitude = response.lon,
             address = toFuzzyAddress(response.address),
-            cuisine = response.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() }
-                ?: "",
+            cuisine = response.extraTags?.cuisine?.replaceFirstChar { it.uppercaseChar() } ?: "",
             imageUrl = PoiImages.getImageUrl(),
             phone = response.extraTags?.phone,
             site = response.extraTags?.website,
