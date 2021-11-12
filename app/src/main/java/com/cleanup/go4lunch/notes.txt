@@ -26,5 +26,18 @@ push notifications:
         protocol for request itself (server API)
 
 alternatives:
+    client side:
+        https://stackoverflow.com/questions/20329403/android-push-notification-without-using-gcm
+    Paho:
+        https://github.com/eclipse/paho.mqtt.android
+        https://www.eclipse.org/paho/index.php?page=clients/android/index.php
+        https://www.eclipse.org/paho/index.php?page=downloads.php
+    server-side:
+        https://github.com/appleboy/gorush
+        https://github.com/tuliomagalhaes/PushSender
+    technical discouragements
+        https://stackoverflow.com/questions/50850054
+        https://stackoverflow.com/questions/60237442
+        https://stackoverflow.com/questions/41511475
 
 
