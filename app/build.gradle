@@ -103,7 +103,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
 
-// todo: du nouveau, pour ça avec Junit5?
+// todo: adapt to Junit5?
 android.applicationVariants.all { variant ->
     def variantName = variant.name.capitalize()
     def filesToAnalyze = [

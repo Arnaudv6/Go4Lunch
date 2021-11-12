@@ -53,7 +53,7 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.viewStateLiveData.observe(this) {
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
-            // todo Nino : ce if là ne peut que rester?
+            // todo Nino: ce if là ne peut que rester?
             if (it.rating != null) likes.rating = it.rating
             address.text = it.address
 

@@ -7,14 +7,24 @@ Notes:
 todo
     some pins should come from server, or app should make sure to download
     PoiPins, with their list-source: colleagues or mapBox
+    validate a lunch when user is in 20m range from announced restaurant between 11h30 and 14h?
+    then remove place from goingAtNoon
 
-valider un déjeuner quand l'uilisateur se trouve entre 11h30 et 14h à 10m du restau qu'il a annoncé
-   ajouter le restau dans la liste visitée de l'user
-   lui proposer de le mettre en favori
-   virer son intention
+push notifications:
+    the tricky part really is client-side:
+        a battery-efficient, network-efficient, C++/XMPP, architecture-tight-bound always up service.
+    maintaining that connection open only to faint a server-to-client initiative.
+        Godot / Cordova... every one relies on google play services.
+        only alternative I found short of writing a C++ service myself is paho (see alternatives below)
 
-settings:
-    clear POI db
-    force theme
+    Go4Lunch actual requirement is a daily message at noon.
+        Fixed time -> we don't care if server or client initiates the check request.
+
+    Alarm instead of a push-notification is only about the trigger.
+    All other constraints are independent follow-ups:
+        single-user multi-device
+        protocol for request itself (server API)
+
+alternatives:
 
 
