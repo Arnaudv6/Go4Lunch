@@ -89,7 +89,7 @@ class DetailsActivity : AppCompatActivity() {
                 viewModel.goingAtNoonClicked()
             }
 
-            adapter.submitList(it.neighbourList)
+            adapter.submitList(it.colleaguesList)
         }
 
     }

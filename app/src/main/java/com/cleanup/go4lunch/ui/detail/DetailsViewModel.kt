@@ -64,7 +64,7 @@ class DetailsViewModel
                 website = poi.site.orEmpty(),
                 websiteColor = if (poi.site.isNullOrEmpty()) colorInactive else colorActive,
                 websiteActive = !poi.site.isNullOrEmpty(),
-                neighbourList = colleagues
+                colleaguesList = colleagues
             )
         }.asLiveData()
 

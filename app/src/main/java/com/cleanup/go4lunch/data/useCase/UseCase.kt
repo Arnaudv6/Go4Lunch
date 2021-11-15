@@ -36,7 +36,6 @@ class UseCase
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
 
-    // todo: fetch all goingAtNoon POIs?
     suspend fun updateUsers() {
         val list = usersRepository.getUsersList()
         if (list != null) matesListMutableStateFlow.tryEmit(list)

@@ -26,7 +26,7 @@ class GpsProviderWrapper @Inject constructor(private val provider: GpsMyLocation
     private var myLocationNewOverlayListener: IMyLocationConsumer? = null
 
     private val mutableLocationFlow = MutableStateFlow(
-        Location("repository").apply {  // todo this "apply" concept I could use in other places.
+        Location("repository").apply {
             latitude = EIFFEL_TOWER.latitude
             longitude = EIFFEL_TOWER.longitude
             altitude = EIFFEL_TOWER.altitude

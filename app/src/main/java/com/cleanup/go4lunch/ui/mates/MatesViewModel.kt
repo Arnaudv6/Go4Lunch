@@ -17,18 +17,21 @@ class MatesViewModel @Inject constructor(
     private val poiRepository: PoiRepository
 ) : ViewModel() {
 
-    suspend fun swipeRefresh() = useCase.updateUsers()
-
     val poiRetrievalNumberSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent()
+
+    suspend fun swipeRefresh() {
+        useCase.updateUsers()
+        // todo this must happen here
+        //  poiRetrievalNumberSingleLiveEvent.value
+    }
 
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
         useCase.matesListFlow.mapNotNull {
-            if (it.isNotEmpty()) {
-                poiRetrievalNumberSingleLiveEvent.value = poiRepository.fetchPOIsInList(
-                    ids = it.mapNotNull { user -> user.goingAtNoon },
-                    refreshExisting = false
-                )
-            }
+            // todo though value is received here
+            poiRepository.fetchPOIsInList(
+                ids = it.mapNotNull { user -> user.goingAtNoon },
+                refreshExisting = false
+            )
 
             it.map { user ->
                 MatesViewStateItem(

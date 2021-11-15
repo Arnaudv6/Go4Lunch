@@ -23,7 +23,6 @@ class UpdateUserUseCase @Inject constructor(
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
 
-    // todo: fetch all goingAtNoon POIs?
     suspend operator fun invoke() {
         matesListMutableStateFlow.tryEmit(emptyList())
     }

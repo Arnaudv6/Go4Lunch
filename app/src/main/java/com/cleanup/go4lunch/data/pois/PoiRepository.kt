@@ -40,17 +40,19 @@ class PoiRepository @Inject constructor(
         // API allows to request up to 50 IDs at a time
         var number = 0
         for (ids_chunk in list.chunked(50)) {
-            val response = poiRetrofit.getPOIsInList(
-                idsLongArray = PoiRetrofit.IdsLongArray(ids_chunk.toLongArray())
-            )
-            if (!response.isSuccessful) continue
+            if (ids_chunk.isNotEmpty()) {
+                val response = poiRetrofit.getPOIsInList(
+                    idsLongArray = PoiRetrofit.IdsLongArray(ids_chunk.toLongArray())
+                )
+                if (!response.isSuccessful) continue
 
-            number += response.body()!!
-                .mapNotNull {  // todo Nino : double bang : je peux faire mieux?
-                    toPoiEntity(it)
-                }.onEach {
-                    poiDao.insertPoi(it)
-                }.size
+                number += response.body()!!
+                    .mapNotNull {  // todo Nino : double bang : je peux faire mieux?
+                        toPoiEntity(it)
+                    }.onEach {
+                        poiDao.insertPoi(it)
+                    }.size
+            }
         }
         return number
     }
