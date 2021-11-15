@@ -183,7 +183,7 @@ class MapFragment : Fragment() {
                     .make(
                         view,
                         "${it.results} POI received and updated on view",
-                        Snackbar.LENGTH_LONG
+                        Snackbar.LENGTH_SHORT
                     )
                     .setAction("Dismiss") {}.show() // empty action will dismiss.
                 else -> Unit // better notation than {}

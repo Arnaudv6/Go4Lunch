@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,6 +48,12 @@ class MatesFragment : Fragment() {
             }
         }
 
+        viewModel.poiRetrievalNumberSingleLiveEvent.observe(viewLifecycleOwner) {
+            Snackbar.make(view, "$it POI received and updated on view", Snackbar.LENGTH_SHORT)
+                .setAction("Dismiss") {}.show() // empty action will dismiss.
+        }
+
         return view
     }
 }
+

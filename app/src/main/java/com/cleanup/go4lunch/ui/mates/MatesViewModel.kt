@@ -6,6 +6,7 @@ import androidx.lifecycle.asLiveData
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.data.users.User
+import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
@@ -18,10 +19,16 @@ class MatesViewModel @Inject constructor(
 
     suspend fun swipeRefresh() = useCase.updateUsers()
 
+    val poiRetrievalNumberSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent()
+
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
         useCase.matesListFlow.mapNotNull {
-            poiRepository.fetchPOIsInList(it.mapNotNull { user -> user.goingAtNoon })
-            // todo snackBar :p
+            if (it.isNotEmpty()) {
+                poiRetrievalNumberSingleLiveEvent.value = poiRepository.fetchPOIsInList(
+                    ids = it.mapNotNull { user -> user.goingAtNoon },
+                    refreshExisting = false
+                )
+            }
 
             it.map { user ->
                 MatesViewStateItem(
@@ -31,7 +38,7 @@ class MatesViewModel @Inject constructor(
                     text = getText(user)
                 )
             }
-            // todo filter myself out? (and do so in detailsVM?)
+            // todo Nino: filter myself out? (and do so in detailsVM?)
         }.asLiveData()
 
     private suspend fun getText(user: User): String {

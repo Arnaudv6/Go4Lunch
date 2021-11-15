@@ -30,10 +30,16 @@ class PoiRepository @Inject constructor(
         }.size
     }
 
-    suspend fun fetchPOIsInList(ids: List<Long>): Int {
-        var number = 0
+    suspend fun fetchPOIsInList(ids: List<Long>, refreshExisting: Boolean): Int {
+        val list = if (refreshExisting) {
+            ids
+        } else {
+            val cachedPoiIds = poiDao.getPoiIds()
+            ids.filter { !cachedPoiIds.contains(it) }
+        }
         // API allows to request up to 50 IDs at a time
-        for (ids_chunk in ids.chunked(50)) {
+        var number = 0
+        for (ids_chunk in list.chunked(50)) {
             val response = poiRetrofit.getPOIsInList(
                 idsLongArray = PoiRetrofit.IdsLongArray(ids_chunk.toLongArray())
             )
