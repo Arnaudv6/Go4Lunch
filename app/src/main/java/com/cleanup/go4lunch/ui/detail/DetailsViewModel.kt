@@ -4,19 +4,24 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.useCase.UseCase
+import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailsViewModel
 @Inject constructor(
     private val poiRepository: PoiRepository,
+    private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
     private val useCase: UseCase,
     sessionUserUseCase: SessionUserUseCase,
@@ -28,11 +33,11 @@ class DetailsViewModel
     private val colorInactive = ContextCompat.getColor(appContext, R.color.grey)
     private val colorGold = ContextCompat.getColor(appContext, R.color.gold)
 
-    private val poiEntityFlow = flow {
+    private val poiEntityFlow: Flow<PoiEntity> = flow {
         val id = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
-
+        // assert() only crashes at unit tests, not in release. Better use check().
         check(id != null) { "OSM_ID is not provided in the SavedStateHandle" }
-        poiRepository.getPoiById(id)?.let { emit(it) } // todo use this let{} everywhere.
+        poiRepository.getPoiById(id)?.let { emit(it) }
     }
 
     private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> = poiEntityFlow.map {
@@ -70,6 +75,10 @@ class DetailsViewModel
         }.asLiveData()
 
     fun goingAtNoonClicked() {
+
+        viewModelScope.launch (Dispatchers.IO) {
+            usersRepository.setGoingAtNoon()
+        }
         // todo interpolation
     }
 

@@ -53,7 +53,7 @@ class MainViewModel @Inject constructor(
 
     fun onCreate() {
         viewModelScope.launch(Dispatchers.IO) {
-            useCase.updateUsers()
+            useCase()
         }
     }
 

@@ -51,10 +51,6 @@ class SettingsRepository @Inject constructor(
 
     @WorkerThread
     fun setNavNum(num: Int) = preferences.edit().putInt(NAV_NUM, num).apply()
-
-    fun getConnectionType(): String = "gmail"
-
-    private val idMutableStateFlow = MutableStateFlow<Long?>(1) // todo replace 1 with null
-
-    val idStateFlow: Flow<Long?> = idMutableStateFlow.asStateFlow()
 }
+
+

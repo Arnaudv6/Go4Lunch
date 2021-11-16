@@ -31,11 +31,11 @@ interface UserRetrofit {
     @POST(USERS)
     suspend fun insertUser(@Body userBody: UserBody)
 
-    // todo
-    suspend fun toggleLiked(userId: Long, osmId: Long)
+    // todo must return a Boolean, as we do interpolation
+    suspend fun toggleLiked(userId: Long, osmId: Long): Response<Unit>
 
-    // todo
-    suspend fun setGoingAtNoon(userId: Long, osmId: Long)
+    // todo must return a Boolean, as we do interpolation
+    suspend fun setGoingAtNoon(userId: Long, osmId: Long): Response<Unit>
 
     // todo
     suspend fun addVisited(userId: Long, osmId: Long)

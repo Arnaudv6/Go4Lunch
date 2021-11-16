@@ -30,8 +30,8 @@ class MatesViewModel @Inject constructor(
     }
 
     private suspend fun updateRatings() {
-        val visited = usersRepository.getVisitedPlaceIds().orEmpty()
-        val liked = usersRepository.getLikedPlaceIds().orEmpty()
+        val visited = usersRepository.getVisitedPlaceIds() ?: LongArray(0)
+        val liked = usersRepository.getLikedPlaceIds() ?: LongArray(0)
         for (place in visited.toSet()) {
             val ratio = liked.count { it == place } / visited.count { it == place }.toFloat()
             poiRepository.updatePoiRating(

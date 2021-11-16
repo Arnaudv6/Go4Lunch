@@ -1,4 +1,6 @@
-package com.cleanup.go4lunch.data.users
+package com.cleanup.go4lunch.data.session
+
+import com.cleanup.go4lunch.data.users.User
 
 data class SessionUser(
     val user: User,

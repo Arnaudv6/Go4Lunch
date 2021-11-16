@@ -82,7 +82,7 @@ class MainActivity :
                 R.id.your_lunch -> if (goingAtNoon != null) startActivity(
                     DetailsActivity.navigate(
                         this,
-                        goingAtNoon!!
+                        goingAtNoon!! // todo Nino double bang OK?
                     )
                 ) else Unit
                 else -> Unit
