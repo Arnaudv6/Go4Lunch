@@ -6,6 +6,7 @@ import androidx.lifecycle.asLiveData
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.data.users.User
+import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.mapNotNull
@@ -14,15 +15,33 @@ import javax.inject.Inject
 @HiltViewModel
 class MatesViewModel @Inject constructor(
     private val useCase: UseCase,
-    private val poiRepository: PoiRepository
+    private val poiRepository: PoiRepository,
+    private val usersRepository: UsersRepository,
 ) : ViewModel() {
 
     val poiRetrievalNumberSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent()
 
     suspend fun swipeRefresh() {
-        useCase.updateUsers()
+        useCase()
+        updateRatings()
+
         // todo this must happen here
         //  poiRetrievalNumberSingleLiveEvent.value
+    }
+
+    private suspend fun updateRatings() {
+        val visited = usersRepository.getVisitedPlaceIds().orEmpty()
+        val liked = usersRepository.getLikedPlaceIds().orEmpty()
+        for (place in visited.toSet()) {
+            val ratio = liked.count { it == place } / visited.count { it == place }.toFloat()
+            poiRepository.updatePoiRating(
+                place, when {
+                    ratio < 0.2 -> 1
+                    ratio < 0.3 -> 2
+                    else -> 3
+                }
+            )
+        }
     }
 
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =

@@ -57,6 +57,7 @@ class DetailsActivity : AppCompatActivity() {
             if (it.rating != null) likes.rating = it.rating
             address.text = it.address
 
+            call.isEnabled = it.callActive  // todo : ca marche sur un AVD api21?
             call.compoundDrawablesRelative.filterNotNull()[0].setTint(it.callColor)
             call.setTextColor(it.callColor)
             // isClickable works not, setAllowClickWhenDisabled() is API 31+

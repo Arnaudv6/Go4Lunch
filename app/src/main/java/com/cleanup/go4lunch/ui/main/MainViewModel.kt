@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.settings.SettingsRepository
-import com.cleanup.go4lunch.data.useCase.UpdateUserUseCase
+import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,13 +22,13 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
     private val settingsRepository: SettingsRepository,
-    useCase: UseCase,
-    private val updateUserUseCase: UpdateUserUseCase,
+    private val useCase: UseCase,
+    sessionUserUseCase: SessionUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
 
-    val viewStateFlow: Flow<MainViewState> = useCase.sessionUserFlow.map {
+    val viewStateFlow: Flow<MainViewState> = sessionUserUseCase.sessionUserFlow.map {
         Log.e(this.javaClass.canonicalName, "sessionUser: $it")
         if (it == null) MainViewState(
             null,
@@ -53,7 +53,7 @@ class MainViewModel @Inject constructor(
 
     fun onCreate() {
         viewModelScope.launch(Dispatchers.IO) {
-            updateUserUseCase()
+            useCase.updateUsers()
         }
     }
 

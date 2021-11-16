@@ -5,6 +5,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,7 @@ class DetailsViewModel
     private val poiRepository: PoiRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
     private val useCase: UseCase,
+    sessionUserUseCase: SessionUserUseCase,
     private val savedStateHandle: SavedStateHandle,
     @ApplicationContext appContext: Context
 ) : ViewModel() {
@@ -28,13 +30,12 @@ class DetailsViewModel
 
     private val poiEntityFlow = flow {
         val id = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
-        if (id != null) { // todo Nino : là, je serais tenté de mettre assert()?
-            val poi = poiRepository.getPoiById(id)
-            if (poi != null) emit(poi)
-        }
+
+        check(id != null) { "OSM_ID is not provided in the SavedStateHandle" }
+        poiRepository.getPoiById(id)?.let { emit(it) } // todo use this let{} everywhere.
     }
 
-    private val colleaguesListFlow: StateFlow<List<DetailsViewState.Item>> = poiEntityFlow.map {
+    private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> = poiEntityFlow.map {
         useCase.usersGoingThere(it.id).map { user ->
             DetailsViewState.Item(
                 mateId = user.id,
@@ -42,12 +43,12 @@ class DetailsViewModel
                 text = user.firstName
             )
         }
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    } // todo c'est là que j'avais mis du state in alors qu'il faut du flow au repo.
 
     val viewStateLiveData: LiveData<DetailsViewState> =
         combine(
             poiEntityFlow,
-            useCase.sessionUserFlow,
+            sessionUserUseCase.sessionUserFlow,
             colleaguesListFlow,
         ) { poi, session, colleagues ->
             DetailsViewState(

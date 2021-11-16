@@ -22,12 +22,8 @@ class PoiRepository @Inject constructor(
             viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
             limit = 30
         )
-        if (!response.isSuccessful) return 0
-        return response.body()!!.mapNotNull {  // todo Nino : double bang : je peux faire mieux?
-            toPoiEntity(it)
-        }.onEach {
-            poiDao.insertPoi(it)
-        }.size
+        return response.body()?.mapNotNull { toPoiEntity(it) }
+            ?.onEach { poiDao.insertPoi(it) }?.size ?: 0
     }
 
     suspend fun fetchPOIsInList(ids: List<Long>, refreshExisting: Boolean): Int {
@@ -44,14 +40,8 @@ class PoiRepository @Inject constructor(
                 val response = poiRetrofit.getPOIsInList(
                     idsLongArray = PoiRetrofit.IdsLongArray(ids_chunk.toLongArray())
                 )
-                if (!response.isSuccessful) continue
-
-                number += response.body()!!
-                    .mapNotNull {  // todo Nino : double bang : je peux faire mieux?
-                        toPoiEntity(it)
-                    }.onEach {
-                        poiDao.insertPoi(it)
-                    }.size
+                number += response.body()?.mapNotNull { toPoiEntity(it) }
+                    ?.onEach { poiDao.insertPoi(it) }?.size ?: 0
             }
         }
         return number

@@ -108,13 +108,14 @@
                 app:layout_constraintTop_toBottomOf="@id/details_place">
 
                 <!--
-                bottomNavBar is not perfect fit: DO NOT force it in.
+                bottomNavBar is no perfect fit: DO NOT force it in.
                 image button is crap https://stackoverflow.com/questions/4457030/
                 -->
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/details_call"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:drawablePadding="12dp"
                     android:gravity="center"
                     android:padding="18dp"
@@ -132,6 +133,7 @@
                     android:id="@+id/details_like"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:drawablePadding="12dp"
                     android:gravity="center"
                     android:padding="18dp"
@@ -149,6 +151,7 @@
                     android:id="@+id/details_website"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:drawablePadding="12dp"
                     android:gravity="center"
                     android:padding="18dp"

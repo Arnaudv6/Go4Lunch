@@ -15,47 +15,16 @@ import javax.inject.Singleton
 @Singleton
 class UseCase
 @Inject constructor(
-    private val settingsRepository: SettingsRepository,
-    private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository
 ) {
-    val sessionUserFlow: Flow<SessionUser?> = settingsRepository.idStateFlow.map {
-        if (it == null) {
-            null
-        } else {
-            val user = usersRepository.getSessionUser(it)
-            if (user == null) null
-            else SessionUser(
-                user,
-                longArrayOf(),// todo usersRepository.getLikedById(it).toLongArray(),
-                settingsRepository.getConnectionType()
-            )
-        }
-    }
-
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
 
-    suspend fun updateUsers() {
-        val list = usersRepository.getUsersList()
-        if (list != null) matesListMutableStateFlow.tryEmit(list)
+    suspend operator fun invoke() {
+        usersRepository.getUsersList()?.let { matesListMutableStateFlow.tryEmit(it) }
     }
 
-    private suspend fun updateRatings() {
-        val visited = usersRepository.getVisitedPlaceIds().orEmpty()
-        val liked = usersRepository.getLikedPlaceIds().orEmpty()
-        for (place in visited.toSet()) {
-            val ratio = liked.count { it == place } / visited.count { it == place }.toFloat()
-            poiRepository.updatePoiRating(
-                place, when {
-                    ratio < 0.2 -> 1
-                    ratio < 0.3 -> 2
-                    else -> 3
-                }
-            )
-        }
-    }
-
+    // TODO use a flow here, don't "query" directly on the "livedata / hotflow"
     fun usersGoingThere(osmId: Long): List<User> = matesListMutableStateFlow
         .value.filter { it.goingAtNoon == osmId }
 

@@ -57,7 +57,6 @@ class DataModule {
     @Provides
     fun providePoiDao(appDatabase: AppDatabase): PoiDao = appDatabase.poiDao
 
-
     @Singleton
     @Provides
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
@@ -132,6 +131,5 @@ class DataModule {
             .build()
             .create(UserRetrofit::class.java)
     }
-
 }
 

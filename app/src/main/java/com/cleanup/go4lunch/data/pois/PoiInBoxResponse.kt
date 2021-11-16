@@ -19,7 +19,7 @@ data class PoiInBoxResponse(
     val extraTags: ExtraTags?,
 
     val category: String?, // amenity
-    val type: String // restaurant
+    val type: String? // restaurant
 ) {
     data class Address(
         val amenity: String?,
