@@ -31,11 +31,25 @@ interface UserRetrofit {
     @POST(USERS)
     suspend fun insertUser(@Body userBody: UserBody)
 
-    // todo must return a Boolean, as we do interpolation
-    suspend fun toggleLiked(userId: Long, osmId: Long): Response<Unit>
+    @Headers("Prefer: resolution=merge-duplicates")
+    @POST(USERS)
+    suspend fun insertLiked(
+        @Query("userid") userId: EqualId,
+        @Query("likedplaceid") osmId: EqualId
+    ): Response<Unit>  // response needed for interpolation
 
-    // todo must return a Boolean, as we do interpolation
-    suspend fun setGoingAtNoon(userId: Long, osmId: Long): Response<Unit>
+    @DELETE(LIKED)
+    suspend fun deleteLiked(
+        @Query("userid") userId: EqualId,
+        @Query("likedplaceid") osmId: EqualId
+    ): Response<Unit>  // response needed for interpolation
+
+    @FormUrlEncoded
+    @PATCH(USERS)
+    suspend fun setGoingAtNoon(
+        @Query("id") userId: EqualId,
+        @Field("goingatnoon") osmId: Long
+    ): Response<Unit>  // response needed for interpolation
 
     // todo
     suspend fun addVisited(userId: Long, osmId: Long)

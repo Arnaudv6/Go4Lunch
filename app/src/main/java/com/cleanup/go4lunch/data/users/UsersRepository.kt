@@ -13,11 +13,23 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     suspend fun getUsersList(): List<User>? = // null if request goes wrong
         userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }
 
-    suspend fun toggleLiked(userId: Long, osmId: Long): Boolean =
-        userRetrofit.toggleLiked(userId, osmId).isSuccessful
+    suspend fun insertLiked(userId: Long, osmId: Long): Boolean =
+        userRetrofit.insertLiked(
+            UserRetrofit.EqualId(userId),
+            UserRetrofit.EqualId(osmId)
+        ).isSuccessful
+
+    suspend fun deleteLiked(userId: Long, osmId: Long): Boolean =
+        userRetrofit.deleteLiked(
+            UserRetrofit.EqualId(userId),
+            UserRetrofit.EqualId(osmId)
+        ).isSuccessful
 
     suspend fun setGoingAtNoon(userId: Long, osmId: Long): Boolean =
-        userRetrofit.setGoingAtNoon(userId, osmId).isSuccessful
+        userRetrofit.setGoingAtNoon(
+            UserRetrofit.EqualId(userId),
+            osmId
+        ).isSuccessful
 
     suspend fun getSessionUser(userId: Long): User? =
         toUser(userRetrofit.getUserById(UserRetrofit.EqualId(userId)).body())

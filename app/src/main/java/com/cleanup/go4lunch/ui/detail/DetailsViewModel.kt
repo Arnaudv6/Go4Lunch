@@ -9,6 +9,7 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.data.users.UsersRepository
+import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -82,6 +83,22 @@ class DetailsViewModel
         }
         // todo interpolation
     }
+
+    fun likeClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val userId = sessionUserUseCase.sessionUserFlow.first()?.user?.id
+            val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
+            if (userId != null && placeId != null) {
+                when (sessionUserUseCase.sessionUserFlow.first()?.liked?.contains(placeId)) {
+                    true -> usersRepository.deleteLiked(userId, placeId)
+                    false -> usersRepository.insertLiked(userId, placeId)
+                    null -> Unit
+                }.exhaustive // todo Nino : c'est un cas où exhaustive marche bof, non?
+            }
+        }
+        // todo interpolation
+    }
+
 
 }
 

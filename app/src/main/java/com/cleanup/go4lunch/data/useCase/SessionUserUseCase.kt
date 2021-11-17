@@ -14,7 +14,7 @@ import javax.inject.Singleton
 class SessionUserUseCase
 @Inject constructor(
     sessionRepository: SessionRepository,
-    usersRepository: UsersRepository
+    usersRepository: UsersRepository,
 ) {
     val sessionUserFlow: Flow<SessionUser?> = sessionRepository.sessionFlow.map {
         it?.let { session: Session ->
