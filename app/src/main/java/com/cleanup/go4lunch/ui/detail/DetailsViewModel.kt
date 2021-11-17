@@ -24,7 +24,7 @@ class DetailsViewModel
     private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
     private val useCase: UseCase,
-    sessionUserUseCase: SessionUserUseCase,
+    private val sessionUserUseCase: SessionUserUseCase,
     private val savedStateHandle: SavedStateHandle,
     @ApplicationContext appContext: Context
 ) : ViewModel() {
@@ -75,9 +75,10 @@ class DetailsViewModel
         }.asLiveData()
 
     fun goingAtNoonClicked() {
-
-        viewModelScope.launch (Dispatchers.IO) {
-            usersRepository.setGoingAtNoon()
+        viewModelScope.launch(Dispatchers.IO) {
+            val userId = sessionUserUseCase.sessionUserFlow.first()?.user?.id
+            val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
+            if (userId != null && placeId != null) usersRepository.setGoingAtNoon(userId, placeId)
         }
         // todo interpolation
     }
