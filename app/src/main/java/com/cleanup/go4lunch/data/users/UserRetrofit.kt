@@ -51,7 +51,7 @@ interface UserRetrofit {
         @Field("goingatnoon") osmId: Long
     ): Response<Unit>  // response needed for interpolation
 
-    // todo
+    // todo or must it be done by server itself ?
     suspend fun addVisited(userId: Long, osmId: Long)
 
     data class EqualId(val id: Long) {

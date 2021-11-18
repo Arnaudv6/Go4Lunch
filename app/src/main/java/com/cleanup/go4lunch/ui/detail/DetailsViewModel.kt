@@ -36,6 +36,9 @@ class DetailsViewModel
 
     private val poiEntityFlow: Flow<PoiEntity> = flow {
         val id = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
+        // todo savedStateHandle.getLiveData
+        //  https://developer.android.com/topic/libraries/architecture/viewmodel-savedstate#kotlin
+        //  https://developer.android.com/reference/androidx/lifecycle/SavedStateHandle
         // assert() only crashes at unit tests, not in release. Better use check().
         check(id != null) { "OSM_ID is not provided in the SavedStateHandle" }
         poiRepository.getPoiById(id)?.let { emit(it) }

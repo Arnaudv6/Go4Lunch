@@ -25,6 +25,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class MainActivity :
     AppCompatActivity(),
@@ -104,22 +105,12 @@ class MainActivity :
         val adapter = MainPagerAdapter(this)
         viewPager.adapter = adapter
 
-        /*
-        viewPager.rootView.setOnTouchListener { view, event ->
-            when{
-                event.action == MotionEvent.EDGE_RIGHT && event.action == MotionEvent.ACTION_MOVE -> {
-                    view.performClick()
-                    true
-                }
-                else -> false
-            }
-        }
-         */
+        findViewById<TouchEventInterceptor>(R.id.touch_interceptor_view_group).viewPager = viewPager
+
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 setTitle(if (position == 2) R.string.title_workmates else R.string.title_hungry)
-                viewPager.isUserInputEnabled = position != 0
                 navBar.menu.findItem(
                     when (position) {
                         0 -> R.id.nav_map

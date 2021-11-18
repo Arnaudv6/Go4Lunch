@@ -25,6 +25,8 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
             UserRetrofit.EqualId(osmId)
         ).isSuccessful
 
+    // todo there should be a snackBar if user clicks between 14h30 and 24h?
+    //  also don't run it if already in fav
     suspend fun setGoingAtNoon(userId: Long, osmId: Long): Boolean =
         userRetrofit.setGoingAtNoon(
             UserRetrofit.EqualId(userId),
