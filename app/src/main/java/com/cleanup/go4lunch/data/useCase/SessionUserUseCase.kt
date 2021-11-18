@@ -27,5 +27,11 @@ class SessionUserUseCase
             }
         }
     }
+
+    /* for a single-function use case, this syntax allows to call UseCaseClass() directly
+    suspend operator fun invoke() {
+        usersRepository.getUsersList()?.let { matesListMutableStateFlow.tryEmit(it) }
+    }
+    */
 }
 

@@ -11,7 +11,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.data.useCase.UseCase
+import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
-    private val useCase: UseCase,
+    matesByPlaceUseCase: MatesByPlaceUseCase,
     poiRepository: PoiRepository,
     gpsProviderWrapper: GpsProviderWrapper, // todo move to usecase ?
     private val application: Application,
@@ -36,21 +36,26 @@ class PlacesListViewModel @Inject constructor(
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
         combine(
             poiRepository.cachedPOIsListFlow,
-            gpsProviderWrapper.locationFlow
-        ) { list, location ->
+            gpsProviderWrapper.locationFlow,
+            matesByPlaceUseCase.matesByPlaceFlow,
+        ) { list, location, mates ->
             list.sortedBy { poiEntity ->
-                distanceBetween(  // todo remove double with line 90
+                distanceBetween(  // todo remove double with line 90. ZIP(poi, distance)?
                     geoPoint1 = GeoPoint(poiEntity.latitude, poiEntity.longitude),
                     geoPoint2 = GeoPoint(location)
                 )
             }.map {
-                viewStateFromPoi(it, location)
+                viewStateFromPoi(it, location, mates)
             }
         }
 
     val viewStateListLiveData = viewStateListFlow.asLiveData()
 
-    private fun viewStateFromPoi(poi: PoiEntity, location: Location): PlacesListViewState {
+    private fun viewStateFromPoi(
+        poi: PoiEntity,
+        location: Location,
+        mates: HashMap<Long, ArrayList<String>>
+    ): PlacesListViewState {
         val dist = distanceBetween(
             geoPoint1 = GeoPoint(poi.latitude, poi.longitude),
             geoPoint2 = GeoPoint(location)
@@ -66,7 +71,7 @@ class PlacesListViewModel @Inject constructor(
                 dist > 1_000 -> "${"%.1f".format(dist / 1000.0)}km"
                 else -> "${dist}m"
             },
-            colleagues = "(${useCase.usersGoingThere(poi.id).size})",
+            colleagues = "(${mates[poi.id]?.size ?: 0})",
             image = poi.imageUrl,
             hours = coloredHours.first,
             hoursColor = coloredHours.second,

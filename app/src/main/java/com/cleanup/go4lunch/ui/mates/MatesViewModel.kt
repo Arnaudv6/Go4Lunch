@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
@@ -14,7 +13,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MatesViewModel @Inject constructor(
-    private val useCase: UseCase,
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
 ) : ViewModel() {
@@ -22,7 +20,7 @@ class MatesViewModel @Inject constructor(
     val poiRetrievalNumberSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent()
 
     suspend fun swipeRefresh() {
-        useCase()
+        usersRepository.updateMatesList()
         updateRatings()
 
         // todo this must happen here
@@ -45,7 +43,7 @@ class MatesViewModel @Inject constructor(
     }
 
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
-        useCase.matesListFlow.mapNotNull {
+        usersRepository.matesListFlow.mapNotNull {
             // todo though value is received here
             poiRepository.fetchPOIsInList(
                 ids = it.mapNotNull { user -> user.goingAtNoon },

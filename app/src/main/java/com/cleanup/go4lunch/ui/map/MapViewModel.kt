@@ -9,7 +9,7 @@ import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
-import com.cleanup.go4lunch.data.useCase.UseCase
+import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,9 +24,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
+    matesByPlaceUseCase: MatesByPlaceUseCase,
     private val poiRepository: PoiRepository,
     private val settingsRepository: SettingsRepository,
-    useCase: UseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val gpsProviderWrapper: GpsProviderWrapper  // todo move to usecase?
 ) : ViewModel() {
@@ -41,20 +41,20 @@ class MapViewModel @Inject constructor(
     }
 
     val viewStateLiveData: LiveData<MapViewState> =
-        combine(poiRepository.cachedPOIsListFlow, useCase.matesListFlow) { poiList, usersList ->
+        combine(
+            poiRepository.cachedPOIsListFlow,
+            matesByPlaceUseCase.matesByPlaceFlow
+        ) { poiList, matesByPlace ->
             MapViewState(
                 poiList.map {
-                    val going = usersList.filter { user ->
-                        user.goingAtNoon == it.id
-                    }.map { user -> user.firstName }
                     MapViewState.Pin(
                         id = it.id,
                         name = it.name,
-                        colleagues = if (going.isNotEmpty()) going.joinToString(
+                        colleagues = matesByPlace[it.id]?.joinToString(
                             separator = ", ",
                             prefix = "going: "
-                        ) else "",
-                        icon = if (going.isEmpty()) {
+                        ) ?: "",
+                        icon = if (matesByPlace[it.id].isNullOrEmpty()) {
                             R.drawable.poi_orange
                         } else {
                             R.drawable.poi_green

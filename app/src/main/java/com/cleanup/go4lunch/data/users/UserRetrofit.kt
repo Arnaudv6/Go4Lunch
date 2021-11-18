@@ -18,8 +18,22 @@ interface UserRetrofit {
     @GET(USERS)
     suspend fun getUsers(): Response<List<UserResponse>>
 
+    @Headers("Prefer: resolution=merge-duplicates")
+    @POST(USERS)
+    suspend fun insertUser(@Body userBody: UserBody)
+
+    @FormUrlEncoded
+    @PATCH(USERS)
+    suspend fun setGoingAtNoon(
+        @Query("id") userId: EqualId,
+        @Field("goingatnoon") osmId: Long
+    ): Response<Unit>  // response needed for interpolation
+
     @GET(VISITED)
     suspend fun getVisitedPlaceIds(): Response<List<Long>>
+
+    // todo or must server itself add visited?
+    suspend fun addVisited(userId: Long, osmId: Long)
 
     @GET(LIKED)
     suspend fun getLikedPlaceIds(): Response<List<Long>>
@@ -28,11 +42,7 @@ interface UserRetrofit {
     suspend fun getLikedById(@Query("id") userId: EqualId): Response<List<Long>>
 
     @Headers("Prefer: resolution=merge-duplicates")
-    @POST(USERS)
-    suspend fun insertUser(@Body userBody: UserBody)
-
-    @Headers("Prefer: resolution=merge-duplicates")
-    @POST(USERS)
+    @POST(LIKED)
     suspend fun insertLiked(
         @Query("userid") userId: EqualId,
         @Query("likedplaceid") osmId: EqualId
@@ -43,16 +53,6 @@ interface UserRetrofit {
         @Query("userid") userId: EqualId,
         @Query("likedplaceid") osmId: EqualId
     ): Response<Unit>  // response needed for interpolation
-
-    @FormUrlEncoded
-    @PATCH(USERS)
-    suspend fun setGoingAtNoon(
-        @Query("id") userId: EqualId,
-        @Field("goingatnoon") osmId: Long
-    ): Response<Unit>  // response needed for interpolation
-
-    // todo or must it be done by server itself ?
-    suspend fun addVisited(userId: Long, osmId: Long)
 
     data class EqualId(val id: Long) {
         override fun toString() = "eq.$id"

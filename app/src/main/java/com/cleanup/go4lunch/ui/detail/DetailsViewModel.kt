@@ -7,7 +7,6 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
-import com.cleanup.go4lunch.data.useCase.UseCase
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
@@ -24,7 +23,6 @@ class DetailsViewModel
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
-    private val useCase: UseCase,
     private val sessionUserUseCase: SessionUserUseCase,
     private val savedStateHandle: SavedStateHandle,
     @ApplicationContext appContext: Context
@@ -34,25 +32,21 @@ class DetailsViewModel
     private val colorInactive = ContextCompat.getColor(appContext, R.color.grey)
     private val colorGold = ContextCompat.getColor(appContext, R.color.gold)
 
-    private val poiEntityFlow: Flow<PoiEntity> = flow {
-        val id = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
-        // todo savedStateHandle.getLiveData
-        //  https://developer.android.com/topic/libraries/architecture/viewmodel-savedstate#kotlin
-        //  https://developer.android.com/reference/androidx/lifecycle/SavedStateHandle
-        // assert() only crashes at unit tests, not in release. Better use check().
-        check(id != null) { "OSM_ID is not provided in the SavedStateHandle" }
-        poiRepository.getPoiById(id)?.let { emit(it) }
-    }
+    // Todo Nino : c'est valide, mon asFlow()?
+    private val idFlow = savedStateHandle.getLiveData<Long>(DetailsActivity.OSM_ID).asFlow()
 
-    private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> = poiEntityFlow.map {
-        useCase.usersGoingThere(it.id).map { user ->
-            DetailsViewState.Item(
-                mateId = user.id,
-                imageUrl = user.avatarUrl ?: "",
-                text = user.firstName
-            )
+    private val poiEntityFlow: Flow<PoiEntity> = idFlow.mapNotNull { poiRepository.getPoiById(it) }
+
+    private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> =
+        combine(idFlow, usersRepository.matesListFlow) { id, mates ->
+            mates.filter { user -> user.goingAtNoon == id }.map { user ->
+                DetailsViewState.Item(
+                    mateId = user.id,
+                    imageUrl = user.avatarUrl ?: "",
+                    text = user.firstName
+                )
+            }
         }
-    } // todo c'est là que j'avais mis du state in alors qu'il faut du flow au repo.
 
     val viewStateLiveData: LiveData<DetailsViewState> =
         combine(

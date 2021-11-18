@@ -26,7 +26,7 @@ ViewPager2 is final (ViewPager was not): we can't override its methods.
 It creates a child, viewPager[0], which is a recyclerview.
 
 viewPager.setOnTouchListener does not get events
-can't use a TouchDelegate
+can't use a TouchDelegate, could on MAP view, but we need viewpager to let events pass to the map anyway.
 can add addOnItemTouchListener() but the I am not the only listener, and can't de-activate others
     short of accessing private fields https://stackoverflow.com/a/68785903
     (actually use a RecyclerView.SimpleOnItemTouchListener object as an argument then

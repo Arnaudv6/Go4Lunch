@@ -1,17 +1,26 @@
 package com.cleanup.go4lunch.data.users
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit) {
 
+    private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
+    val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
+
+    suspend fun updateMatesList() {
+        userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }?.let {
+            matesListMutableStateFlow.tryEmit(it)
+        }
+    }
+
     suspend fun insertUser(user: User) = userRetrofit.insertUser(
         UserBody(user.id, user.firstName, user.lastName, user.avatarUrl, user.goingAtNoon)
     )
-
-    suspend fun getUsersList(): List<User>? = // null if request goes wrong
-        userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }
 
     suspend fun insertLiked(userId: Long, osmId: Long): Boolean =
         userRetrofit.insertLiked(

@@ -8,7 +8,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
-import com.cleanup.go4lunch.data.useCase.UseCase
+import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,9 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    private val usersRepository: UsersRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
     private val settingsRepository: SettingsRepository,
-    private val useCase: UseCase,
     sessionUserUseCase: SessionUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
@@ -53,7 +53,7 @@ class MainViewModel @Inject constructor(
 
     fun onCreate() {
         viewModelScope.launch(Dispatchers.IO) {
-            useCase()
+            usersRepository.updateMatesList()
         }
     }
 
