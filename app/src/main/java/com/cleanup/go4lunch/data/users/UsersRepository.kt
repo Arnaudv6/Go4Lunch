@@ -37,10 +37,10 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
             UserRetrofit.EqualId(osmId)
         ).isSuccessful
 
-    suspend fun setGoingAtNoon(userId: Long, osmId: Long) {
+    suspend fun setGoingAtNoon(userId: Long, osmId: Long?) {
         if (userRetrofit.setGoingAtNoon(
                 UserRetrofit.EqualId(userId),
-                osmId
+                UserRetrofit.NullableLong(osmId)
             ).isSuccessful
         ) refreshUser(userId)
     }

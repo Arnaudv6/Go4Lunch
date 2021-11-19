@@ -77,7 +77,7 @@ class MainActivity :
 
         findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.logout -> viewModel.onDisconnectClicked()
+                R.id.logout -> viewModel.onLogoutClicked()
                 R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
                 R.id.your_lunch -> if (goingAtNoon != null) startActivity(
                     DetailsActivity.navigate(

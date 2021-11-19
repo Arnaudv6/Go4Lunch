@@ -26,7 +26,7 @@ interface UserRetrofit {
     @PATCH(USERS)
     suspend fun setGoingAtNoon(
         @Query("id") userId: EqualId,
-        @Field("goingatnoon") osmId: Long
+        @Field("goingatnoon") osmId: NullableLong
     ): Response<Unit>  // response needed for interpolation
 
     @GET(VISITED)
@@ -56,6 +56,10 @@ interface UserRetrofit {
 
     data class EqualId(val id: Long) {
         override fun toString() = "eq.$id"
+    }
+
+    data class NullableLong(val long:Long?){
+        override fun toString() = long?.toString() ?: "null"
     }
 
 }

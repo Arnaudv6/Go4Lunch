@@ -5,17 +5,21 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
+import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -73,5 +77,15 @@ class MainViewModel @Inject constructor(
         gpsProviderWrapper.locationPermissionUpdate(fine, coarse)
     }
 
-    fun onDisconnectClicked() = Unit
+    fun onLogoutClicked() {
+        viewModelScope.launch (Dispatchers.IO){
+            usersRepository.insertUser(User(
+                13,
+                "Natasha",
+                "Zobovich",
+                null,
+                null
+            ))
+        }
+    }
 }

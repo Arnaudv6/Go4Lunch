@@ -1,19 +1,25 @@
 package com.cleanup.go4lunch.ui.detail
 
 import android.content.Context
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
+import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,6 +43,8 @@ class DetailsViewModel
 
     private val poiEntityFlow: Flow<PoiEntity> = idFlow.mapNotNull { poiRepository.getPoiById(it) }
 
+    private var session: SessionUser? = null
+
     private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> =
         combine(idFlow, usersRepository.matesListFlow) { id, mates ->
             mates.filter { user -> user.goingAtNoon == id }.map { user ->
@@ -54,6 +62,7 @@ class DetailsViewModel
             sessionUserUseCase.sessionUserFlow,
             colleaguesListFlow,
         ) { poi, session, colleagues ->
+            this.session = session // todo Nino : je peux sauver ca dans un field?
             DetailsViewState(
                 name = poi.name,
                 goAtNoonColor = if (session?.user?.goingAtNoon == poi.id) colorGold else colorInactive,
@@ -76,9 +85,11 @@ class DetailsViewModel
     fun goingAtNoonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
             val placeId = idFlow.first()
-            sessionUserUseCase.sessionUserFlow.first()?.user?.let {
-                if (placeId != null && it.goingAtNoon != placeId){
-                    usersRepository.setGoingAtNoon(it.id, placeId)
+            session?.user?.let { // todo fix this line
+                Log.e("TAG", "goingAtNoonClicked: $placeId", )
+                if (placeId != null) {
+                    if (it.goingAtNoon == placeId) usersRepository.setGoingAtNoon(it.id, null)
+                    else usersRepository.setGoingAtNoon(it.id, placeId)
                 }
             }
         }
@@ -87,7 +98,7 @@ class DetailsViewModel
 
     fun likeClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val userId = sessionUserUseCase.sessionUserFlow.first()?.user?.id
+            val userId = session?.user?.id
             val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
             if (userId != null && placeId != null) {
                 when (sessionUserUseCase.sessionUserFlow.first()?.liked?.contains(placeId)) {
