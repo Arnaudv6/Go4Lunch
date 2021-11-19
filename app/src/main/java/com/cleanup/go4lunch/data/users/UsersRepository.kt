@@ -22,28 +22,35 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
         UserBody(user.id, user.firstName, user.lastName, user.avatarUrl, user.goingAtNoon)
     )
 
+    // we don't refresh on Liked
     suspend fun insertLiked(userId: Long, osmId: Long): Boolean =
         userRetrofit.insertLiked(
             UserRetrofit.EqualId(userId),
             UserRetrofit.EqualId(osmId)
         ).isSuccessful
 
+    // we don't refresh on Liked
     suspend fun deleteLiked(userId: Long, osmId: Long): Boolean =
         userRetrofit.deleteLiked(
             UserRetrofit.EqualId(userId),
             UserRetrofit.EqualId(osmId)
         ).isSuccessful
 
-    // todo there should be a snackBar if user clicks between 14h30 and 24h?
-    //  also don't run it if already in fav
-    suspend fun setGoingAtNoon(userId: Long, osmId: Long): Boolean =
-        userRetrofit.setGoingAtNoon(
-            UserRetrofit.EqualId(userId),
-            osmId
-        ).isSuccessful
+    suspend fun setGoingAtNoon(userId: Long, osmId: Long) {
+        if (userRetrofit.setGoingAtNoon(
+                UserRetrofit.EqualId(userId),
+                osmId
+            ).isSuccessful
+        ) refreshUser(userId)
+    }
 
-    suspend fun getSessionUser(userId: Long): User? =
-        toUser(userRetrofit.getUserById(UserRetrofit.EqualId(userId)).body())
+    private suspend fun refreshUser(userId: Long) {
+        val user = toUser(userRetrofit.getUserById(UserRetrofit.EqualId(userId)).body())
+        // going in this order as getUserById() is suspend and list is heavy on memory
+        val list = ArrayList(matesListMutableStateFlow.value.filter { it.id != userId })
+        list.add(user)
+        matesListMutableStateFlow.tryEmit(list)
+    }
 
     private fun toUser(userResponse: UserResponse?): User? =
         if (

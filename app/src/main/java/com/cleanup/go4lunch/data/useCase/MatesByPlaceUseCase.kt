@@ -11,7 +11,7 @@ class MatesByPlaceUseCase @Inject constructor(usersRepository: UsersRepository) 
     val matesByPlaceFlow : Flow<HashMap<Long, ArrayList<String>>> = usersRepository.matesListFlow.map {
         val map = HashMap<Long, ArrayList<String>>()
         for (user in it){
-            if(user.goingAtNoon != null && map.containsKey(user.goingAtNoon))
+            if(user.goingAtNoon != null)
                 map[user.goingAtNoon]?.add(user.firstName)
                     ?: map.put(user.goingAtNoon, ArrayList(listOf(user.firstName)))
         }

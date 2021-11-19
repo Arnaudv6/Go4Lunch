@@ -72,11 +72,15 @@ class DetailsViewModel
             )
         }.asLiveData()
 
+    // todo there should be a snackBar if user clicks between 14h30 and 24h?
+    //  also don't run it if already in fav
     fun goingAtNoonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
             val userId = sessionUserUseCase.sessionUserFlow.first()?.user?.id
-            val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
+            val placeId = idFlow.first()
             if (userId != null && placeId != null) usersRepository.setGoingAtNoon(userId, placeId)
+
+            // usersRepository.updateMatesList() // so choice is reflected on map and places list
         }
         // todo interpolation
     }
