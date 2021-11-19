@@ -5,7 +5,6 @@ import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.users.UsersRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,14 +15,17 @@ class SessionUserUseCase
     usersRepository: UsersRepository,
 ) {
     val sessionUserFlow: Flow<SessionUser?> = combine(
-        sessionRepository.sessionFlow.filterNotNull(),
+        sessionRepository.sessionFlow,
         usersRepository.matesListFlow
     ) { session, mates ->
-        SessionUser(
-            mates.first { it.id == session.userId },
-            usersRepository.getLikedById(session.userId) ?: LongArray(0),
-            session.connectionType
-        )
+        if (session == null) null
+        else mates.firstOrNull { it.id == session.userId }?.let { user ->
+            SessionUser(
+                user = user,
+                liked = usersRepository.getLikedById(session.userId) ?: LongArray(0),
+                connectedThrough = session.connectionType
+            )
+        }
     }
 
     /* for a single-function use case, this syntax allows to call UseCaseClass() directly

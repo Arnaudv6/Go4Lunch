@@ -45,7 +45,7 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.onCreate()
+        viewModel.connectivityFlow.collectWithLifecycle(this){}
 
         setContentView(R.layout.activity_main)
 

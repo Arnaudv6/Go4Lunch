@@ -3,8 +3,8 @@ package com.cleanup.go4lunch.ui.main
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
@@ -12,20 +12,23 @@ import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
+    connectivityRepository: ConnectivityRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
     private val settingsRepository: SettingsRepository,
     sessionUserUseCase: SessionUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
+    val connectivityFlow = connectivityRepository.isNetworkAvailableFlow.map {
+        if (it) usersRepository.updateMatesList()
+    } // todo Nino : je ne vois pas comment faire mieux que créer ça là et l'observer depuis l'activity
+
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
 
     val viewStateFlow: Flow<MainViewState> = sessionUserUseCase.sessionUserFlow.map {
@@ -49,12 +52,6 @@ class MainViewModel @Inject constructor(
 
     init {
         navNumSingleLiveEvent.value = settingsRepository.getNavNum()
-    }
-
-    fun onCreate() {
-        viewModelScope.launch(Dispatchers.IO) {
-            usersRepository.updateMatesList()
-        }
     }
 
     fun onDestroy(num: Int) {

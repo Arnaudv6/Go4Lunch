@@ -32,8 +32,8 @@ class DetailsViewModel
     private val colorInactive = ContextCompat.getColor(appContext, R.color.grey)
     private val colorGold = ContextCompat.getColor(appContext, R.color.gold)
 
-    // Todo Nino : c'est valide, mon asFlow()?
-    private val idFlow = savedStateHandle.getLiveData<Long>(DetailsActivity.OSM_ID).asFlow()
+    // Todo Nino : c'est valide, mon asFlow()? et <Long?>
+    private val idFlow = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID).asFlow()
 
     private val poiEntityFlow: Flow<PoiEntity> = idFlow.mapNotNull { poiRepository.getPoiById(it) }
 
@@ -73,12 +73,14 @@ class DetailsViewModel
         }.asLiveData()
 
     // todo there should be a snackBar if user clicks between 14h30 and 24h?
-    //  also don't run it if already in fav
     fun goingAtNoonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
-            val userId = sessionUserUseCase.sessionUserFlow.first()?.user?.id
             val placeId = idFlow.first()
-            if (userId != null && placeId != null) usersRepository.setGoingAtNoon(userId, placeId)
+            sessionUserUseCase.sessionUserFlow.first()?.user?.let {
+                if (placeId != null && it.goingAtNoon != placeId){
+                    usersRepository.setGoingAtNoon(it.id, placeId)
+                }
+            }
 
             // usersRepository.updateMatesList() // so choice is reflected on map and places list
         }
