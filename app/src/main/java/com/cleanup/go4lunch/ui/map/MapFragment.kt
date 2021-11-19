@@ -50,10 +50,10 @@ class MapFragment : Fragment() {
         }
     }
 
+    // onAttach() gives us the context for free
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mClickInterface = WeakReference(context as DetailsActivityLauncher)
-        // TODO understand this is OK: in onAttach() as we get context for free
     }
 
     override fun onCreateView(
@@ -178,7 +178,7 @@ class MapFragment : Fragment() {
                 // animations are stub as of OSM-Droid 6.1.11
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
                 is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
-                // todo: change theme: does not always work. and I don't get an ancient value. I get non-sense view reset
+                // todo: fix change theme makes a view reset
                 is MapViewAction.PoiRetrieval -> Snackbar
                     .make(
                         view,

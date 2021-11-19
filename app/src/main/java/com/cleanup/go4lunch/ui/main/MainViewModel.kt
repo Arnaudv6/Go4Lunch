@@ -2,7 +2,9 @@ package com.cleanup.go4lunch.ui.main
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
@@ -27,11 +29,11 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     val connectivityFlow = connectivityRepository.isNetworkAvailableFlow.map {
         if (it) usersRepository.updateMatesList()
-    } // todo Nino : je ne vois pas comment faire mieux que créer ça là et l'observer depuis l'activity
+    }.asLiveData() // todo Nino: is there a better way?
 
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
 
-    val viewStateFlow: Flow<MainViewState> = sessionUserUseCase.sessionUserFlow.map {
+    val viewStateFlow: LiveData<MainViewState> = sessionUserUseCase.sessionUserFlow.map {
         Log.e(this.javaClass.canonicalName, "sessionUser: $it")
         if (it == null) MainViewState(
             null,
@@ -48,7 +50,7 @@ class MainViewModel @Inject constructor(
             it.connectedThrough,
             it.user.goingAtNoon
         )
-    }
+    }.asLiveData()
 
     init {
         navNumSingleLiveEvent.value = settingsRepository.getNavNum()

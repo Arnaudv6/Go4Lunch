@@ -72,7 +72,7 @@ class DetailsViewModel
             )
         }.asLiveData()
 
-    // todo there should be a snackBar if user clicks between 14h30 and 24h?
+    // todo snackBar if user clicks between 14h30 and 24h?
     fun goingAtNoonClicked() {
         viewModelScope.launch(Dispatchers.IO) {
             val placeId = idFlow.first()
@@ -81,8 +81,6 @@ class DetailsViewModel
                     usersRepository.setGoingAtNoon(it.id, placeId)
                 }
             }
-
-            // usersRepository.updateMatesList() // so choice is reflected on map and places list
         }
         // todo interpolation
     }

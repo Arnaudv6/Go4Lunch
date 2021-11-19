@@ -17,7 +17,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
 import com.cleanup.go4lunch.ui.settings.SettingsActivity
@@ -45,7 +44,7 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.connectivityFlow.collectWithLifecycle(this){}
+        viewModel.connectivityFlow.observe(this) {}
 
         setContentView(R.layout.activity_main)
 
@@ -67,7 +66,7 @@ class MainActivity :
 
         val headerView = findViewById<NavigationView>(R.id.side_nav).getHeaderView(0)
 
-        viewModel.viewStateFlow.collectWithLifecycle(this) {
+        viewModel.viewStateFlow.observe(this) {
             if (it.avatarUrl != null) Glide.with(baseContext).load(it.avatarUrl)
                 .apply(RequestOptions.circleCropTransform())
                 .into(headerView.findViewById(R.id.drawer_avatar))

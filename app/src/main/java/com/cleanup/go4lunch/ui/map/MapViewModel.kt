@@ -28,7 +28,7 @@ class MapViewModel @Inject constructor(
     private val poiRepository: PoiRepository,
     private val settingsRepository: SettingsRepository,
     private val ioDispatcher: CoroutineDispatcher,
-    private val gpsProviderWrapper: GpsProviderWrapper  // todo move to usecase?
+    private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
     private val boundingBoxMutableStateFlow = MutableStateFlow(BoundingBox())

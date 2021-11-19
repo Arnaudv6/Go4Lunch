@@ -25,14 +25,13 @@ import javax.inject.Inject
 class PlacesListViewModel @Inject constructor(
     matesByPlaceUseCase: MatesByPlaceUseCase,
     poiRepository: PoiRepository,
-    gpsProviderWrapper: GpsProviderWrapper, // todo move to usecase ?
+    gpsProviderWrapper: GpsProviderWrapper,
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
-    // todo : check all colors, and those of hours in particular
+    // todo: fix hours Colors: theme repository?
     private val colorOnSecondary = ContextCompat.getColor(application, R.color.colorOnSecondary)
 
-    // todo : en soi, là, je dépend aussi de l'heure et des collegues.
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
         combine(
             poiRepository.cachedPOIsListFlow,

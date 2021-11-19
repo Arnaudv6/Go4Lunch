@@ -16,7 +16,7 @@ class PoiRepository @Inject constructor(
 
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
-    // todo ensure 1_500ms delay
+    // todo Nino ensure 1_500ms delay between any request
     suspend fun fetchPOIsInBoundingBox(boundingBox: BoundingBox): Int {
         val response = poiRetrofit.getPoiInBoundingBox(  // getPOICloseTo() also exists
             viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",

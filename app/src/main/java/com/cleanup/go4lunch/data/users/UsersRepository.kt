@@ -12,6 +12,7 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
 
+    // this list also depends on current hour for goingAtNoon
     suspend fun updateMatesList() {
         userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }?.let {
             matesListMutableStateFlow.tryEmit(it)

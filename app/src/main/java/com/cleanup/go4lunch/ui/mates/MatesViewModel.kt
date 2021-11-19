@@ -42,6 +42,7 @@ class MatesViewModel @Inject constructor(
         }
     }
 
+    // don't filter sessionUser out (nor in detailsVM) as list would refresh when not networkIsAvailable
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
         usersRepository.matesListFlow.mapNotNull {
             // todo though value is received here
@@ -58,7 +59,6 @@ class MatesViewModel @Inject constructor(
                     text = getText(user)
                 )
             }
-            // todo Nino: filter myself out? (and do so in detailsVM?)
         }.asLiveData()
 
     private suspend fun getText(user: User): String {

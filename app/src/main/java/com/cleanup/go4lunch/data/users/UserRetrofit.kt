@@ -32,8 +32,8 @@ interface UserRetrofit {
     @GET(VISITED)
     suspend fun getVisitedPlaceIds(): Response<List<Long>>
 
-    // todo or must server itself add visited?
-    suspend fun addVisited(userId: Long, osmId: Long)
+    // must server itself add visited?
+    // suspend fun addVisited(userId: Long, osmId: Long)
 
     @GET(LIKED)
     suspend fun getLikedPlaceIds(): Response<List<Long>>
