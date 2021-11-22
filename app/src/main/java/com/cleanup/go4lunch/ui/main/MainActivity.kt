@@ -44,8 +44,6 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.connectivityFlow.observe(this) {}
-
         setContentView(R.layout.activity_main)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -79,12 +77,7 @@ class MainActivity :
             when (it.itemId) {
                 R.id.logout -> viewModel.onLogoutClicked()
                 R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-                R.id.your_lunch -> if (goingAtNoon != null) startActivity(
-                    DetailsActivity.navigate(
-                        this,
-                        goingAtNoon!! // todo Nino double bang OK?
-                    )
-                ) else Unit
+                R.id.your_lunch -> viewModel.onYourLunchClicked()
                 else -> Unit
             }.exhaustive
             true

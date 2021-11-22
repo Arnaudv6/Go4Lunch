@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,11 +32,16 @@ class MainViewModel @Inject constructor(
     sessionUserUseCase: SessionUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
-    val connectivityFlow = connectivityRepository.isNetworkAvailableFlow.map {
-        if (it) usersRepository.updateMatesList()
-    }.asLiveData() // todo Nino: is there a better way to trigger repository?
 
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
+
+    init {
+        viewModelScope.launch {
+            connectivityRepository.isNetworkAvailableFlow.collect {
+                if (it) usersRepository.updateMatesList()
+            }
+        }
+    }
 
     val viewStateFlow: LiveData<MainViewState> = sessionUserUseCase.sessionUserFlow.map {
         Log.e(this.javaClass.canonicalName, "sessionUser: $it")
