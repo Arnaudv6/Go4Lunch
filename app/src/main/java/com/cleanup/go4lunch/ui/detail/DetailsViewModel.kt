@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.ui.detail
 
 import android.content.Context
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
@@ -9,16 +8,14 @@ import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
-import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
-import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
+import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +26,7 @@ class DetailsViewModel
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
-    private val sessionUserUseCase: SessionUserUseCase,
+    sessionUserUseCase: SessionUserUseCase,
     private val savedStateHandle: SavedStateHandle,
     @ApplicationContext appContext: Context
 ) : ViewModel() {
@@ -38,12 +35,15 @@ class DetailsViewModel
     private val colorInactive = ContextCompat.getColor(appContext, R.color.grey)
     private val colorGold = ContextCompat.getColor(appContext, R.color.gold)
 
-    // Todo Nino : c'est valide, mon asFlow()? et <Long?>
+    val intentSingleLiveEvent = SingleLiveEvent<DetailsViewAction>()
+
+    // Todo Nino : c'est valide, mon asFlow()? et <Long?> avec "?"
     private val idFlow = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID).asFlow()
 
     private val poiEntityFlow: Flow<PoiEntity> = idFlow.mapNotNull { poiRepository.getPoiById(it) }
 
     private var session: SessionUser? = null
+    private var poi: PoiEntity? = null
 
     private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> =
         combine(idFlow, usersRepository.matesListFlow) { id, mates ->
@@ -63,6 +63,7 @@ class DetailsViewModel
             colleaguesListFlow,
         ) { poi, session, colleagues ->
             this.session = session // todo Nino : je peux sauver ca dans un field?
+            this.poi = poi
             DetailsViewState(
                 name = poi.name,
                 goAtNoonColor = if (session?.user?.goingAtNoon == poi.id) colorGold else colorInactive,
@@ -83,34 +84,29 @@ class DetailsViewModel
 
     // todo snackBar if user clicks between 14h30 and 24h?
     fun goingAtNoonClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val placeId = idFlow.first()
-            session?.user?.let { // todo fix this line
-                Log.e("TAG", "goingAtNoonClicked: $placeId", )
-                if (placeId != null) {
+        poi?.id?.let { placeId -> // 'if' would not fix the complex value: linter would complain
+            session?.user?.let {
+                viewModelScope.launch(Dispatchers.IO) {
                     if (it.goingAtNoon == placeId) usersRepository.setGoingAtNoon(it.id, null)
                     else usersRepository.setGoingAtNoon(it.id, placeId)
                 }
             }
-        }
-        // todo interpolation
+        }  // todo interpolation
     }
 
     fun likeClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val userId = session?.user?.id
-            val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
-            if (userId != null && placeId != null) {
-                when (sessionUserUseCase.sessionUserFlow.first()?.liked?.contains(placeId)) {
-                    true -> usersRepository.deleteLiked(userId, placeId)
-                    false -> usersRepository.insertLiked(userId, placeId)
-                    null -> Unit
-                }.exhaustive // todo Nino : c'est un cas où exhaustive marche bof, non?
+        poi?.id?.let { placeId ->
+            session?.let {
+                viewModelScope.launch(Dispatchers.IO) {
+                    if (it.liked.contains(placeId)) usersRepository.deleteLiked(it.user.id, placeId)
+                    else usersRepository.insertLiked(it.user.id, placeId)
+                }
             }
-        }
-        // todo interpolation
+        }  // todo interpolation
     }
 
+    fun callClicked() = poi?.phone?.let { intentSingleLiveEvent.value = DetailsViewAction.Call(it) }
 
+    fun webClicked() = poi?.site?.let { intentSingleLiveEvent.value = DetailsViewAction.Surf(it) }
 }
 

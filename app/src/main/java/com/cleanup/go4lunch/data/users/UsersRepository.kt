@@ -15,7 +15,7 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     // this list also depends on current hour for goingAtNoon
     suspend fun updateMatesList() {
         userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }?.let {
-            matesListMutableStateFlow.tryEmit(it)
+            matesListMutableStateFlow.emit(it)
         }
     }
 
@@ -23,19 +23,17 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
         UserBody(user.id, user.firstName, user.lastName, user.avatarUrl, user.goingAtNoon)
     )
 
-    // we don't refresh on Liked
-    suspend fun insertLiked(userId: Long, osmId: Long): Boolean =
-        userRetrofit.insertLiked(
-            UserRetrofit.EqualId(userId),
-            UserRetrofit.EqualId(osmId)
-        ).isSuccessful
+    suspend fun insertLiked(userId: Long, osmId: Long) {
+        if (userRetrofit.insertLiked(userId, osmId).isSuccessful) refreshUser(userId)
+    }
 
-    // we don't refresh on Liked
-    suspend fun deleteLiked(userId: Long, osmId: Long): Boolean =
-        userRetrofit.deleteLiked(
-            UserRetrofit.EqualId(userId),
-            UserRetrofit.EqualId(osmId)
-        ).isSuccessful
+    suspend fun deleteLiked(userId: Long, osmId: Long) {
+        if (userRetrofit.deleteLiked(
+                UserRetrofit.EqualId(userId),
+                UserRetrofit.EqualId(osmId)
+            ).isSuccessful
+        ) refreshUser(userId)
+    }
 
     suspend fun setGoingAtNoon(userId: Long, osmId: Long?) {
         if (userRetrofit.setGoingAtNoon(
@@ -47,10 +45,10 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
 
     private suspend fun refreshUser(userId: Long) {
         val user = toUser(userRetrofit.getUserById(UserRetrofit.EqualId(userId)).body())
-        // going in this order as getUserById() is suspend and list is heavy on memory
+        // steps order as getUserById() is suspend and list is heavy on memory
         val list = ArrayList(matesListMutableStateFlow.value.filter { it.id != userId })
         list.add(user)
-        matesListMutableStateFlow.tryEmit(list)
+        matesListMutableStateFlow.emit(list)
     }
 
     private fun toUser(userResponse: UserResponse?): User? =
@@ -66,14 +64,15 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
             goingAtNoon = userResponse.goingAtNoon
         ) else null
 
-    suspend fun getLikedById(userId: Long): LongArray? =
-        userRetrofit.getLikedById(UserRetrofit.EqualId(userId)).body()?.toLongArray()
+    suspend fun getLikedById(userId: Long): LongArray? = userRetrofit.getLikedById(
+        UserRetrofit.EqualId(userId)
+    ).body()?.map { it.likedPlaceId }?.toLongArray()
 
     suspend fun getLikedPlaceIds(): LongArray? =
-        userRetrofit.getLikedPlaceIds().body()?.toLongArray()
+        userRetrofit.getLikedPlaceIds().body()?.map { it.likedPlaceId }?.toLongArray()
 
     suspend fun getVisitedPlaceIds(): LongArray? =
-        userRetrofit.getVisitedPlaceIds().body()?.toLongArray()
+        userRetrofit.getVisitedPlaceIds().body()?.map { it.visitedId }?.toLongArray()
 
 }
 

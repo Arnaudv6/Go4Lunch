@@ -1,5 +1,6 @@
 package com.cleanup.go4lunch.data.useCase
 
+import android.util.Log
 import com.cleanup.go4lunch.data.session.SessionRepository
 import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.users.UsersRepository
@@ -18,6 +19,7 @@ class SessionUserUseCase
         sessionRepository.sessionFlow,
         usersRepository.matesListFlow
     ) { session, mates ->
+        Log.e("TAG", "liste rafraichie ", )  // todo Nino : pourquoi je ne passe pas là quand je favorite?
         if (session == null) null
         else mates.firstOrNull { it.id == session.userId }?.let { user ->
             SessionUser(

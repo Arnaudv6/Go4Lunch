@@ -8,7 +8,6 @@ interface UserRetrofit {
         private const val USERS = "users"
         private const val VISITED = "visited_places"
         private const val LIKED = "likedplaces"
-        private const val LIKED_BY_ID = "likedplaces?select="
     }
 
     @Headers("Accept: application/vnd.pgrst.object")
@@ -26,26 +25,27 @@ interface UserRetrofit {
     @PATCH(USERS)
     suspend fun setGoingAtNoon(
         @Query("id") userId: EqualId,
-        @Field("goingatnoon") osmId: NullableLong
+        @Field("goingatnoon") osmId: NullableLong  // todo fix that
     ): Response<Unit>  // response needed for interpolation
 
     @GET(VISITED)
-    suspend fun getVisitedPlaceIds(): Response<List<Long>>
+    suspend fun getVisitedPlaceIds(): Response<List<VisitedResponse>>
 
     // must server itself add visited?
     // suspend fun addVisited(userId: Long, osmId: Long)
 
     @GET(LIKED)
-    suspend fun getLikedPlaceIds(): Response<List<Long>>
+    suspend fun getLikedPlaceIds(): Response<List<LikedResponse>>
 
-    @GET(LIKED_BY_ID)
-    suspend fun getLikedById(@Query("id") userId: EqualId): Response<List<Long>>
+    @GET(LIKED)  // "likedplaces?select=likedplaceid"
+    suspend fun getLikedById(@Query("userid") userId: EqualId): Response<List<LikedResponse>>
 
-    @Headers("Prefer: resolution=merge-duplicates")
+    @FormUrlEncoded
+    @Headers("Prefer: resolution=merge-duplicates")  // todo I get duplicates anyway.
     @POST(LIKED)
     suspend fun insertLiked(
-        @Query("userid") userId: EqualId,
-        @Query("likedplaceid") osmId: EqualId
+        @Field("userid") userId: Long,
+        @Field("likedplaceid") osmId: Long
     ): Response<Unit>  // response needed for interpolation
 
     @DELETE(LIKED)

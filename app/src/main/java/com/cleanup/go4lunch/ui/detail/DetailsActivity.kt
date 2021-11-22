@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.exhaustive
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -57,40 +58,38 @@ class DetailsActivity : AppCompatActivity() {
             if (it.rating != null) likes.rating = it.rating
             address.text = it.address
 
-            call.isEnabled = it.callActive  // todo : ca marche sur un AVD api21?
+            call.isEnabled = it.callActive
+            // isClickable works not, setAllowClickWhenDisabled() is API 31+
             call.compoundDrawablesRelative.filterNotNull()[0].setTint(it.callColor)
             call.setTextColor(it.callColor)
-            // isClickable works not, setAllowClickWhenDisabled() is API 31+
-            // Todo Nino: là faut que je pass le click au VM pour dégager le if?
-            call.setOnClickListener { _ ->
-                if (it.callActive) startActivity(
-                    Intent(
-                        Intent.ACTION_DIAL,
-                        Uri.fromParts("tel", it.call, null)
-                    )
-                )
-                // todo click sounds even when inactive. return false?
-            }
+            call.setOnClickListener { viewModel.callClicked() } // todo click sounds even when inactive. return false?
+
             like.compoundDrawablesRelative.filterNotNull()[0].setTint(it.likeColor)
             like.setTextColor(it.likeColor)
-            like.isClickable = it.likeActive
+            like.setOnClickListener { viewModel.likeClicked() }
+
+            website.isEnabled = it.websiteActive
             website.compoundDrawablesRelative.filterNotNull()[0].setTint(it.websiteColor)
             website.setTextColor(it.websiteColor)
-            website.isClickable = it.websiteActive
-            website.setOnClickListener { _ ->
-                if (it.websiteActive) startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(it.website)
-                    )
-                )
-            }
+            website.setOnClickListener { viewModel.webClicked() }
+
             button.setColorFilter(it.goAtNoonColor)
-            button.setOnClickListener {
-                viewModel.goingAtNoonClicked()
-            }
+            button.setOnClickListener { viewModel.goingAtNoonClicked() }
 
             adapter.submitList(it.colleaguesList)
+        }
+
+        viewModel.intentSingleLiveEvent.observe(this) {
+            startActivity(
+                when (it) {
+                    // todo Nino : plutot creer les Intent dans le VM, non ?
+                    is DetailsViewAction.Call -> Intent(
+                        Intent.ACTION_DIAL,
+                        Uri.fromParts("tel", it.number, null)
+                    )
+                    is DetailsViewAction.Surf -> Intent(Intent.ACTION_VIEW, Uri.parse(it.address))
+                }.exhaustive
+            )
         }
 
     }
