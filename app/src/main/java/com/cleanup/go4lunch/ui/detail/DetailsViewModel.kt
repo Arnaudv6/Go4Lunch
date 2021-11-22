@@ -14,7 +14,9 @@ import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -37,7 +39,6 @@ class DetailsViewModel
 
     val intentSingleLiveEvent = SingleLiveEvent<DetailsViewAction>()
 
-    // Todo Nino : c'est valide, mon asFlow()? et <Long?> avec "?"
     private val idFlow = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID).asFlow()
 
     private val poiEntityFlow: Flow<PoiEntity> = idFlow.mapNotNull { poiRepository.getPoiById(it) }
@@ -56,12 +57,16 @@ class DetailsViewModel
             }
         }
 
+    // TODO Arnaud usecase
+    private val interpolatedColleagues = MutableStateFlow<Boolean?>(null)
+
     val viewStateLiveData: LiveData<DetailsViewState> =
         combine(
             poiEntityFlow,
             sessionUserUseCase.sessionUserFlow,
             colleaguesListFlow,
-        ) { poi, session, colleagues ->
+            interpolatedColleagues
+        ) { poi, session, colleagues, interpolatedState ->
             this.session = session // todo Nino : je peux sauver ca dans un field?
             this.poi = poi
             DetailsViewState(
@@ -87,14 +92,19 @@ class DetailsViewModel
         poi?.id?.let { placeId -> // 'if' would not fix the complex value: linter would complain
             session?.user?.let {
                 viewModelScope.launch(Dispatchers.IO) {
+                    interpolatedColleagues.value = true
+                    launch {
+                        delay(1_000)
+                        interpolatedColleagues.value = false
+                    }
                     if (it.goingAtNoon == placeId) usersRepository.setGoingAtNoon(it.id, null)
                     else usersRepository.setGoingAtNoon(it.id, placeId)
                 }
             }
-        }  // todo Nino interpolation
+        }
     }
 
-    fun likeClicked() {
+    fun likeClicked(lol: String) {
         poi?.id?.let { placeId ->
             session?.let {
                 viewModelScope.launch(Dispatchers.IO) {

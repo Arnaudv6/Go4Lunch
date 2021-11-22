@@ -82,7 +82,6 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.intentSingleLiveEvent.observe(this) {
             startActivity(
                 when (it) {
-                    // todo Nino : plutot creer les Intent dans le VM, ou pas (android) ?
                     is DetailsViewAction.Call -> Intent(
                         Intent.ACTION_DIAL,
                         Uri.fromParts("tel", it.number, null)

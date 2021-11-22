@@ -1,8 +1,10 @@
 package com.cleanup.go4lunch.data.users
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +17,7 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     // this list also depends on current hour for goingAtNoon
     suspend fun updateMatesList() {
         userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }?.let {
-            matesListMutableStateFlow.emit(it)
+            matesListMutableStateFlow.value = it
         }
     }
 
@@ -48,7 +50,7 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
         // steps order as getUserById() is suspend and list is heavy on memory
         val list = ArrayList(matesListMutableStateFlow.value.filter { it.id != userId })
         list.add(user)
-        matesListMutableStateFlow.emit(list)
+        matesListMutableStateFlow.value = list
     }
 
     private fun toUser(userResponse: UserResponse?): User? =

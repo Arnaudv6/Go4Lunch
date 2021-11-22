@@ -19,7 +19,7 @@ class SessionUserUseCase
         sessionRepository.sessionFlow,
         usersRepository.matesListFlow
     ) { session, mates ->
-        Log.e("TAG", "liste rafraichie ", )  // todo Nino : pourquoi je ne passe pas là quand je favorite?
+        Log.e("TAG", "liste rafraichie ")
         if (session == null) null
         else mates.firstOrNull { it.id == session.userId }?.let { user ->
             SessionUser(
