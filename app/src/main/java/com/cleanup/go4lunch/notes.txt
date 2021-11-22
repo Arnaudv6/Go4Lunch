@@ -7,6 +7,7 @@ Notes:
 todo
     validate a lunch when user is in 20m range from announced restaurant between 11h30 and 14h?
     then remove place from goingAtNoon
+    snackBar if user clicks "goingAtNoon" between 14h30 and 24h?
 
 push notifications:
     the tricky part really is client-side:

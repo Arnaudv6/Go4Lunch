@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -73,11 +74,20 @@ class MainActivity :
             goingAtNoon = it.goingAtNoon
         }
 
+        viewModel.viewActionSingleLiveEvent.observe(this) {
+            when (it) {
+                is MainViewAction.LaunchDetail -> startActivity(
+                        DetailsActivity.navigate(this, it.osmId)
+                    )
+                is MainViewAction.StartNavNum -> viewPager.currentItem = it.number
+            }.exhaustive
+        }
+
         findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.logout -> viewModel.onLogoutClicked()
                 R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-                R.id.your_lunch -> viewModel.onYourLunchClicked()
+                R.id.your_lunch -> viewModel.onLunchClicked()
                 else -> Unit
             }.exhaustive
             true
@@ -89,10 +99,6 @@ class MainActivity :
 
         // supportFragmentManager retainedFragments is incompatible with Hilt.
         viewPager = findViewById(R.id.view_pager)
-
-        viewModel.navNumSingleLiveEvent.observe(this) {
-            viewPager.currentItem = it
-        }
 
         val adapter = MainPagerAdapter(this)
         viewPager.adapter = adapter

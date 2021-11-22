@@ -3,6 +3,7 @@ package com.cleanup.go4lunch.data.useCase
 import android.util.Log
 import com.cleanup.go4lunch.data.session.SessionRepository
 import com.cleanup.go4lunch.data.session.SessionUser
+import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -19,14 +20,17 @@ class SessionUserUseCase
         sessionRepository.sessionFlow,
         usersRepository.matesListFlow
     ) { session, mates ->
-        Log.e("TAG", "liste rafraichie ")
+        Log.e("TAG", "liste rafraichie $session ")
         if (session == null) null
-        else mates.firstOrNull { it.id == session.userId }?.let { user ->
-            SessionUser(
-                user = user,
-                liked = usersRepository.getLikedById(session.userId) ?: LongArray(0),
-                connectedThrough = session.connectionType
-            )
+        else mates.firstOrNull { it.id == session.userId }.let {
+            when (it) {
+                is User -> SessionUser(
+                    user = it,
+                    liked = usersRepository.getLikedById(it.id) ?: LongArray(0),
+                    connectedThrough = session.connectionType
+                )
+                else -> null
+            }
         }
     }
 

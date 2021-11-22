@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
-import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
@@ -15,10 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,7 +24,7 @@ class DetailsViewModel
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
-    sessionUserUseCase: SessionUserUseCase,
+    private val sessionUserUseCase: SessionUserUseCase,
     private val savedStateHandle: SavedStateHandle,
     @ApplicationContext appContext: Context
 ) : ViewModel() {
@@ -39,15 +35,13 @@ class DetailsViewModel
 
     val intentSingleLiveEvent = SingleLiveEvent<DetailsViewAction>()
 
-    private val idFlow = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID).asFlow()
+    private val osmIdFlow =
+        savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID).asFlow() // todo livedata
 
-    private val poiEntityFlow: Flow<PoiEntity> = idFlow.mapNotNull { poiRepository.getPoiById(it) }
-
-    private var session: SessionUser? = null
-    private var poi: PoiEntity? = null
+    private val poiFlow: Flow<PoiEntity> = osmIdFlow.mapNotNull { poiRepository.getPoiById(it) }
 
     private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> =
-        combine(idFlow, usersRepository.matesListFlow) { id, mates ->
+        combine(osmIdFlow, usersRepository.matesListFlow) { id, mates ->
             mates.filter { user -> user.goingAtNoon == id }.map { user ->
                 DetailsViewState.Item(
                     mateId = user.id,
@@ -62,16 +56,16 @@ class DetailsViewModel
 
     val viewStateLiveData: LiveData<DetailsViewState> =
         combine(
-            poiEntityFlow,
+            poiFlow,
             sessionUserUseCase.sessionUserFlow,
             colleaguesListFlow,
             interpolatedColleagues
         ) { poi, session, colleagues, interpolatedState ->
-            this.session = session // todo Nino : je peux sauver ca dans un field?
-            this.poi = poi
+            val color = interpolatedState?.let { if (it) colorGold else colorInactive }
+                ?: if (session?.user?.goingAtNoon == poi.id) colorGold else colorInactive
             DetailsViewState(
                 name = poi.name,
-                goAtNoonColor = if (session?.user?.goingAtNoon == poi.id) colorGold else colorInactive,
+                goAtNoonColor = color,
                 rating = poi.rating,
                 address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
                 bigImageUrl = poi.imageUrl.removeSuffix("/preview"),
@@ -87,36 +81,62 @@ class DetailsViewModel
             )
         }.asLiveData()
 
-    // todo snackBar if user clicks between 14h30 and 24h?
     fun goingAtNoonClicked() {
-        poi?.id?.let { placeId -> // 'if' would not fix the complex value: linter would complain
-            session?.user?.let {
-                viewModelScope.launch(Dispatchers.IO) {
-                    interpolatedColleagues.value = true
+        val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
+        if (placeId != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val session = sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull()
+                if (session != null) {
+                    val initialState = session.user.goingAtNoon == placeId
+                    interpolatedColleagues.value = !initialState
                     launch {
                         delay(1_000)
-                        interpolatedColleagues.value = false
+                        interpolatedColleagues.value = null
                     }
-                    if (it.goingAtNoon == placeId) usersRepository.setGoingAtNoon(it.id, null)
-                    else usersRepository.setGoingAtNoon(it.id, placeId)
+                    if (initialState) usersRepository.setGoingAtNoon(session.user.id, null)
+                    else usersRepository.setGoingAtNoon(session.user.id, placeId)
                 }
             }
         }
     }
 
-    fun likeClicked(lol: String) {
-        poi?.id?.let { placeId ->
-            session?.let {
-                viewModelScope.launch(Dispatchers.IO) {
-                    if (it.liked.contains(placeId)) usersRepository.deleteLiked(it.user.id, placeId)
-                    else usersRepository.insertLiked(it.user.id, placeId)
+    fun likeClicked() {
+        val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
+        if (placeId != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val session = sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull()
+                if (session != null) {
+                    if (session.liked.contains(placeId)) usersRepository.deleteLiked(
+                        session.user.id,
+                        placeId
+                    )
+                    else usersRepository.insertLiked(session.user.id, placeId)
                 }
             }
         }  // todo interpolation
     }
 
-    fun callClicked() = poi?.phone?.let { intentSingleLiveEvent.value = DetailsViewAction.Call(it) }
+    fun callClicked() {
+        // todo pareil : filterNotNull().first()
+        viewModelScope.launch(Dispatchers.IO) {
+            poiFlow.filterNotNull().first().phone?.let {
+                launch(Dispatchers.Main) {
+                    intentSingleLiveEvent.value = DetailsViewAction.Call(it)
+                }
+            }
+        }
+    }
 
-    fun webClicked() = poi?.site?.let { intentSingleLiveEvent.value = DetailsViewAction.Surf(it) }
+    fun webClicked() {
+        // todo pareil : filterNotNull().first()
+        viewModelScope.launch(Dispatchers.IO) {
+            poiFlow.filterNotNull().first().site?.let {
+                launch(Dispatchers.Main) {
+                    intentSingleLiveEvent.value = DetailsViewAction.Surf(it)
+                }
+            }
+        }
+    }
+
 }
 

@@ -6,6 +6,10 @@ import dagger.hilt.android.HiltAndroidApp
 @HiltAndroidApp
 class MainApplication : Application() {
 
+    // todo count activities to observe NetworkConnectivity repo from here.
+
+
+
 }
 
 // this can be accessed with:

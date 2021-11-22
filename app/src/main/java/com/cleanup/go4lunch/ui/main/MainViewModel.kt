@@ -17,9 +17,7 @@ import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,13 +27,16 @@ class MainViewModel @Inject constructor(
     connectivityRepository: ConnectivityRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val settingsRepository: SettingsRepository,
-    sessionUserUseCase: SessionUserUseCase,
+    private val sessionUserUseCase: SessionUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
 
-    val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
+    val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
 
     init {
+        viewActionSingleLiveEvent.value = MainViewAction.StartNavNum(settingsRepository.getNavNum())
+
+        // todo must move to APP when counting activities
         viewModelScope.launch {
             connectivityRepository.isNetworkAvailableFlow.collect {
                 if (it) usersRepository.updateMatesList()
@@ -62,10 +63,6 @@ class MainViewModel @Inject constructor(
         )
     }.asLiveData()
 
-    init {
-        navNumSingleLiveEvent.value = settingsRepository.getNavNum()
-    }
-
     fun onDestroy(num: Int) {
         settingsRepository.setNavNum(num)
         gpsProviderWrapper.destroyWrapper()
@@ -84,14 +81,26 @@ class MainViewModel @Inject constructor(
     }
 
     fun onLogoutClicked() {
-        viewModelScope.launch (Dispatchers.IO){
-            usersRepository.insertUser(User(
-                13,
-                "Natasha",
-                "Zobovich",
-                null,
-                null
-            ))
+        viewModelScope.launch(Dispatchers.IO) {
+            usersRepository.insertUser(
+                User(
+                    13,
+                    "Natasha",
+                    "Zobovich",
+                    null,
+                    null
+                )
+            )
+        }
+    }
+
+    fun onLunchClicked() {
+        viewModelScope.launch(Dispatchers.Main) {
+            // Todo Nino filterNotNull().firstOrNull(): OK?
+            sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull().let {
+                val id = it?.user?.goingAtNoon
+                if (id != null) viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(id)
+            }
         }
     }
 }
