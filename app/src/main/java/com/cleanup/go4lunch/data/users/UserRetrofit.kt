@@ -25,7 +25,7 @@ interface UserRetrofit {
     @PATCH(USERS)
     suspend fun setGoingAtNoon(
         @Query("id") userId: EqualId,
-        @Field("goingatnoon") osmId: NullableLong  // todo fix that
+        @Field("goingatnoon") osmId: NullableLong  // todo fix that deletion
     ): Response<Unit>  // response needed for interpolation
 
     @GET(VISITED)
@@ -41,7 +41,7 @@ interface UserRetrofit {
     suspend fun getLikedById(@Query("userid") userId: EqualId): Response<List<LikedResponse>>
 
     @FormUrlEncoded
-    @Headers("Prefer: resolution=merge-duplicates")  // todo I get duplicates anyway.
+    @Headers("Prefer: resolution=merge-duplicates")  // todo fix duplicates.
     @POST(LIKED)
     suspend fun insertLiked(
         @Field("userid") userId: Long,

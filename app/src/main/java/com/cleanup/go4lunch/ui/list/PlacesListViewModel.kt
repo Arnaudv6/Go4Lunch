@@ -29,8 +29,8 @@ class PlacesListViewModel @Inject constructor(
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
-    // todo: fix hours Colors: theme repository?
-    private val colorOnSecondary = ContextCompat.getColor(application, R.color.colorOnSecondary)
+    // todo: fix R.color.colorOnSecondary don't refresh on theme change
+    private val colorOnSecondary = ContextCompat.getColor(application, R.color.grey)
 
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
         combine(

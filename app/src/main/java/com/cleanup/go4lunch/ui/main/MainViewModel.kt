@@ -26,14 +26,14 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
     connectivityRepository: ConnectivityRepository,
-    private val gpsProviderWrapper: GpsProviderWrapper,  // todo move to usecase?
+    private val gpsProviderWrapper: GpsProviderWrapper,
     private val settingsRepository: SettingsRepository,
     sessionUserUseCase: SessionUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
     val connectivityFlow = connectivityRepository.isNetworkAvailableFlow.map {
         if (it) usersRepository.updateMatesList()
-    }.asLiveData() // todo Nino: is there a better way?
+    }.asLiveData() // todo Nino: is there a better way to trigger repository?
 
     val navNumSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent<Int>()
 

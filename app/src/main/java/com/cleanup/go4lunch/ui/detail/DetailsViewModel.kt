@@ -91,7 +91,7 @@ class DetailsViewModel
                     else usersRepository.setGoingAtNoon(it.id, placeId)
                 }
             }
-        }  // todo interpolation
+        }  // todo Nino interpolation
     }
 
     fun likeClicked() {

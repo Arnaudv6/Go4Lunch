@@ -54,7 +54,7 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.viewStateLiveData.observe(this) {
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
-            // todo Nino: ce if là ne peut que rester?
+            // todo: ce if là ne peut que rester?
             if (it.rating != null) likes.rating = it.rating
             address.text = it.address
 
@@ -62,7 +62,7 @@ class DetailsActivity : AppCompatActivity() {
             // isClickable works not, setAllowClickWhenDisabled() is API 31+
             call.compoundDrawablesRelative.filterNotNull()[0].setTint(it.callColor)
             call.setTextColor(it.callColor)
-            call.setOnClickListener { viewModel.callClicked() } // todo click sounds even when inactive. return false?
+            call.setOnClickListener { viewModel.callClicked() }
 
             like.compoundDrawablesRelative.filterNotNull()[0].setTint(it.likeColor)
             like.setTextColor(it.likeColor)
@@ -82,7 +82,7 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.intentSingleLiveEvent.observe(this) {
             startActivity(
                 when (it) {
-                    // todo Nino : plutot creer les Intent dans le VM, non ?
+                    // todo Nino : plutot creer les Intent dans le VM, ou pas (android) ?
                     is DetailsViewAction.Call -> Intent(
                         Intent.ACTION_DIAL,
                         Uri.fromParts("tel", it.number, null)
