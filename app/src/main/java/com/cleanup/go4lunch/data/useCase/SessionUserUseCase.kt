@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.data.useCase
 
-import android.util.Log
 import com.cleanup.go4lunch.data.session.SessionRepository
 import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.users.User
@@ -20,7 +19,6 @@ class SessionUserUseCase
         sessionRepository.sessionFlow,
         usersRepository.matesListFlow
     ) { session, mates ->
-        Log.e("TAG", "liste rafraichie $session ")
         if (session == null) null
         else mates.firstOrNull { it.id == session.userId }.let {
             when (it) {

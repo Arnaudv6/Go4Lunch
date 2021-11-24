@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
@@ -52,6 +53,7 @@ class DetailsActivity : AppCompatActivity() {
         recycler.adapter = adapter
 
         viewModel.viewStateLiveData.observe(this) {
+            Log.e("received livedatal", "onCreate: ", )
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
             // todo: ce if là ne peut que rester?

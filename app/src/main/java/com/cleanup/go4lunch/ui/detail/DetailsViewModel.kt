@@ -1,12 +1,16 @@
 package com.cleanup.go4lunch.ui.detail
 
 import android.content.Context
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.session.SessionUser
+import com.cleanup.go4lunch.data.useCase.InterpolationUseCase
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
+import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.SingleLiveEvent
@@ -14,7 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,6 +31,7 @@ class DetailsViewModel
     private val poiMapperDelegate: PoiMapperDelegate,
     private val sessionUserUseCase: SessionUserUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val interpolationUseCase: InterpolationUseCase,
     @ApplicationContext appContext: Context
 ) : ViewModel() {
 
@@ -35,51 +41,98 @@ class DetailsViewModel
 
     val intentSingleLiveEvent = SingleLiveEvent<DetailsViewAction>()
 
-    private val osmIdFlow =
-        savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID).asFlow() // todo livedata
+    private val osmIdLiveData = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID)
 
-    private val poiFlow: Flow<PoiEntity> = osmIdFlow.mapNotNull { poiRepository.getPoiById(it) }
+    private val matesListLiveData = usersRepository.matesListFlow.asLiveData()
 
-    private val colleaguesListFlow: Flow<List<DetailsViewState.Item>> =
-        combine(osmIdFlow, usersRepository.matesListFlow) { id, mates ->
-            mates.filter { user -> user.goingAtNoon == id }.map { user ->
-                DetailsViewState.Item(
-                    mateId = user.id,
-                    imageUrl = user.avatarUrl ?: "",
-                    text = user.firstName
-                )
-            }
+    private val sessionUserLiveData = sessionUserUseCase.sessionUserFlow.asLiveData()
+
+    private val poiLiveData: LiveData<PoiEntity?> = osmIdLiveData.switchMap {
+        liveData { emit(if (it != null) poiRepository.getPoiById(it) else null) }
+    }
+
+    private val goingMatesListLiveData = MediatorLiveData<List<DetailsViewState.Item>>().apply {
+        addSource(osmIdLiveData) { osmId -> value = goingMates(osmId, matesListLiveData.value) }
+        addSource(matesListLiveData) { mates -> value = goingMates(osmIdLiveData.value, mates) }
+    }
+
+    private fun goingMates(osmId: Long?, mates: List<User>?): List<DetailsViewState.Item> =
+        mates?.filter { user -> user.goingAtNoon == osmId }?.map { user ->
+            DetailsViewState.Item(
+                mateId = user.id,
+                imageUrl = user.avatarUrl ?: "",
+                text = user.firstName
+            )
+        } ?: emptyList()
+
+    val viewStateLiveData: LiveData<DetailsViewState> = MediatorLiveData<DetailsViewState>().apply {
+        addSource(poiLiveData) { poi ->
+            toViewState(
+                poi,
+                sessionUserLiveData.value,
+                goingMatesListLiveData.value,
+                interpolationUseCase.interpolatedValuesLiveData.value
+            )?.let { value = it }
         }
+        addSource(sessionUserLiveData) { session ->
+            toViewState(
+                poiLiveData.value,
+                session,
+                goingMatesListLiveData.value,
+                interpolationUseCase.interpolatedValuesLiveData.value
+            )?.let { value = it }
+        }
+        addSource(goingMatesListLiveData) { mates ->
+            toViewState(
+                poiLiveData.value,
+                sessionUserLiveData.value,
+                mates,
+                interpolationUseCase.interpolatedValuesLiveData.value
+            )?.let { value = it }
+        }
+        addSource(interpolationUseCase.interpolatedValuesLiveData) { interpolated ->
+            toViewState(
+                poiLiveData.value,
+                sessionUserLiveData.value,
+                goingMatesListLiveData.value,
+                interpolated
+            )?.let { value = it }
+        }
+    }
 
-    // TODO Arnaud usecase
-    private val interpolatedColleagues = MutableStateFlow<Boolean?>(null)
-
-    val viewStateLiveData: LiveData<DetailsViewState> =
-        combine(
-            poiFlow,
-            sessionUserUseCase.sessionUserFlow,
-            colleaguesListFlow,
-            interpolatedColleagues
-        ) { poi, session, colleagues, interpolatedState ->
-            val color = interpolatedState?.let { if (it) colorGold else colorInactive }
-                ?: if (session?.user?.goingAtNoon == poi.id) colorGold else colorInactive
-            DetailsViewState(
+    private fun toViewState(
+        poiEntity: PoiEntity?,
+        session: SessionUser?,
+        colleagues: List<DetailsViewState.Item>?,
+        interpolatedValues: InterpolationUseCase.Values?
+    ): DetailsViewState? {
+        Log.e("toViewState", "$poiEntity,\n $session,\n $colleagues,\n $interpolatedValues")
+        poiEntity?.let { poi ->
+            val goingColor =
+                interpolatedValues?.goingAtNoon?.let { if (it) colorGold else colorInactive }
+                    ?: if (session?.user?.goingAtNoon == poi.id) colorGold else colorInactive
+            val likeColor =
+                interpolatedValues?.isLikedPlace?.let { if (it) colorActive else colorInactive }
+                    ?: if (session?.liked?.contains(poi.id) == true) colorActive else colorInactive
+            return DetailsViewState(
                 name = poi.name,
-                goAtNoonColor = color,
+                goAtNoonColor = goingColor,
                 rating = poi.rating,
                 address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
                 bigImageUrl = poi.imageUrl.removeSuffix("/preview"),
                 call = poi.phone,
                 callColor = if (poi.phone.isNullOrEmpty()) colorInactive else colorActive,
                 callActive = !poi.phone.isNullOrEmpty(),
-                likeColor = if (session?.liked?.contains(poi.id) == false) colorInactive else colorActive,
+                likeColor = likeColor,
                 likeActive = session?.liked?.contains(poi.id) ?: false,
                 website = poi.site.orEmpty(),
                 websiteColor = if (poi.site.isNullOrEmpty()) colorInactive else colorActive,
                 websiteActive = !poi.site.isNullOrEmpty(),
-                colleaguesList = colleagues
+                colleaguesList = colleagues ?: emptyList()
             )
-        }.asLiveData()
+        }
+        return null
+    }
 
     fun goingAtNoonClicked() {
         val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
@@ -88,10 +141,10 @@ class DetailsViewModel
                 val session = sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull()
                 if (session != null) {
                     val initialState = session.user.goingAtNoon == placeId
-                    interpolatedColleagues.value = !initialState
+                    interpolationUseCase.setGoingAtNoon(!initialState)
                     launch {
                         delay(1_000)
-                        interpolatedColleagues.value = null
+                        interpolationUseCase.setGoingAtNoon(null)
                     }
                     if (initialState) usersRepository.setGoingAtNoon(session.user.id, null)
                     else usersRepository.setGoingAtNoon(session.user.id, placeId)
@@ -106,37 +159,25 @@ class DetailsViewModel
             viewModelScope.launch(Dispatchers.IO) {
                 val session = sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull()
                 if (session != null) {
-                    if (session.liked.contains(placeId)) usersRepository.deleteLiked(
-                        session.user.id,
-                        placeId
-                    )
+                    val initialState = session.liked.contains(placeId)
+                    interpolationUseCase.setLikeCurrentPlace(!initialState)
+                    launch {
+                        delay(1_000)
+                        interpolationUseCase.setLikeCurrentPlace(null)
+                    }
+                    if (initialState) usersRepository.deleteLiked(session.user.id, placeId)
                     else usersRepository.insertLiked(session.user.id, placeId)
                 }
             }
-        }  // todo interpolation
+        }
     }
 
     fun callClicked() {
-        // todo pareil : filterNotNull().first()
-        viewModelScope.launch(Dispatchers.IO) {
-            poiFlow.filterNotNull().first().phone?.let {
-                launch(Dispatchers.Main) {
-                    intentSingleLiveEvent.value = DetailsViewAction.Call(it)
-                }
-            }
-        }
+        poiLiveData.value?.phone?.let { intentSingleLiveEvent.value = DetailsViewAction.Call(it) }
     }
 
     fun webClicked() {
-        // todo pareil : filterNotNull().first()
-        viewModelScope.launch(Dispatchers.IO) {
-            poiFlow.filterNotNull().first().site?.let {
-                launch(Dispatchers.Main) {
-                    intentSingleLiveEvent.value = DetailsViewAction.Surf(it)
-                }
-            }
-        }
+        poiLiveData.value?.site?.let { intentSingleLiveEvent.value = DetailsViewAction.Surf(it) }
     }
-
 }
 
