@@ -23,8 +23,8 @@
         android:ellipsize="end"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/mates_item_image"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/mates_item_image"
         app:layout_constraintTop_toTopOf="@id/mates_item_image"
-        app:layout_constraintEnd_toEndOf="parent"
         tools:text="@tools:sample/first_names" />
 </androidx.constraintlayout.widget.ConstraintLayout>

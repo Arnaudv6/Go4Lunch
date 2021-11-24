@@ -63,7 +63,7 @@ class MatesViewModel @Inject constructor(
         }.asLiveData()
 
     private suspend fun getText(user: User): String {
-        if (user.goingAtNoon == null) return "${user.firstName} has not decided yet" // todo italic, grey
+        if (user.goingAtNoon == null) return "${user.firstName} has not decided yet"
         val restaurant = poiRepository.getPoiById(user.goingAtNoon)
             ?: return "${user.firstName}: chose restaurant id ${user.goingAtNoon}"
         if (restaurant.cuisine.isEmpty()) return "${user.firstName} is eating at ${restaurant.name}"
