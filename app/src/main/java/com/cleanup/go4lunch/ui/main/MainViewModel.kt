@@ -17,7 +17,10 @@ import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -97,10 +100,10 @@ class MainViewModel @Inject constructor(
     fun onLunchClicked() {
         viewModelScope.launch(Dispatchers.Main) {
             // Todo Nino filterNotNull().firstOrNull(): OK?
-            sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull().let {
-                val id = it?.user?.goingAtNoon
-                if (id != null) viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(id)
-            }
+            sessionUserUseCase.sessionUserFlow.filterNotNull()
+                .firstOrNull()?.user?.goingAtNoon?.let {
+                    viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(it)
+                }
         }
     }
 }

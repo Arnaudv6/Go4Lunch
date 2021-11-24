@@ -5,19 +5,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.TextUtilsCompat.getLayoutDirectionFromLocale
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
@@ -108,7 +115,6 @@ class MapFragment : Fragment() {
         // SimpleLocationOverlay is noop
         val locationOverlay = MyLocationNewOverlay(gpsProviderWrapper, map)
 
-        // todo make it livedata? put some of this in VM?
         gpsProviderWrapper.possibleLocation.collectWithLifecycle(viewLifecycleOwner) {
             locationOverlay.enableMyLocation()  // so location pin updates
         }
@@ -159,13 +165,24 @@ class MapFragment : Fragment() {
         map.overlays.add(mScaleBarOverlay)
 
         // bind centerOnMe button
-        val centerOnMeButton = view.findViewById<AppCompatImageButton>(R.id.center_on_me)
+        val centerOnMeButton = view.findViewById<FloatingActionButton>(R.id.center_on_me)
         centerOnMeButton.setOnClickListener { viewModel.onCenterOnMeClicked() }
 
         // bind updatePoiPins button
-        val updatePoiPins = view.findViewById<AppCompatImageButton>(R.id.update_poi_pins)
-        updatePoiPins.setOnClickListener { viewModel.requestPoiPins(map.boundingBox) }
-        // todo use swipe-to-refresh busy spindle.
+        val updatePoiPins = view.findViewById<FloatingActionButton>(R.id.update_poi_pins)
+
+        val mProgress = CircularProgressDrawable(requireContext()).apply{
+            setStyle(CircularProgressDrawable.DEFAULT)
+            setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.colorOnSecondary))
+            start() // this won't show in emulator if animation scale is off.
+        }
+
+        view.findViewById<FloatingActionButton>(R.id.progress_circular)
+            .apply { setImageDrawable(mProgress) }
+
+        updatePoiPins.setOnClickListener {
+            viewModel.requestPoiPins(map.boundingBox)
+        }
         // map.addMapListener(object : MapListener {    override onScroll() and onZoom()    })
 
         return view

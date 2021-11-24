@@ -66,11 +66,8 @@ class MapViewModel @Inject constructor(
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(ioDispatcher) {
-            val numberOfPoi =
-                MapViewAction.PoiRetrieval(poiRepository.fetchPOIsInBoundingBox(boundingBox))
-            withContext(Dispatchers.Main) {
-                viewActionLiveEvent.value = numberOfPoi
-            }
+            val numberOfPoi = poiRepository.fetchPOIsInBoundingBox(boundingBox)
+            viewActionLiveEvent.postValue(MapViewAction.PoiRetrieval(numberOfPoi))
         }
     }
 
