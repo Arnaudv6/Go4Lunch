@@ -5,10 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.ProgressBar
-import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -17,7 +13,6 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.collectWithLifecycle
@@ -171,41 +166,40 @@ class MapFragment : Fragment() {
         // bind updatePoiPins button
         val updatePoiPins = view.findViewById<FloatingActionButton>(R.id.update_poi_pins)
 
-        val mProgress = CircularProgressDrawable(requireContext()).apply{
+        val progress = CircularProgressDrawable(requireContext()).apply {
             setStyle(CircularProgressDrawable.DEFAULT)
             setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.colorOnSecondary))
-            start() // this won't show in emulator if animation scale is off.
+            // this won't show in emulator if animation scale is off.
         }
 
-        view.findViewById<FloatingActionButton>(R.id.progress_circular)
-            .apply { setImageDrawable(mProgress) }
+        val progressButton = view.findViewById<FloatingActionButton>(R.id.progress_circular)
+        progressButton.setImageDrawable(progress)
 
         updatePoiPins.setOnClickListener {
+            progressButton.visibility = View.VISIBLE
+            progress.start()
             viewModel.requestPoiPins(map.boundingBox)
         }
-        // map.addMapListener(object : MapListener {    override onScroll() and onZoom()    })
 
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         viewModel.viewActionLiveEvent.observe(viewLifecycleOwner) {
             when (it) {
                 // animations are stub as of OSM-Droid 6.1.11
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
                 is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
                 // todo: fix change theme makes a view reset
-                is MapViewAction.PoiRetrieval -> Snackbar
-                    .make(
-                        view,
-                        "${it.results} POI received and updated on view",
+                is MapViewAction.PoiRetrieval -> {
+                    progress.stop()
+                    progressButton.visibility = View.GONE
+                    Snackbar.make(
+                        view, "${it.results} POI received and updated on view",
                         Snackbar.LENGTH_SHORT
-                    )
-                    .setAction("Dismiss") {}.show() // empty action will dismiss.
+                    ).setAction("Dismiss") {}.show()
+                } // empty action will dismiss.
                 else -> Unit // better notation than {}
             }.exhaustive
         }
+
+        return view
     }
 
     override fun onStop() {
