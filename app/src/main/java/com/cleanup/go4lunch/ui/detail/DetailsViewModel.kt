@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.ui.detail
 
 import android.content.Context
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
@@ -18,8 +17,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,7 +26,7 @@ class DetailsViewModel
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
-    private val sessionUserUseCase: SessionUserUseCase,
+    sessionUserUseCase: SessionUserUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val interpolationUseCase: InterpolationUseCase,
     @ApplicationContext appContext: Context
@@ -106,7 +103,6 @@ class DetailsViewModel
         colleagues: List<DetailsViewState.Item>?,
         interpolatedValues: InterpolationUseCase.Values?
     ): DetailsViewState? {
-        Log.e("toViewState", "$poiEntity,\n $session,\n $colleagues,\n $interpolatedValues")
         poiEntity?.let { poi ->
             val goingColor =
                 interpolatedValues?.goingAtNoon?.let { if (it) colorGold else colorInactive }
@@ -120,12 +116,10 @@ class DetailsViewModel
                 rating = poi.rating,
                 address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
                 bigImageUrl = poi.imageUrl.removeSuffix("/preview"),
-                call = poi.phone,
                 callColor = if (poi.phone.isNullOrEmpty()) colorInactive else colorActive,
                 callActive = !poi.phone.isNullOrEmpty(),
                 likeColor = likeColor,
                 likeActive = session?.liked?.contains(poi.id) ?: false,
-                website = poi.site.orEmpty(),
                 websiteColor = if (poi.site.isNullOrEmpty()) colorInactive else colorActive,
                 websiteActive = !poi.site.isNullOrEmpty(),
                 colleaguesList = colleagues ?: emptyList()
@@ -135,30 +129,26 @@ class DetailsViewModel
     }
 
     fun goingAtNoonClicked() {
-        val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
-        if (placeId != null) {
+        savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
             viewModelScope.launch(Dispatchers.IO) {
-                val session = sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull()
-                if (session != null) {
-                    val initialState = session.user.goingAtNoon == placeId
+                sessionUserLiveData.value?.user?.let { user ->
+                    val initialState = user.goingAtNoon == placeId
                     interpolationUseCase.setGoingAtNoon(!initialState)
                     launch {
                         delay(1_000)
                         interpolationUseCase.setGoingAtNoon(null)
                     }
-                    if (initialState) usersRepository.setGoingAtNoon(session.user.id, null)
-                    else usersRepository.setGoingAtNoon(session.user.id, placeId)
+                    if (initialState) usersRepository.setGoingAtNoon(user.id, null)
+                    else usersRepository.setGoingAtNoon(user.id, placeId)
                 }
             }
         }
     }
 
     fun likeClicked() {
-        val placeId = savedStateHandle.get<Long>(DetailsActivity.OSM_ID)
-        if (placeId != null) {
+        savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
             viewModelScope.launch(Dispatchers.IO) {
-                val session = sessionUserUseCase.sessionUserFlow.filterNotNull().firstOrNull()
-                if (session != null) {
+                sessionUserLiveData.value?.let { session ->
                     val initialState = session.liked.contains(placeId)
                     interpolationUseCase.setLikeCurrentPlace(!initialState)
                     launch {

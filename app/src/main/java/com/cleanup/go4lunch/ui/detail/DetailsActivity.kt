@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
@@ -23,7 +23,6 @@ class DetailsActivity : AppCompatActivity() {
     private val viewModel: DetailsViewModel by viewModels()
 
     companion object {
-
         const val OSM_ID = "osm_id"
 
         fun navigate(caller: Activity, osmId: Long): Intent =
@@ -53,11 +52,12 @@ class DetailsActivity : AppCompatActivity() {
         recycler.adapter = adapter
 
         viewModel.viewStateLiveData.observe(this) {
-            Log.e("received livedatal", "onCreate: ", )
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
-            // todo: ce if là ne peut que rester?
-            if (it.rating != null) likes.rating = it.rating
+            it.rating?.let { float ->
+                likes.visibility = View.VISIBLE
+                likes.rating = float
+            }
             address.text = it.address
 
             call.isEnabled = it.callActive

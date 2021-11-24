@@ -82,6 +82,7 @@
                     android:rating="3"
                     android:stepSize="1"
                     android:theme="@style/RatingBar"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/details_name"
                     app:layout_constraintStart_toEndOf="@id/details_name"
                     tools:rating="@sample/restaurants.json/data/stars" />

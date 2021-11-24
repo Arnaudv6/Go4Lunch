@@ -95,7 +95,9 @@ class MainActivity :
 
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true)
 
-        // todo spindle search: filter as you type + one dropdown element "enter to search online"
+        // todo spindle search:
+        //  can't do filter-as-you-type + one dropdown element "enter to search online"
+        //  as autocomplete is in requirements
 
         // supportFragmentManager retainedFragments is incompatible with Hilt.
         viewPager = findViewById(R.id.view_pager)

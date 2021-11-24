@@ -21,7 +21,7 @@ class MatesViewModel @Inject constructor(
 
     suspend fun swipeRefresh() {
         usersRepository.updateMatesList()
-        updateRatings()
+        updateRatings()  // todo emerge a UseCase for this
 
         // todo this must happen here
         //  poiRetrievalNumberSingleLiveEvent.value
@@ -30,8 +30,9 @@ class MatesViewModel @Inject constructor(
     private suspend fun updateRatings() {
         val visited = usersRepository.getVisitedPlaceIds() ?: LongArray(0)
         val liked = usersRepository.getLikedPlaceIds() ?: LongArray(0)
-        for (place in visited.toSet()) {
-            val ratio = liked.count { it == place } / visited.count { it == place }.toFloat()
+        for (place in (visited + liked).toSet()) {
+            // avoid dividing by zero.
+            val ratio = liked.count { it == place } / (visited.count { it == place }.toFloat() + .1)
             poiRepository.updatePoiRating(
                 place, when {
                     ratio < 0.2 -> 1

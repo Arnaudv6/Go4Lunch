@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.data.users
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -65,12 +64,8 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
             goingAtNoon = userResponse.goingAtNoon
         ) else null
 
-    suspend fun getLikedById(userId: Long): LongArray? {
-        Log.e("TAG", "getLikedById: ")
-        return userRetrofit.getLikedById(
-            UserRetrofit.EqualId(userId)
-        ).body()?.map { it.likedPlaceId }?.toLongArray()
-    }
+    suspend fun getLikedById(userId: Long): LongArray? = userRetrofit
+        .getLikedById(UserRetrofit.EqualId(userId)).body()?.map { it.likedPlaceId }?.toLongArray()
 
     suspend fun getLikedPlaceIds(): LongArray? =
         userRetrofit.getLikedPlaceIds().body()?.map { it.likedPlaceId }?.toLongArray()

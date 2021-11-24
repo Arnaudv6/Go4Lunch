@@ -10,14 +10,12 @@ data class DetailsViewState(
     val address: String,
     val bigImageUrl: String,
 
-    val call: String?, // todo why
     @ColorInt
     val callColor: Int,
     val callActive: Boolean,
     @ColorInt
     val likeColor: Int,
     val likeActive: Boolean,
-    val website: String,
     @ColorInt
     val websiteColor: Int,
     val websiteActive: Boolean,

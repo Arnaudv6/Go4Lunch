@@ -29,7 +29,7 @@ class PlacesListViewModel @Inject constructor(
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
-    // todo: fix R.color.colorOnSecondary don't refresh on theme change
+    // using grey as R.color.colorOnSecondary don't refresh on theme change
     private val colorOnSecondary = ContextCompat.getColor(application, R.color.grey)
 
     private val viewStateListFlow: Flow<List<PlacesListViewState>> =
