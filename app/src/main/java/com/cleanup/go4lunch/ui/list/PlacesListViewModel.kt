@@ -1,9 +1,9 @@
 package com.cleanup.go4lunch.ui.list
 
 import android.app.Application
-import android.location.Location
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import ch.poole.openinghoursparser.OpeningHoursParser
@@ -32,33 +32,26 @@ class PlacesListViewModel @Inject constructor(
     // using grey as R.color.colorOnSecondary don't refresh on theme change
     private val colorOnSecondary = ContextCompat.getColor(application, R.color.grey)
 
-    private val viewStateListFlow: Flow<List<PlacesListViewState>> =
-        combine(
-            poiRepository.cachedPOIsListFlow,
-            gpsProviderWrapper.locationFlow,
-            matesByPlaceUseCase.matesByPlaceFlow,
-        ) { list, location, mates ->
-            list.sortedBy { poiEntity ->
-                distanceBetween(  // todo remove double with line 90. ZIP(poi, distance)?
-                    geoPoint1 = GeoPoint(poiEntity.latitude, poiEntity.longitude),
-                    geoPoint2 = GeoPoint(location)
-                )
-            }.map {
-                viewStateFromPoi(it, location, mates)
-            }
-        }
+    private val orderedPoiListFlow: Flow<List<Pair<Int, PoiEntity>>> = combine(
+        poiRepository.cachedPOIsListFlow,
+        gpsProviderWrapper.locationFlow
+    ) { list, location ->
+        val locGeoPoint = GeoPoint(location)
+        list.map {
+            Pair(locGeoPoint.distanceToAsDouble(GeoPoint(it.latitude, it.longitude)).toInt(), it)
+        }.sortedBy { it.first }
+    }
 
-    val viewStateListLiveData = viewStateListFlow.asLiveData()
+    val viewStateListLiveData: LiveData<List<PlacesListViewState>> = combine(
+        orderedPoiListFlow,
+        matesByPlaceUseCase.matesByPlaceFlow,
+    ) { list, mates -> list.map { viewStateFromPoi(it.second, it.first, mates) } }.asLiveData()
 
     private fun viewStateFromPoi(
         poi: PoiEntity,
-        location: Location,
+        dist: Int,
         mates: HashMap<Long, ArrayList<String>>
     ): PlacesListViewState {
-        val dist = distanceBetween(
-            geoPoint1 = GeoPoint(poi.latitude, poi.longitude),
-            geoPoint2 = GeoPoint(location)
-        )
         val coloredHours = fuzzyHours(poi.hours.orEmpty().trim())
 
         return PlacesListViewState(
@@ -114,7 +107,4 @@ class PlacesListViewModel @Inject constructor(
         if (instant.dayOfWeek == now.dayOfWeek) return "at $formatted"
         return "${instant.dayOfWeek.name} at $formatted"
     }
-
-    private fun distanceBetween(geoPoint1: GeoPoint, geoPoint2: GeoPoint): Int =
-        geoPoint1.distanceToAsDouble(geoPoint2).toInt()
 }
