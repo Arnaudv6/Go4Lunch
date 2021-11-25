@@ -4,11 +4,12 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -64,21 +65,26 @@ class MainActivity :
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
 
         val headerView = findViewById<NavigationView>(R.id.side_nav).getHeaderView(0)
+        val avatar = headerView.findViewById<ImageView>(R.id.drawer_avatar)
 
-        viewModel.viewStateFlow.observe(this) {
-            if (it.avatarUrl != null) Glide.with(baseContext).load(it.avatarUrl)
-                .apply(RequestOptions.circleCropTransform())
-                .into(headerView.findViewById(R.id.drawer_avatar))
-            headerView.findViewById<TextView>(R.id.drawer_user_name).text = it.name
-            headerView.findViewById<TextView>(R.id.drawer_user_email).text = it.connectedVia
-            goingAtNoon = it.goingAtNoon
+        viewModel.viewStateFlow.observe(this) { viewState ->
+            avatar.setImageDrawable(
+                AppCompatResources.getDrawable(applicationContext, R.drawable.ic_baseline_group_24)
+            )
+            viewState.avatarUrl?.let {
+                Glide.with(baseContext).load(it)
+                    .apply(RequestOptions.circleCropTransform()).into(avatar)
+            }
+            headerView.findViewById<TextView>(R.id.drawer_user_name).text = viewState.name
+            headerView.findViewById<TextView>(R.id.drawer_user_email).text = viewState.connectedVia
+            goingAtNoon = viewState.goingAtNoon
         }
 
         viewModel.viewActionSingleLiveEvent.observe(this) {
             when (it) {
                 is MainViewAction.LaunchDetail -> startActivity(
-                        DetailsActivity.navigate(this, it.osmId)
-                    )
+                    DetailsActivity.navigate(this, it.osmId)
+                )
                 is MainViewAction.StartNavNum -> viewPager.currentItem = it.number
             }.exhaustive
         }
