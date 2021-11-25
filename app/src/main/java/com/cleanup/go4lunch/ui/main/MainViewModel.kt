@@ -17,6 +17,8 @@ import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
@@ -99,11 +101,15 @@ class MainViewModel @Inject constructor(
 
     fun onLunchClicked() {
         viewModelScope.launch(Dispatchers.Main) {
-            // Todo Nino filterNotNull().firstOrNull(): OK?
-            sessionUserUseCase.sessionUserFlow.filterNotNull()
-                .firstOrNull()?.user?.goingAtNoon?.let {
-                    viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(it)
-                }
+            val job = launch {
+                // Todo Nino filterNotNull().firstOrNull(): OK?
+                sessionUserUseCase.sessionUserFlow.filterNotNull()
+                    .firstOrNull()?.user?.goingAtNoon?.let {
+                        viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(it)
+                    }
+            }
+            delay(2_000)
+            job.cancel("Do not start activity as we get connection over 2 secs later")
         }
     }
 }
