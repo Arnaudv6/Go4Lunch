@@ -21,8 +21,7 @@ class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
     )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-        if (item != null) holder.bind(activityLauncher, item)
+        getItem(position)?.let { holder.bind(activityLauncher, it) }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -42,7 +41,11 @@ class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
             colleagues.text = viewState.colleagues
             hours.text = viewState.hours
             hours.setTextColor(viewState.hoursColor)
-            if (viewState.rating != null) likes.rating = viewState.rating
+            likes.visibility = View.GONE
+            viewState.rating?.let{
+                likes.visibility = View.VISIBLE
+                likes.rating = it
+            }
             Glide.with(itemView).load(viewState.image).into(image)
         }
     }
