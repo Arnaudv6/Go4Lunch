@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.RatingBar
@@ -27,6 +28,15 @@ class DetailsActivity : AppCompatActivity() {
 
         fun navigate(caller: Activity, osmId: Long): Intent =
             Intent(caller, DetailsActivity::class.java).apply { putExtra(OSM_ID, osmId) }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // https://stackoverflow.com/questions/28438030
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

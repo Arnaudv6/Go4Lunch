@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
@@ -31,7 +30,6 @@ class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
     connectivityRepository: ConnectivityRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
-    private val settingsRepository: SettingsRepository,
     private val sessionUserUseCase: SessionUserUseCase,
     @ApplicationContext appContext: Context,
 ) : ViewModel() {
@@ -39,8 +37,6 @@ class MainViewModel @Inject constructor(
     val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
 
     init {
-        viewActionSingleLiveEvent.value = MainViewAction.StartNavNum(settingsRepository.getNavNum())
-
         // todo must move to APP when counting activities
         viewModelScope.launch {
             connectivityRepository.isNetworkAvailableFlow.collect {
@@ -68,8 +64,7 @@ class MainViewModel @Inject constructor(
         )
     }.asLiveData()
 
-    fun onDestroy(num: Int) {
-        settingsRepository.setNavNum(num)
+    fun onDestroy() {
         gpsProviderWrapper.destroyWrapper()
     }
 
@@ -108,7 +103,7 @@ class MainViewModel @Inject constructor(
                         viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(it)
                     }
             }
-            delay(2_000)
+            delay(2_000) // todo implement this in repository  for most requests
             job.cancel("Do not start activity as we get connection over 2 secs later")
         }
     }

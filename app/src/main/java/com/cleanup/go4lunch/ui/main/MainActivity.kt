@@ -34,6 +34,7 @@ class MainActivity :
     DetailsActivityLauncher {
     companion object {
         private const val PERMISSIONS_REQUEST_CODE = 44
+        private const val LAST_VIEW_PAGER_ITEM = "LAST_VIEW_PAGER_ITEM"
     }
 
     private lateinit var drawerLayout: DrawerLayout
@@ -50,6 +51,8 @@ class MainActivity :
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true) for drawer
+
         drawerLayout = findViewById(R.id.drawer_layout)
         navBar = findViewById(R.id.bottom_nav_view)
 
@@ -81,12 +84,8 @@ class MainActivity :
         }
 
         viewModel.viewActionSingleLiveEvent.observe(this) {
-            when (it) {
-                is MainViewAction.LaunchDetail -> startActivity(
-                    DetailsActivity.navigate(this, it.osmId)
-                )
-                is MainViewAction.StartNavNum -> viewPager.currentItem = it.number
-            }.exhaustive
+            if (it is MainViewAction.LaunchDetail)
+                startActivity(DetailsActivity.navigate(this, it.osmId))
         }
 
         findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {
@@ -99,17 +98,18 @@ class MainActivity :
             true
         }
 
-        supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true)
-
         // todo spindle search:
         //  can't do filter-as-you-type + one dropdown element "enter to search online"
         //  as autocomplete is in requirements
 
-        // supportFragmentManager retainedFragments is incompatible with Hilt.
+        // supportFragmentManager retainedFragments is incompatible with Hilt. ViewPager it is.
         viewPager = findViewById(R.id.view_pager)
 
         val adapter = MainPagerAdapter(this)
         viewPager.adapter = adapter
+        savedInstanceState?.getInt(LAST_VIEW_PAGER_ITEM, 0)?.let { viewPager.currentItem = it }
+        // I used sharedPreferences before, from the repo... with @WorkerThread annotation
+        // could not successfully override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
 
         findViewById<TouchEventInterceptor>(R.id.touch_interceptor_view_group).viewPager = viewPager
 
@@ -137,6 +137,11 @@ class MainActivity :
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(LAST_VIEW_PAGER_ITEM, viewPager.currentItem)
+    }
+
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         toggle.syncState()
@@ -154,7 +159,7 @@ class MainActivity :
     }
 
     override fun onDestroy() {
-        viewModel.onDestroy(viewPager.currentItem)
+        viewModel.onDestroy()
         super.onDestroy()
     }
 
