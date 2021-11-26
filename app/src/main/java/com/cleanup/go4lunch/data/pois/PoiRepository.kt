@@ -85,5 +85,9 @@ class PoiRepository @Inject constructor(
     suspend fun updatePoiRating(osmId: Long, rating: Int) =
         poiDao.updatePoiRating(osmId, rating)
 
+    suspend fun clearCache() {
+        // poiDao.
+    }
+
 }
 

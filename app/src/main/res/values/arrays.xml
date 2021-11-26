@@ -6,9 +6,10 @@
         <item>force dark theme</item>
     </string-array>
 
-    <string-array name="theme_values">
-        <item>system</item>
-        <item>light</item>
-        <item>dark</item>
+    <string-array name="theme_values">:
+        <!-- we could define strings instead of refering to them here, but no access from code then -->
+        <item>@string/preferences_theme_key_system</item>
+        <item>@string/preferences_theme_key_light</item>
+        <item>@string/preferences_theme_key_dark</item>
     </string-array>
 </resources>

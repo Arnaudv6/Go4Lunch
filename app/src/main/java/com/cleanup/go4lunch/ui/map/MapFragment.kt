@@ -176,6 +176,7 @@ class MapFragment : Fragment() {
         progressButton.setImageDrawable(progress)
 
         updatePoiPins.setOnClickListener {
+            // either that or ExtendedFloatingActionButton, with properties icon, text and methods extend(), shrink()
             progressButton.visibility = View.VISIBLE
             progress.start()
             viewModel.requestPoiPins(map.boundingBox)
