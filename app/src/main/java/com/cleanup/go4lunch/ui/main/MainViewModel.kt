@@ -9,20 +9,15 @@ import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -104,7 +99,35 @@ class MainViewModel @Inject constructor(
                     }
             }
             delay(2_000) // todo Nino implement this in repository  for most requests
-            job.cancel("Do not start activity as we get connection over 2 secs later")
+            if (job.isActive) {
+                job.cancel("Do not start activity as we get connection over 2 secs later")
+            }
         }
+    }
+
+    fun onLunchClicked2() {
+        viewModelScope.launch(Dispatchers.Main) {
+            val launchDetailAction: MainViewAction.LaunchDetail? = withTimeoutOrNull(2_000) {
+                // Todo Nino filterNotNull().firstOrNull(): OK?
+                sessionUserUseCase.sessionUserFlow
+                    .filterNotNull()
+                    .firstOrNull()?.let { sessionUser ->
+                        sessionUser.user.goingAtNoon?.let {
+                            MainViewAction.LaunchDetail(it)
+                        }
+                    }
+            }
+
+            if (launchDetailAction != null) {
+                viewActionSingleLiveEvent.value = launchDetailAction
+            } else {
+
+            }
+        }
+    }
+
+    sealed class Wrapper {
+        data class Success(val data : SessionUser?) : Wrapper()
+        object Timeout : Wrapper()
     }
 }
