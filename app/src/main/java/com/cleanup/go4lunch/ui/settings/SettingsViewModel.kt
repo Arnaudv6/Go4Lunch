@@ -3,11 +3,14 @@ package com.cleanup.go4lunch.ui.settings
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.exhaustive
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,7 +31,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun clearCache(){
-        poiRepository.clearCache()
+        viewModelScope.launch (Dispatchers.IO){
+            poiRepository.clearCache()
+        }
     }
 
 }

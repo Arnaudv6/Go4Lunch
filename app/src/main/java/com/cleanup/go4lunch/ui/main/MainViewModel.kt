@@ -103,7 +103,7 @@ class MainViewModel @Inject constructor(
                         viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(it)
                     }
             }
-            delay(2_000) // todo implement this in repository  for most requests
+            delay(2_000) // todo Nino implement this in repository  for most requests
             job.cancel("Do not start activity as we get connection over 2 secs later")
         }
     }
