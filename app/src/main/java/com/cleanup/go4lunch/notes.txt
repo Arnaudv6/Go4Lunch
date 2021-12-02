@@ -1,3 +1,7 @@
+Todo Nino : est-ce qu'il faut plus de log
+    un catcher de stacktrace
+    et loguer dans un fichier applicatif?
+
 Notes:
   - my usage of nominatim is borderline. search-autocompletion is unacceptable use
   - distances are calculated by GPS coordinates, not taking routes into account

@@ -8,6 +8,7 @@ import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.useCase.InterpolationUseCase
+import com.cleanup.go4lunch.data.useCase.RatedPOIsUseCase
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
@@ -17,6 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,6 +30,7 @@ class DetailsViewModel
     private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
     sessionUserUseCase: SessionUserUseCase,
+    ratedPOIsUseCase: RatedPOIsUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val interpolationUseCase: InterpolationUseCase,
     @ApplicationContext appContext: Context
@@ -44,8 +48,14 @@ class DetailsViewModel
 
     private val sessionUserLiveData = sessionUserUseCase.sessionUserFlow.asLiveData()
 
+    private val ratingsLiveData = ratedPOIsUseCase.placesIdRatingsFlow.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        HashMap(0)
+    ).asLiveData()
+
     private val poiLiveData: LiveData<PoiEntity?> = osmIdLiveData.switchMap {
-        liveData { emit(if (it != null) poiRepository.getPoiById(it) else null) }
+        liveData { emit(if (it == null) null else poiRepository.getPoiById(it)) }
     }
 
     private val goingMatesListLiveData = MediatorLiveData<List<DetailsViewState.Item>>().apply {
@@ -68,7 +78,8 @@ class DetailsViewModel
                 poi,
                 sessionUserLiveData.value,
                 goingMatesListLiveData.value,
-                interpolationUseCase.interpolatedValuesLiveData.value
+                interpolationUseCase.interpolatedValuesLiveData.value,
+                ratingsLiveData.value
             )?.let { value = it }
         }
         addSource(sessionUserLiveData) { session ->
@@ -76,7 +87,8 @@ class DetailsViewModel
                 poiLiveData.value,
                 session,
                 goingMatesListLiveData.value,
-                interpolationUseCase.interpolatedValuesLiveData.value
+                interpolationUseCase.interpolatedValuesLiveData.value,
+                ratingsLiveData.value
             )?.let { value = it }
         }
         addSource(goingMatesListLiveData) { mates ->
@@ -84,7 +96,8 @@ class DetailsViewModel
                 poiLiveData.value,
                 sessionUserLiveData.value,
                 mates,
-                interpolationUseCase.interpolatedValuesLiveData.value
+                interpolationUseCase.interpolatedValuesLiveData.value,
+                ratingsLiveData.value
             )?.let { value = it }
         }
         addSource(interpolationUseCase.interpolatedValuesLiveData) { interpolated ->
@@ -92,7 +105,17 @@ class DetailsViewModel
                 poiLiveData.value,
                 sessionUserLiveData.value,
                 goingMatesListLiveData.value,
-                interpolated
+                interpolated,
+                ratingsLiveData.value
+            )?.let { value = it }
+        }
+        addSource(ratingsLiveData) { ratings ->
+            toViewState(
+                poiLiveData.value,
+                sessionUserLiveData.value,
+                goingMatesListLiveData.value,
+                interpolationUseCase.interpolatedValuesLiveData.value,
+                ratings
             )?.let { value = it }
         }
     }
@@ -101,7 +124,8 @@ class DetailsViewModel
         poiEntity: PoiEntity?,
         session: SessionUser?,
         colleagues: List<DetailsViewState.Item>?,
-        interpolatedValues: InterpolationUseCase.Values?
+        interpolatedValues: InterpolationUseCase.Values?,
+        ratings: HashMap<Long, Int>?
     ): DetailsViewState? {
         poiEntity?.let { poi ->
             val goingColor =
@@ -113,7 +137,7 @@ class DetailsViewModel
             return DetailsViewState(
                 name = poi.name,
                 goAtNoonColor = goingColor,
-                rating = poi.rating,
+                rating = ratings?.get(poi.id)?.toFloat(),
                 address = poiMapperDelegate.cuisineAndAddress(poi.cuisine, poi.address),
                 bigImageUrl = poi.imageUrl.removeSuffix("/preview"),
                 callColor = if (poi.phone.isNullOrEmpty()) colorInactive else colorActive,

@@ -1,17 +1,14 @@
 package com.cleanup.go4lunch.data.settings
 
-import android.content.Context
-import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatDelegate
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SettingsRepository @Inject constructor(
-    @ApplicationContext appContext: Context,
     private val settingsDao: SettingsDao,
     private val ioDispatcher: CoroutineDispatcher
 ) {
@@ -36,12 +33,6 @@ class SettingsRepository @Inject constructor(
             settingsDao.setBox(boxEntity)
         }
     }
-
-
-    val isNightTheme = appContext.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-    // Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_NIGHT_NO
-    // Nino, comment tu l'appliques, le dark theme? https://stackoverflow.com/a/56036734
-
 }
 
 

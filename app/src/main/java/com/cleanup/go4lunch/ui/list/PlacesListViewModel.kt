@@ -6,17 +6,21 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import ch.poole.openinghoursparser.OpeningHoursParser
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
+import com.cleanup.go4lunch.data.useCase.RatedPOIsUseCase
 import com.cleanup.go4lunch.ui.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import org.osmdroid.util.GeoPoint
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -24,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlacesListViewModel @Inject constructor(
     matesByPlaceUseCase: MatesByPlaceUseCase,
+    ratedPOIsUseCase: RatedPOIsUseCase,
     poiRepository: PoiRepository,
     gpsProviderWrapper: GpsProviderWrapper,
     private val application: Application,
@@ -45,12 +50,22 @@ class PlacesListViewModel @Inject constructor(
     val viewStateListLiveData: LiveData<List<PlacesListViewState>> = combine(
         orderedPoiListFlow,
         matesByPlaceUseCase.matesByPlaceFlow,
-    ) { list, mates -> list.map { viewStateFromPoi(it.second, it.first, mates) } }.asLiveData()
+        ratedPOIsUseCase.placesIdRatingsFlow.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            HashMap(0)
+        )
+    ) { list, mates, ratings ->
+        list.map {
+            viewStateFromPoi(it.second, it.first, mates, ratings)
+        }
+    }.asLiveData()
 
     private fun viewStateFromPoi(
         poi: PoiEntity,
         dist: Int,
-        mates: HashMap<Long, ArrayList<String>>
+        mates: HashMap<Long, ArrayList<String>>,
+        ratings: HashMap<Long, Int>
     ): PlacesListViewState {
         val coloredHours = fuzzyHours(poi.hours.orEmpty().trim())
 
@@ -67,7 +82,7 @@ class PlacesListViewModel @Inject constructor(
             image = poi.imageUrl,
             hours = coloredHours.first,
             hoursColor = coloredHours.second,
-            rating = poi.rating
+            rating = ratings[poi.id]?.toFloat()
         )
     }
 

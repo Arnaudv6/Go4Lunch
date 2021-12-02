@@ -82,9 +82,6 @@ class PoiRepository @Inject constructor(
             "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
         }
 
-    suspend fun updatePoiRating(osmId: Long, rating: Int) =
-        poiDao.updatePoiRating(osmId, rating)
-
     suspend fun clearCache() {
         // poiDao.
     }

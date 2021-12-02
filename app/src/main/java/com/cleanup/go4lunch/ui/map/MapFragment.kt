@@ -76,7 +76,10 @@ class MapFragment : Fragment() {
         map = view.findViewById(R.id.map)
         map.setDestroyMode(false)  // https://github.com/osmdroid/osmdroid/issues/277
         map.setTileSource(TileSourceFactory.MAPNIK)
-        // WIKIMEDIA map first appears white until map takes screen's height :/
+        /* WIKIMEDIA map first appears white until map takes screen's height :/
+            val isNightTheme = appContext.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_NIGHT_NO
+        */
 
         map.setMinZoomLevel(null) // null: use Tile Provider's value
         map.setMultiTouchControls(true)
@@ -199,7 +202,6 @@ class MapFragment : Fragment() {
                 else -> Unit // better notation than {}
             }.exhaustive
         }
-
         return view
     }
 
