@@ -12,7 +12,7 @@ import com.cleanup.go4lunch.data.useCase.RatedPOIsUseCase
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
-import com.cleanup.go4lunch.ui.PoiMapperDelegate
+import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

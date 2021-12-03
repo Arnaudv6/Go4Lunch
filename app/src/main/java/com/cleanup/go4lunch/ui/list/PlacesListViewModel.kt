@@ -14,7 +14,7 @@ import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
 import com.cleanup.go4lunch.data.useCase.RatedPOIsUseCase
-import com.cleanup.go4lunch.ui.PoiMapperDelegate
+import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
 import kotlinx.coroutines.flow.Flow

@@ -1,11 +1,16 @@
 package com.cleanup.go4lunch.ui.settings
 
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,7 +39,7 @@ class SettingsActivity : AppCompatActivity() {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 
-            setPreferencesFromResource(R.xml.root_preferences, rootKey)
+            setPreferencesFromResource(R.xml.root_preferences, null)
 
             this.findPreference<ListPreference>(getString(R.string.preferences_theme_key))
                 ?.onPreferenceChangeListener =
@@ -53,14 +58,20 @@ class SettingsActivity : AppCompatActivity() {
             this.findPreference<Preference>(getString(R.string.preferences_login_key))
                 ?.onPreferenceClickListener =
                 Preference.OnPreferenceClickListener {
+                    // startActivity(Intent())
                     true
                 }
 
-            this.findPreference<Preference>(getString(R.string.preferences_gps_key))
-                ?.onPreferenceClickListener =
-                Preference.OnPreferenceClickListener {
-                    true
-                }
+            // no binding for notifications SwitchPreference, as Android automagically
+            // saves the value in defaultSharedPreferences, and settings repo has a callBack.
+        }
+
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            viewModel.notificationsEnabledLiveData.observe(viewLifecycleOwner) {
+                viewModel.enableNotifications(it)
+            }
         }
     }
 }

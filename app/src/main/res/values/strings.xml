@@ -25,9 +25,9 @@
     <string name="preferences_clear_cache_key">clear_cache</string>
     <string name="preferences_clear_cache_description">use only if application feels slow</string>
     <string name="preferences_clear_cache_caption">Clear cache</string>
-    <string name="preferences_gps_key">gps</string>
-    <string name="preferences_gps_title">Request GPS permission</string>
-    <string name="preferences_gps_text">to appear on map and use \"center on me\" button.</string>
+    <string name="preferences_notif_key">notifications</string>
+    <string name="preferences_notif_title">Receive notifications at noon</string>
+    <string name="preferences_notif_text">as a reminder of where you\'re taking lunch.</string>
     <string name="preferences_login_text">to share meals with your colleagues</string>
     <string name="preferences_login_title">Login</string>
     <string name="preferences_login_key">login</string>

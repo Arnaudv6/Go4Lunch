@@ -1,11 +1,12 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- <PreferenceCategory app:title="@string/messages_header"> -->
-    <Preference
-        app:icon="@drawable/ic_baseline_my_location_24"
-        app:key="@string/preferences_gps_key"
-        app:summary="@string/preferences_gps_text"
-        app:title="@string/preferences_gps_title"
+
+    <SwitchPreference
+        app:icon="@drawable/ic_baseline_restaurant_menu_24"
+        app:key="@string/preferences_notif_key"
+        app:summary="@string/preferences_notif_text"
+        app:title="@string/preferences_notif_title"
         app:useSimpleSummaryProvider="true" />
 
     <Preference
