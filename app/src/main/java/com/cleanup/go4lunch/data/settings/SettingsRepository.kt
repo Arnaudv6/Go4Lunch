@@ -1,15 +1,15 @@
 package com.cleanup.go4lunch.data.settings
 
 import android.app.Application
-import android.content.Context
-import android.util.Log
+import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.cleanup.go4lunch.R
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
@@ -47,18 +47,19 @@ class SettingsRepository @Inject constructor(
     private val notificationKey = application.getString(R.string.preferences_notif_key)
     private val initialValue = preferences.getBoolean(notificationKey, true)
 
-    private val notificationsEnabledMutableStateFlow = MutableStateFlow(initialValue)
-    val notificationsEnabledFlow: Flow<Boolean> = notificationsEnabledMutableStateFlow.asStateFlow()
+    @ExperimentalCoroutinesApi
+    val notificationsEnabledFlow: Flow<Boolean> = callbackFlow {
+        trySend(initialValue)
 
-    init {
-        preferences.registerOnSharedPreferenceChangeListener { _, key ->
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key.equals(notificationKey)) {
-                val enabled = preferences.getBoolean(notificationKey, true)
-                notificationsEnabledMutableStateFlow.tryEmit(enabled)
+                trySend(preferences.getBoolean(notificationKey, true))
             }
         }
-    }
 
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
 }
 
 

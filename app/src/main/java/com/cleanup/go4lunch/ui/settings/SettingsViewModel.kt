@@ -6,6 +6,7 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -17,6 +18,7 @@ import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.alarm.AlarmActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -59,14 +61,18 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun enableNotifications(enable: Boolean) {
+        Log.d(this.javaClass.canonicalName, "enableNotifications: $enable")
         if (enable) {
             val nextLunch =
                 if (LocalDateTime.now().hour < 12) LocalDate.now().atTime(LocalTime.NOON)
                 else LocalDate.now().plusDays(1).atTime(LocalTime.NOON)
 
+            val nextLunch2 = LocalDateTime.now().plusSeconds(15)
+
             alarmManager.setRepeating(
                 AlarmManager.RTC_WAKEUP,
-                nextLunch.toInstant(ZoneOffset.UTC).toEpochMilli(),
+//                nextLunch2.toInstant(ZoneOffset.UTC).toEpochMilli(),
+                15*1000,  // c'est lui qui marche
                 AlarmManager.INTERVAL_DAY,
                 pendingIntent
             )
@@ -75,6 +81,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    @ExperimentalCoroutinesApi
     val notificationsEnabledLiveData = settingsRepository.notificationsEnabledFlow.asLiveData()
 
 }

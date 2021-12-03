@@ -7,12 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
+import androidx.preference.*
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
@@ -67,8 +65,10 @@ class SettingsActivity : AppCompatActivity() {
         }
 
 
+        @ExperimentalCoroutinesApi
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
+            // todo enable notifications by default
             viewModel.notificationsEnabledLiveData.observe(viewLifecycleOwner) {
                 viewModel.enableNotifications(it)
             }

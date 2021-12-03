@@ -6,6 +6,7 @@ import android.net.Network
 import android.net.NetworkRequest
 import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -18,6 +19,7 @@ class ConnectivityRepository @Inject constructor(@ApplicationContext appContext:
         appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
 
+    @ExperimentalCoroutinesApi
     val isNetworkAvailableFlow: Flow<Boolean> = callbackFlow {
         trySend(false)
         val callback = object : ConnectivityManager.NetworkCallback() {
