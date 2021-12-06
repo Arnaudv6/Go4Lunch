@@ -17,7 +17,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MatesViewModel @Inject constructor(
     @ApplicationContext private val appContext: Context,
-    // todo Nino : pourquoi il me fait chier là
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
 ) : ViewModel() {

@@ -48,11 +48,7 @@ class DetailsViewModel
 
     private val sessionUserLiveData = sessionUserUseCase.sessionUserFlow.asLiveData()
 
-    private val ratingsLiveData = ratedPOIsUseCase.placesIdRatingsFlow.stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        HashMap(0)
-    ).asLiveData()
+    private val ratingsLiveData = ratedPOIsUseCase.placesIdRatingsFlow.asLiveData()
 
     private val poiLiveData: LiveData<PoiEntity?> = osmIdLiveData.switchMap {
         liveData { emit(if (it == null) null else poiRepository.getPoiById(it)) }

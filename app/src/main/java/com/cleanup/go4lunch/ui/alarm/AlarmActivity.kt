@@ -80,6 +80,8 @@ class AlarmActivity : AppCompatActivity() {
 
             val intent = DetailsActivity.navigate(this, it.id)
 
+            Thread.sleep(6_000)
+
             @SuppressLint("UnspecifiedImmutableFlag") // API 24+
             val pendingIntent = PendingIntent.getActivity(
                 this, REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT
