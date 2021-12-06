@@ -187,8 +187,8 @@ class MapFragment : Fragment() {
 
         viewModel.viewActionLiveEvent.observe(viewLifecycleOwner) {
             when (it) {
-                // animations are stub as of OSM-Droid 6.1.11
-                is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, 1)
+                // null speed gets converted to default speed
+                is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, null)
                 is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
                 // todo: fix change theme makes a view reset
                 is MapViewAction.PoiRetrieval -> {

@@ -15,7 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class AlarmActivity : AppCompatActivity() {
 
