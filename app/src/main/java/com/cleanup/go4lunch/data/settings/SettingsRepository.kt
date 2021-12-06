@@ -26,16 +26,8 @@ class SettingsRepository @Inject constructor(
         private val FRANCE_BOX = BoundingBox(51.404, 8.341, 42.190, -4.932)
     }
 
-    suspend fun getInitialBox(): BoundingBox = run {
-        val box = settingsDao.getBox()
-        if (box == null) FRANCE_BOX
-        else BoundingBox(
-            box.north,
-            box.east,
-            box.south,
-            box.west
-        )
-    }
+    suspend fun getInitialBox(): BoundingBox = settingsDao.getBox()
+        ?.let { BoundingBox(it.north, it.east, it.south, it.west) } ?: FRANCE_BOX
 
     fun setMapBox(boxEntity: BoxEntity) {
         CoroutineScope(ioDispatcher).launch {

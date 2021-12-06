@@ -107,5 +107,6 @@ class MainViewModel @Inject constructor(
                 job.cancel("Do not start activity as we get connection over 2 secs later")
             }
         }
+        // todo snackBar if not connected/going somewhere at noon
     }
 }

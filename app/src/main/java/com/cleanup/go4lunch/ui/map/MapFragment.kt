@@ -43,13 +43,11 @@ class MapFragment : Fragment() {
     @Inject
     lateinit var gpsProviderWrapper: GpsProviderWrapper
     private val viewModel: MapViewModel by viewModels()
-    private lateinit var map: MapView // init in onCreateView, not constructor...
+    private lateinit var map: MapView
     private lateinit var mClickInterface: WeakReference<DetailsActivityLauncher>
 
     companion object {
-        fun newInstance(): MapFragment {
-            return MapFragment()
-        }
+        fun newInstance() = MapFragment()
     }
 
     // onAttach() gives us the context for free
@@ -77,7 +75,8 @@ class MapFragment : Fragment() {
         map.setDestroyMode(false)  // https://github.com/osmdroid/osmdroid/issues/277
         map.setTileSource(TileSourceFactory.MAPNIK)
         /* WIKIMEDIA map first appears white until map takes screen's height :/
-            val isNightTheme = appContext.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            val isNightTheme = appContext.resources.configuration.uiMode
+            and android.content.res.Configuration.UI_MODE_NIGHT_MASK
             Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_NIGHT_NO
         */
 
@@ -133,20 +132,21 @@ class MapFragment : Fragment() {
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             poiMarkers.items?.clear()
             for (pin in it.pinList) {
-                val poiMarker = Marker(map)
-                poiMarker.title = pin.name
-                poiMarker.snippet = pin.colleagues
-                poiMarker.position = pin.location
-                poiMarker.setPanToView(true)  // onClick, animate to map center?
-                poiMarker.setInfoWindow(
-                    MyMarkerInfoWindow(
-                        osmId = pin.id,
-                        mapView = map,
-                        detailsActivityLauncher = mClickInterface
+                val poiMarker = Marker(map).apply {
+                    this.title = pin.name
+                    this.snippet = pin.colleagues
+                    this.position = pin.location
+                    this.setPanToView(true)  // onClick, animate to map center?
+                    this.setInfoWindow(  // null to disable
+                        MyMarkerInfoWindow(
+                            osmId = pin.id,
+                            mapView = map,
+                            detailsActivityLauncher = mClickInterface
+                        )
                     )
-                )  // null to disable
-                poiMarker.icon =
-                    ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
+                    this.icon =
+                        ResourcesCompat.getDrawable(requireContext().resources, pin.icon, null)
+                }
                 // don't inject appContext here in Fragment : we're not injecting for instrumented tests.
                 // don't worry about the loop: getDrawable is cached by Android
                 poiMarkers.add(poiMarker)
@@ -179,7 +179,7 @@ class MapFragment : Fragment() {
         progressButton.setImageDrawable(progress)
 
         updatePoiPins.setOnClickListener {
-            // either that or ExtendedFloatingActionButton, with properties icon, text and methods extend(), shrink()
+            // or ExtendedFloatingActionButton, with properties icon, text and methods extend(), shrink()
             progressButton.visibility = View.VISIBLE
             progress.start()
             viewModel.requestPoiPins(map.boundingBox)
@@ -197,9 +197,9 @@ class MapFragment : Fragment() {
                     Snackbar.make(
                         view, "${it.results} POI received and updated on view",
                         Snackbar.LENGTH_SHORT
-                    ).setAction("Dismiss") {}.show()
-                } // empty action will dismiss.
-                else -> Unit // better notation than {}
+                    ).setAction("Dismiss") { /* empty action: dismiss.*/ }.show()
+                }
+                else -> Unit
             }.exhaustive
         }
         return view
