@@ -25,7 +25,6 @@ class MatesAdapter(private val activityLauncher: DetailsActivityLauncher) :
         holder.bind(activityLauncher, getItem(position))
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // todo Nino : itemView, une facon plus propre de préciser le scope?
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
         private val textView: TextView = itemView.findViewById(R.id.mates_item_text)
 

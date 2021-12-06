@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
     companion object {
         private const val REQUEST_CODE = 4444
     }
-    // todo Nino : which context for a pending intent?
+    // todo Arnaud -> worker route
     private val intent = Intent().setClass(application, AlarmActivity::class.java)
     @SuppressLint("UnspecifiedImmutableFlag")  // API 24+
     private val pendingIntent = PendingIntent.getActivity(

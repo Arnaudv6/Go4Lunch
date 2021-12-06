@@ -2,6 +2,8 @@ package com.cleanup.go4lunch.data.useCase
 
 import com.cleanup.go4lunch.data.users.UsersRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,7 +12,7 @@ import javax.inject.Singleton
 class RatedPOIsUseCase @Inject constructor(
     usersRepository: UsersRepository,
 ) {
-    val placesIdRatingsFlow: Flow<HashMap<Long, Int>> = usersRepository.matesListFlow.map {
+    val placesIdRatingsFlow: Flow<HashMap<Long, Int>> = flow {
         // following two suspend functions would delay first value by much
         // todo Nino : callback-flow? launch? stateIn? c'est suspend et memory-heavy
         val visited = usersRepository.getVisitedPlaceIds() ?: LongArray(0)
@@ -26,7 +28,7 @@ class RatedPOIsUseCase @Inject constructor(
                 else -> 3
             }
         }
-        placesIdRatings
+        emit(placesIdRatings)
     }
 }
 
