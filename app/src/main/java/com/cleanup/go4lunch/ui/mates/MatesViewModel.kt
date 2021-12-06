@@ -32,6 +32,7 @@ class MatesViewModel @Inject constructor(
     }
 
     // don't filter sessionUser out (nor in detailsVM) as list would refresh when not networkIsAvailable
+    // todo Arnaud : move this to mainViewModel? Usecase?
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
         usersRepository.matesListFlow.mapNotNull {
             // todo though value is received here
