@@ -1,6 +1,6 @@
 package com.cleanup.go4lunch.ui.main
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +14,6 @@ import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -31,7 +30,7 @@ class MainViewModel @Inject constructor(
     connectivityRepository: ConnectivityRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val sessionUserUseCase: SessionUserUseCase,
-    @ApplicationContext appContext: Context,
+    private val application: Application,
 ) : ViewModel() {
 
     val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
@@ -49,8 +48,8 @@ class MainViewModel @Inject constructor(
         Log.d(this.javaClass.canonicalName, "sessionUser: $it")
         if (it == null) MainViewState(
             null,
-            appContext.getString(R.string.not_connected),
-            appContext.getString(R.string.not_connected),
+            application.getString(R.string.not_connected),
+            application.getString(R.string.not_connected),
             null
         )
         else MainViewState(
@@ -102,11 +101,12 @@ class MainViewModel @Inject constructor(
                         viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(it)
                     }
             }
-            delay(2_000) // todo implement this timeout for all relevant cases
+            delay(2_000) // there may be other places where a timeout is relevant.
             if (job.isActive) {
                 job.cancel("Do not start activity as we get connection over 2 secs later")
+                viewActionSingleLiveEvent.value =
+                    MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))
             }
         }
-        // todo snackBar if not connected/going somewhere at noon
     }
 }

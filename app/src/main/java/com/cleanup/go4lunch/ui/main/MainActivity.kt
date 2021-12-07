@@ -24,6 +24,7 @@ import com.cleanup.go4lunch.ui.detail.DetailsActivity
 import com.cleanup.go4lunch.ui.settings.SettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -84,8 +85,13 @@ class MainActivity :
         }
 
         viewModel.viewActionSingleLiveEvent.observe(this) {
-            if (it is MainViewAction.LaunchDetail)
-                startActivity(DetailsActivity.navigate(this, it.osmId))
+            when (it){
+                is MainViewAction.LaunchDetail ->
+                    startActivity(DetailsActivity.navigate(this, it.osmId))
+                is MainViewAction.SnackBar ->
+                    Snackbar.make(drawerLayout, it.message, Snackbar.LENGTH_SHORT)
+                        .setAction("Dismiss") {}.show() // empty action will dismiss.
+            }.exhaustive
         }
 
         findViewById<NavigationView>(R.id.side_nav).setNavigationItemSelectedListener {

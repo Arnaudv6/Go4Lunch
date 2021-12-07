@@ -20,6 +20,7 @@
     <string name="website">WEBSITE</string>
     <string name="not_connected">Not Connected</string>
     <string name="content_loading">Content loading</string>
+    <string name="not_going_at_noon">Not going anywhere at noon</string>
 
     <!-- Preferences -->
     <string name="preferences_clear_cache_key">clear_cache</string>
