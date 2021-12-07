@@ -5,21 +5,20 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiEntity
+import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.useCase.InterpolationUseCase
+import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
 import com.cleanup.go4lunch.data.useCase.RatedPOIsUseCase
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
-import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,6 +30,7 @@ class DetailsViewModel
     private val poiMapperDelegate: PoiMapperDelegate,
     sessionUserUseCase: SessionUserUseCase,
     ratedPOIsUseCase: RatedPOIsUseCase,
+    matesByPlaceUseCase: MatesByPlaceUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val interpolationUseCase: InterpolationUseCase,
     @ApplicationContext appContext: Context
@@ -44,7 +44,7 @@ class DetailsViewModel
 
     private val osmIdLiveData = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID)
 
-    private val matesListLiveData = usersRepository.matesListFlow.asLiveData()
+    private val matesByPlaceLivedata = matesByPlaceUseCase.matesByPlaceFlow.asLiveData()
 
     private val sessionUserLiveData = sessionUserUseCase.sessionUserFlow.asLiveData()
 
@@ -55,18 +55,20 @@ class DetailsViewModel
     }
 
     private val goingMatesListLiveData = MediatorLiveData<List<DetailsViewState.Item>>().apply {
-        addSource(osmIdLiveData) { osmId -> value = goingMates(osmId, matesListLiveData.value) }
-        addSource(matesListLiveData) { mates -> value = goingMates(osmIdLiveData.value, mates) }
+        addSource(osmIdLiveData) { osmId -> value = goingMates(osmId, matesByPlaceLivedata.value) }
+        addSource(matesByPlaceLivedata) { mates -> value = goingMates(osmIdLiveData.value, mates) }
     }
 
-    private fun goingMates(osmId: Long?, mates: List<User>?): List<DetailsViewState.Item> =
-        mates?.filter { user -> user.goingAtNoon == osmId }?.map { user ->
-            DetailsViewState.Item(
-                mateId = user.id,
-                imageUrl = user.avatarUrl ?: "",
-                text = user.firstName
-            )
-        } ?: emptyList()
+    private fun goingMates(
+        osmId: Long?,
+        matesByPlace: HashMap<Long, ArrayList<User>>?
+    ): List<DetailsViewState.Item> = matesByPlace?.get(osmId)?.map { user ->
+        DetailsViewState.Item(
+            mateId = user.id,
+            imageUrl = user.avatarUrl.orEmpty(),
+            text = user.firstName
+        )
+    } ?: emptyList()
 
     val viewStateLiveData: LiveData<DetailsViewState> = MediatorLiveData<DetailsViewState>().apply {
         addSource(poiLiveData) { poi ->
