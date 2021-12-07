@@ -51,7 +51,7 @@ class MapViewModel @Inject constructor(
                         colleagues = matesByPlace[it.id]?.joinToString(
                             separator = ", ",
                             prefix = "going: "
-                        ) ?: "",
+                        ) { user -> user.firstName } ?: "",
                         icon = if (matesByPlace[it.id].isNullOrEmpty()) {
                             R.drawable.poi_orange
                         } else {
@@ -83,7 +83,8 @@ class MapViewModel @Inject constructor(
 
     fun onStop() {
         val boundingBox = boundingBoxMutableStateFlow.value
-        // viewActionLiveEvent.value = MapViewAction.InitialBox(boundingBox)
+        // theme changes through Android top pane => onStop() but VM survives => singleLiveEvent
+        viewActionLiveEvent.value = MapViewAction.InitialBox(boundingBox)
         if (boundingBox != BoundingBox()) {
             settingsRepository.setMapBox(
                 BoxEntity(

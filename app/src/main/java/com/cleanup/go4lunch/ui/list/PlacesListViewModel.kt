@@ -15,6 +15,7 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
 import com.cleanup.go4lunch.data.useCase.RatedPOIsUseCase
 import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
+import com.cleanup.go4lunch.data.users.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.leonard.OpeningHoursEvaluator
 import kotlinx.coroutines.flow.Flow
@@ -64,7 +65,7 @@ class PlacesListViewModel @Inject constructor(
     private fun viewStateFromPoi(
         poi: PoiEntity,
         dist: Int,
-        mates: HashMap<Long, ArrayList<String>>,
+        mates: HashMap<Long, ArrayList<User>>,
         ratings: HashMap<Long, Int>
     ): PlacesListViewState {
         val coloredHours = fuzzyHours(poi.hours.orEmpty().trim())

@@ -1,17 +1,13 @@
-Todo Nino : est-ce qu'il faut plus de log
-    un catcher de stacktrace
-    et loguer dans un fichier applicatif?
-
 Notes:
   - my usage of nominatim is borderline. search-autocompletion is unacceptable use
   - distances are calculated by GPS coordinates, not taking routes into account
   - restaurants images are not linked to actual restaurants they're attached to
   - map scale is erratic non-sense
 
-todo
+backend:
     validate a lunch when user is in 20m range from announced restaurant between 11h30 and 14h?
     then remove place from goingAtNoon
-    snackBar if user clicks "goingAtNoon" between 14h30 and 24h?
+    refuse setting "goingAtNoon" between 14h30 and 24h?
 
 push notifications:
     the tricky part really is client-side:

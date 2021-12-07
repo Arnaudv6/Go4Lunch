@@ -2,6 +2,7 @@ package com.cleanup.go4lunch.ui.map
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +35,7 @@ import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.lang.Thread.sleep
 import java.lang.ref.WeakReference
 import java.util.Locale.getDefault
 import javax.inject.Inject
@@ -131,6 +133,7 @@ class MapFragment : Fragment() {
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
             poiMarkers.items?.clear()
+            // shown marker must be closed and shown again to see new names applied
             for (pin in it.pinList) {
                 val poiMarker = Marker(map).apply {
                     this.title = pin.name
@@ -189,8 +192,12 @@ class MapFragment : Fragment() {
             when (it) {
                 // null speed gets converted to default speed
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, null)
-                is MapViewAction.InitialBox -> map.zoomToBoundingBox(it.boundingBox, false)
-                // todo: fix change theme makes a view reset
+                is MapViewAction.InitialBox -> {
+                    Log.e("TAG", "onCreateView: reset", )
+                    // todo: fix change theme makes a view reset. calls onStop(), even onDestroy()
+                    //  bellow line indeed gets ran, but map is not in a state where it obeys
+                    map.zoomToBoundingBox(it.boundingBox, true)
+                }
                 is MapViewAction.PoiRetrieval -> {
                     progress.stop()
                     progressButton.visibility = View.GONE
@@ -203,6 +210,16 @@ class MapFragment : Fragment() {
             }.exhaustive
         }
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        map.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        map.onPause()
     }
 
     override fun onStop() {
