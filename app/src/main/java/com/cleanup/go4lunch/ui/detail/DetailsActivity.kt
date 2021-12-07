@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.exhaustive
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class DetailsActivity : AppCompatActivity() {
@@ -83,6 +85,21 @@ class DetailsActivity : AppCompatActivity() {
 
             button.setColorFilter(it.goAtNoonColor)
             button.setOnClickListener { viewModel.goingAtNoonClicked() }
+
+            findViewById<AppBarLayout>(R.id.appbar).addOnOffsetChangedListener(
+                AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+                    val ratio = verticalOffset / appBarLayout.totalScrollRange.toFloat()
+                    if (ratio < -0.7) button.hide() else button.show()
+
+                    /*
+                    if (verticalOffset == 0) return@OnOffsetChangedListener
+                    (button.layoutParams as CoordinatorLayout.LayoutParams).anchorId =
+                        if (verticalOffset < -300) R.id.collapsing
+                        else R.id.details_recycler_view
+
+                     */
+                })
+
 
             adapter.submitList(it.colleaguesList)
         }

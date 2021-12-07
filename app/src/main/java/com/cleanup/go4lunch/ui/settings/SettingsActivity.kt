@@ -65,7 +65,6 @@ class SettingsActivity : AppCompatActivity() {
         }
 
 
-        @ExperimentalCoroutinesApi
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             // todo enable notifications by default

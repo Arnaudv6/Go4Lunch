@@ -25,6 +25,7 @@ class MatesAdapter(private val activityLauncher: DetailsActivityLauncher) :
         holder.bind(activityLauncher, getItem(position))
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // could give itemView another name in constructor for clarity, or keep it, for clarity also
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
         private val textView: TextView = itemView.findViewById(R.id.mates_item_text)
 

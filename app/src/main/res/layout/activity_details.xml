@@ -10,14 +10,15 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         app:subtitleTextColor="@android:color/white"
         app:titleTextColor="@android:color/white">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="300dp"
             app:layout_scrollFlags="scroll|enterAlways"
             app:toolbarId="@+id/collapsing_toolbar">
             <!-- app:layout_scrollInterpolator="@android:anim/decelerate_interpolator" -->
@@ -46,31 +47,27 @@
                     android:elevation="10dp"
                     android:outlineProvider="bounds"
                     android:src="?attr/homeAsUpIndicator" />
+
             </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/header_bottom"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <View
+                android:id="@+id/orange_background"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@color/orange"
                 app:layout_constraintBottom_toBottomOf="@id/details_address"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                android:padding="14dp"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/details_name"
@@ -78,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="14dp"
                 android:layout_marginTop="14dp"
+                android:ellipsize="end"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -88,19 +86,19 @@
                 android:id="@+id/details_likes"
                 style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
-                android:layout_marginStart="14dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/list_item_margin"
-                android:isIndicator="true"
+                android:layout_marginStart="14dp"
                 android:layout_marginEnd="14dp"
+                android:isIndicator="true"
                 android:numStars="3"
                 android:rating="3"
                 android:stepSize="1"
                 android:theme="@style/RatingBar"
                 android:visibility="gone"
-                app:layout_constraintTop_toTopOf="@id/details_name"
                 app:layout_constraintBottom_toBottomOf="@id/details_name"
                 app:layout_constraintStart_toEndOf="@id/details_name"
+                app:layout_constraintTop_toTopOf="@id/details_name"
                 tools:rating="@sample/restaurants.json/data/stars"
                 tools:visibility="visible" />
 
@@ -108,96 +106,86 @@
                 android:id="@+id/details_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
                 android:layout_marginTop="7dp"
+                android:ellipsize="end"
+                android:paddingBottom="14dp"
                 android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/details_name"
                 tools:text="@sample/restaurants.json/data/address" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/details_menu"
-                android:layout_width="match_parent"
+            <!--
+            bottomNavBar is no perfect fit: DO NOT force it in.
+            image button is crap https://stackoverflow.com/questions/4457030/
+            -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/details_call"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                android:elevation="7dp"
-                android:visibility="visible"
+                android:background="?selectableItemBackground"
+                android:drawablePadding="12dp"
+                android:gravity="center"
+                android:padding="18dp"
+                android:text="@string/call"
+                android:textColor="@color/orange"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableTint="@color/orange"
+                app:drawableTopCompat="@drawable/ic_baseline_call_24"
+                app:layout_constraintEnd_toStartOf="@id/details_like"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/details_address">
+                app:layout_constraintTop_toBottomOf="@id/orange_background" />
 
-                <!--
-                bottomNavBar is no perfect fit: DO NOT force it in.
-                image button is crap https://stackoverflow.com/questions/4457030/
-                -->
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/details_call"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackground"
-                    android:drawablePadding="12dp"
-                    android:gravity="center"
-                    android:padding="18dp"
-                    android:text="@string/call"
-                    android:textColor="@color/orange"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:drawableTint="@color/orange"
-                    app:drawableTopCompat="@drawable/ic_baseline_call_24"
-                    app:layout_constraintEnd_toStartOf="@id/details_like"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/details_like"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:drawablePadding="12dp"
+                android:gravity="center"
+                android:padding="18dp"
+                android:text="@string/like"
+                android:textColor="@color/orange"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableTint="@color/orange"
+                app:drawableTopCompat="@drawable/ic_baseline_star_rate_24"
+                app:layout_constraintEnd_toStartOf="@id/details_website"
+                app:layout_constraintStart_toEndOf="@id/details_call"
+                app:layout_constraintTop_toBottomOf="@id/orange_background" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/details_like"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackground"
-                    android:drawablePadding="12dp"
-                    android:gravity="center"
-                    android:padding="18dp"
-                    android:text="@string/like"
-                    android:textColor="@color/orange"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:drawableTint="@color/orange"
-                    app:drawableTopCompat="@drawable/ic_baseline_star_rate_24"
-                    app:layout_constraintEnd_toStartOf="@id/details_website"
-                    app:layout_constraintStart_toEndOf="@id/details_call"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/details_website"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackground"
-                    android:drawablePadding="12dp"
-                    android:gravity="center"
-                    android:padding="18dp"
-                    android:text="@string/website"
-                    android:textColor="@color/orange"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:drawableTint="@color/orange"
-                    app:drawableTopCompat="@drawable/ic_baseline_public_24"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/details_like"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/details_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/details_menu"
-                tools:itemCount="3"
-                tools:listitem="@layout/fragment_mates_item" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/details_website"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground"
+                android:drawablePadding="12dp"
+                android:gravity="center"
+                android:padding="18dp"
+                android:text="@string/website"
+                android:textColor="@color/orange"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableTint="@color/orange"
+                app:drawableTopCompat="@drawable/ic_baseline_public_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/details_like"
+                app:layout_constraintTop_toBottomOf="@id/orange_background" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/details_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:itemCount="3"
+        tools:listitem="@layout/fragment_mates_item" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/details_floatingActionButton"
@@ -206,10 +194,11 @@
         android:layout_margin="20dp"
         android:contentDescription="@string/going_at_noon"
         app:backgroundTint="?attr/colorBackgroundFloating"
-        app:layout_anchor="@id/appbar"
+        app:layout_anchor="@id/collapsing"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_baseline_check_circle_24"
         app:tint="?attr/colorButtonNormal" />
     <!-- remark: we can write app:tint="@null" -->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

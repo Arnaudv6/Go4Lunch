@@ -1,22 +1,22 @@
 package com.cleanup.go4lunch.ui.mates
 
-import android.content.Context
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.cleanup.go4lunch.MainApplication
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
 
 @HiltViewModel
 class MatesViewModel @Inject constructor(
-    @ApplicationContext private val appContext: Context,
+    private val application: Application,  // appContext notation gives a harmless "leak" linter warning.
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
 ) : ViewModel() {
@@ -51,11 +51,15 @@ class MatesViewModel @Inject constructor(
         }.asLiveData()
 
     private suspend fun getText(user: User): String {
-        if (user.goingAtNoon == null) return appContext.getString(R.string.not_decided_yet).format(user.firstName)
+        if (user.goingAtNoon == null) return application.getString(R.string.not_decided_yet)
+            .format(user.firstName)
         val restaurant = poiRepository.getPoiById(user.goingAtNoon)
-            ?: return appContext.getString(R.string.chose_restaurant_pid).format(user.firstName, user.goingAtNoon)
-        if (restaurant.cuisine.isEmpty()) return appContext.getString(R.string.chose_restaurant_name).format(user.firstName, restaurant.name)
-        return appContext.getString(R.string.chose_restaurant_cuisine).format(user.firstName, restaurant.cuisine, restaurant.name)
+            ?: return application.getString(R.string.chose_restaurant_pid)
+                .format(user.firstName, user.goingAtNoon)
+        if (restaurant.cuisine.isEmpty()) return application.getString(R.string.chose_restaurant_name)
+            .format(user.firstName, restaurant.name)
+        return application.getString(R.string.chose_restaurant_cuisine)
+            .format(user.firstName, restaurant.cuisine, restaurant.name)
     }
 }
 
