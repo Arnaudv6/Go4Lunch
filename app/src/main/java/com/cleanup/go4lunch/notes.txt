@@ -3,6 +3,8 @@ Notes:
   - distances are calculated by GPS coordinates, not taking routes into account
   - restaurants images are not linked to actual restaurants they're attached to
   - map scale is erratic non-sense
+  - should mates number be an issue performance-wise, make a searchable mates directory for user to select people he follows
+
 
 backend:
     validate a lunch when user is in 20m range from announced restaurant between 11h30 and 14h?

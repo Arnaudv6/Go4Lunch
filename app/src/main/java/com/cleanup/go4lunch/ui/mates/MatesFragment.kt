@@ -48,11 +48,6 @@ class MatesFragment : Fragment() {
             }
         }
 
-        viewModel.poiRetrievalNumberSingleLiveEvent.observe(viewLifecycleOwner) {
-            Snackbar.make(view, "$it POI received and updated on view", Snackbar.LENGTH_SHORT)
-                .setAction("Dismiss") {}.show() // empty action will dismiss.
-        }
-
         return view
     }
 }

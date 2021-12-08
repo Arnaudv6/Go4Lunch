@@ -1,5 +1,6 @@
 package com.cleanup.go4lunch.data.users
 
+import android.util.Log
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,31 +11,34 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
     val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
 
-    private val placesRatingsMutableStateFlow = MutableStateFlow(HashMap<Long, Int>())
-    val placesRatingsFlow: Flow<Map<Long, Int>> = placesRatingsMutableStateFlow.asStateFlow()
+    private val visitedPlacesFlow = MutableStateFlow<LongArray?>(longArrayOf())
+    private val likedPlacesFlow = MutableStateFlow<LongArray?>(longArrayOf())
+
+    val placesRatingsFlow: Flow<Map<Long, Int>> = combine(
+        visitedPlacesFlow.filterNotNull(),
+        likedPlacesFlow.filterNotNull()
+    ) { visited, liked ->
+        Log.e("test", "updateMatesList: $visited, $liked")
+        val placesIdRatings = HashMap<Long, Int>()
+        for (place in (visited + liked).toSet()) {
+            // avoid division by zero.
+            val ratio = liked.count { it == place } / (visited.count { it == place }.toFloat() + .1)
+            placesIdRatings[place] = when {
+                ratio < 0.2 -> 1
+                ratio < 0.3 -> 2
+                else -> 3
+            }
+        }
+        placesIdRatings
+    }
 
     // this list also depends on current hour for goingAtNoon
     suspend fun updateMatesList() {
         userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }?.let {
             matesListMutableStateFlow.value = it
         }
-
-        combine(
-            getVisitedPlaceIds().filterNotNull(),
-            getLikedPlaceIds().filterNotNull()
-        ){ visited, liked ->
-            val placesIdRatings = HashMap<Long, Int>()
-            for (place in (visited + liked).toSet()) {
-                // avoid division by zero.
-                val ratio = liked.count { it == place } / (visited.count { it == place }.toFloat() + .1)
-                placesIdRatings[place] = when {
-                    ratio < 0.2 -> 1
-                    ratio < 0.3 -> 2
-                    else -> 3
-                }
-            }
-            placesRatingsMutableStateFlow.emit(placesIdRatings)
-        }
+        getLikedPlaceIds()
+        getVisitedPlaceIds()
     }
 
     suspend fun insertUser(user: User) = userRetrofit.insertUser(
@@ -85,13 +89,15 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     suspend fun getLikedById(userId: Long): LongArray? = userRetrofit
         .getLikedById(UserRetrofit.EqualId(userId)).body()?.map { it.likedPlaceId }?.toLongArray()
 
-    private fun getLikedPlaceIds() = flow {
+    private suspend fun getLikedPlaceIds() {
         // retry + delay loop?
-        emit(userRetrofit.getLikedPlaceIds().body()?.map { it.likedPlaceId }?.toLongArray())
+        likedPlacesFlow.emit(userRetrofit.getLikedPlaceIds().body()?.map { it.likedPlaceId }
+            ?.toLongArray())
     }
 
-    private fun getVisitedPlaceIds() = flow {
-        emit(userRetrofit.getVisitedPlaceIds().body()?.map { it.visitedId }?.toLongArray())
+    private suspend fun getVisitedPlaceIds() {
+        visitedPlacesFlow.emit(userRetrofit.getVisitedPlaceIds().body()?.map { it.visitedId }
+            ?.toLongArray())
     }
 
 }

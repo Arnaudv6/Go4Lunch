@@ -59,7 +59,7 @@ class DetailsViewModel
 
     private fun goingMates(
         osmId: Long?,
-        matesByPlace: HashMap<Long, ArrayList<User>>?
+        matesByPlace: Map<Long, ArrayList<User>>?
     ): List<DetailsViewState.Item> = matesByPlace?.get(osmId)?.map { user ->
         DetailsViewState.Item(
             mateId = user.id,

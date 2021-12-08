@@ -46,10 +46,12 @@ class MainViewModel @Inject constructor(
         }
         viewModelScope.launch {
             usersRepository.matesListFlow.collect {
-                // todo snackBar
-                poiRepository.fetchPOIsInList(
+                val num = poiRepository.fetchPOIsInList(
                     ids = it.mapNotNull { user -> user.goingAtNoon },
                     refreshExisting = false
+                )
+                viewActionSingleLiveEvent.value = MainViewAction.SnackBar(
+                    "$num POI received and updated on view"
                 )
             }
         }
