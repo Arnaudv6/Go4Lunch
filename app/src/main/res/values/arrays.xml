@@ -7,7 +7,7 @@
     </string-array>
 
     <string-array name="theme_values">:
-        <!-- we could define strings instead of refering to them here, but no access from code then -->
+        <!-- references as strings here, to access them from code -->
         <item>@string/preferences_theme_key_system</item>
         <item>@string/preferences_theme_key_light</item>
         <item>@string/preferences_theme_key_dark</item>

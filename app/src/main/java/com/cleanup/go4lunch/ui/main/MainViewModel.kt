@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
+    poiRepository: PoiRepository,
     connectivityRepository: ConnectivityRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val sessionUserUseCase: SessionUserUseCase,
@@ -36,10 +38,19 @@ class MainViewModel @Inject constructor(
     val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
 
     init {
-        // todo must move to APP when counting activities
+        // to collect from MainApp with relevant lifecycle, we'd have to track (started) activities
         viewModelScope.launch {
             connectivityRepository.isNetworkAvailableFlow.collect {
                 if (it) usersRepository.updateMatesList()
+            }
+        }
+        viewModelScope.launch {
+            usersRepository.matesListFlow.collect {
+                // todo snackBar
+                poiRepository.fetchPOIsInList(
+                    ids = it.mapNotNull { user -> user.goingAtNoon },
+                    refreshExisting = false
+                )
             }
         }
     }

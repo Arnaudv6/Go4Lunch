@@ -4,12 +4,10 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.cleanup.go4lunch.MainApplication
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
-import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.mapNotNull
 import javax.inject.Inject
@@ -21,30 +19,19 @@ class MatesViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
 ) : ViewModel() {
 
-    val poiRetrievalNumberSingleLiveEvent: SingleLiveEvent<Int> = SingleLiveEvent()
-
     suspend fun swipeRefresh() {
         usersRepository.updateMatesList()
-
-        // todo this must happen here
-        //  poiRetrievalNumberSingleLiveEvent.value
     }
 
     // don't filter sessionUser out (nor in detailsVM) as list would refresh when not networkIsAvailable
-    // todo Arnaud : move this to mainViewModel? Usecase?
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> =
         usersRepository.matesListFlow.mapNotNull {
-            // todo though value is received here
-            poiRepository.fetchPOIsInList(
-                ids = it.mapNotNull { user -> user.goingAtNoon },
-                refreshExisting = false
-            )
-
+            // mapNotNull is about keeping mates when connection lost
             it.map { user ->
                 MatesViewStateItem(
                     mateId = user.id,
                     placeId = user.goingAtNoon,
-                    imageUrl = user.avatarUrl ?: "",
+                    imageUrl = user.avatarUrl.orEmpty(),
                     text = getText(user)
                 )
             }

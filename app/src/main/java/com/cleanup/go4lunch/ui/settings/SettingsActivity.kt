@@ -1,16 +1,14 @@
 package com.cleanup.go4lunch.ui.settings
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
-import androidx.preference.*
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import com.cleanup.go4lunch.R
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {

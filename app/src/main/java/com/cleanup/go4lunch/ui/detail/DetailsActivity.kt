@@ -99,8 +99,6 @@ class DetailsActivity : AppCompatActivity() {
 
                      */
                 })
-
-
             adapter.submitList(it.colleaguesList)
         }
 

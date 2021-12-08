@@ -2,7 +2,6 @@ package com.cleanup.go4lunch.data.session
 
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton

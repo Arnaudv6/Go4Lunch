@@ -10,7 +10,6 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.session.SessionUser
 import com.cleanup.go4lunch.data.useCase.InterpolationUseCase
 import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
-import com.cleanup.go4lunch.data.useCase.RatedPOIsUseCase
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
@@ -29,7 +28,6 @@ class DetailsViewModel
     private val usersRepository: UsersRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
     sessionUserUseCase: SessionUserUseCase,
-    ratedPOIsUseCase: RatedPOIsUseCase,
     matesByPlaceUseCase: MatesByPlaceUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val interpolationUseCase: InterpolationUseCase,
@@ -48,7 +46,7 @@ class DetailsViewModel
 
     private val sessionUserLiveData = sessionUserUseCase.sessionUserFlow.asLiveData()
 
-    private val ratingsLiveData = ratedPOIsUseCase.placesIdRatingsFlow.asLiveData()
+    private val ratingsLiveData = usersRepository.placesRatingsFlow.asLiveData()
 
     private val poiLiveData: LiveData<PoiEntity?> = osmIdLiveData.switchMap {
         liveData { emit(if (it == null) null else poiRepository.getPoiById(it)) }
@@ -123,7 +121,7 @@ class DetailsViewModel
         session: SessionUser?,
         colleagues: List<DetailsViewState.Item>?,
         interpolatedValues: InterpolationUseCase.Values?,
-        ratings: HashMap<Long, Int>?
+        ratings: Map<Long, Int>?
     ): DetailsViewState? {
         poiEntity?.let { poi ->
             val goingColor =

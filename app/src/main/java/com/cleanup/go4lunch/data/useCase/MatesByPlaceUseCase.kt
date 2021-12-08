@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 class MatesByPlaceUseCase @Inject constructor(usersRepository: UsersRepository) {
 
-    val matesByPlaceFlow: Flow<HashMap<Long, ArrayList<User>>> = usersRepository.matesListFlow.map {
+    val matesByPlaceFlow: Flow<Map<Long, ArrayList<User>>> = usersRepository.matesListFlow.map {
         val map = HashMap<Long, ArrayList<User>>()
         for (user in it) {
             user.goingAtNoon?.let { placeId ->
