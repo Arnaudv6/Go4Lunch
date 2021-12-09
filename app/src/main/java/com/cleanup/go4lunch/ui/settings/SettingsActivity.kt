@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.settings
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
@@ -8,6 +9,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.cleanup.go4lunch.R
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,6 +28,15 @@ class SettingsActivity : AppCompatActivity() {
                 .replace(R.id.settings, SettingsFragment())
                 .commit()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // https://stackoverflow.com/questions/28438030
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     @AndroidEntryPoint
@@ -66,8 +77,13 @@ class SettingsActivity : AppCompatActivity() {
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             // todo enable notifications by default
+            // todo make a ViewAction class for both those events
             viewModel.notificationsEnabledLiveData.observe(viewLifecycleOwner) {
                 viewModel.enableNotifications(it)
+            }
+
+            viewModel.snackBarSingleLiveEvent.observe(viewLifecycleOwner) {
+                Snackbar.make(view, it, Snackbar.LENGTH_SHORT).setAction("Dismiss") {}.show()
             }
         }
     }

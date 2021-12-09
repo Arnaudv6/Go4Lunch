@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -40,11 +39,12 @@ class MatesFragment : Fragment() {
             adapter.submitList(it)
         }
 
-        val swipe: SwipeRefreshLayout = view.findViewById(R.id.mates_swipe_refresh_layout)
-        swipe.setOnRefreshListener {
-            lifecycleScope.launchWhenStarted {
-                viewModel.swipeRefresh()
-                swipe.isRefreshing = false
+        view.findViewById<SwipeRefreshLayout>(R.id.mates_swipe_refresh_layout).let {
+            it.setOnRefreshListener {
+                lifecycleScope.launchWhenStarted {
+                    viewModel.swipeRefresh()
+                    it.isRefreshing = false
+                }
             }
         }
 

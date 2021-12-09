@@ -4,6 +4,7 @@ Notes:
   - restaurants images are not linked to actual restaurants they're attached to
   - map scale is erratic non-sense
   - should mates number be an issue performance-wise, make a searchable mates directory for user to select people he follows
+  - app is usable without authentication (to match requirement, simply listen session and navigate to log activity)
 
 
 backend:

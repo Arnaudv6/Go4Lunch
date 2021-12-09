@@ -2,6 +2,7 @@ package com.cleanup.go4lunch.data.users
 
 import retrofit2.Response
 import retrofit2.http.*
+import java.util.*
 
 interface UserRetrofit {
     companion object {
@@ -21,11 +22,23 @@ interface UserRetrofit {
     @POST(USERS)
     suspend fun insertUser(@Body userBody: UserBody)
 
+    // todo Nino fix that deletion, null gets invisible simple-quoting it seems
+    //  (based on postgres message when I run
+    //   ALTER TABLE
     @FormUrlEncoded
     @PATCH(USERS)
     suspend fun setGoingAtNoon(
         @Query("id") userId: EqualId,
-        @Field("goingatnoon") osmId: NullableLong  // todo fix that deletion
+        @Field("goingatnoon", encoded = true) osmId: NullableLong
+    ): Response<Unit>  // response needed for interpolation
+
+
+    @Headers("Prefer: resolution=merge-duplicates")
+    @FormUrlEncoded
+    @POST(USERS)
+    suspend fun setGoingAtNoon2(
+        @Query("id") userId: EqualId,
+        @Field("goingatnoon", encoded = true) osmId: NullableLong  // todo fix that deletion
     ): Response<Unit>  // response needed for interpolation
 
     @GET(VISITED)
@@ -58,8 +71,9 @@ interface UserRetrofit {
         override fun toString() = "eq.$id"
     }
 
-    data class NullableLong(val long:Long?){
+    data class NullableLong(val long: Long?) {
         override fun toString() = long?.toString() ?: "null"
+        // https://www.postgresql.org/message-id/Pine.LNX.4.33.0402181239030.2832-100000@css120.ihs.com
     }
 
 }

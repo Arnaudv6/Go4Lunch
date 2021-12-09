@@ -1,9 +1,6 @@
 package com.cleanup.go4lunch.data.pois
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,4 +21,9 @@ interface PoiDao {
 
     @Query("SELECT id FROM poi_pins")
     suspend fun getPoiIds(): List<Long>
+
+    @Transaction
+    @Query("DELETE FROM poi_pins")
+    suspend fun nukePOIS()
 }
+

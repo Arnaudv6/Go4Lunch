@@ -1,5 +1,7 @@
 package com.cleanup.go4lunch.data.pois
 
+import android.app.Application
+import com.cleanup.go4lunch.R
 import kotlinx.coroutines.flow.Flow
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
@@ -7,6 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PoiRepository @Inject constructor(
+    private val application: Application,
     private val poiRetrofit: PoiRetrofit,
     private val poiDao: PoiDao
 ) {
@@ -77,14 +80,12 @@ class PoiRepository @Inject constructor(
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)
         ) {
-            "address unknown"
+            application.getString(R.string.address_unknown)
         } else {
             "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
         }
 
-    suspend fun clearCache() {
-        // poiDao.
-    }
+    suspend fun clearCache() = poiDao.nukePOIS()
 
 }
 

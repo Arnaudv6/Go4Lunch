@@ -39,19 +39,22 @@ class MainViewModel @Inject constructor(
 
     init {
         // to collect from MainApp with relevant lifecycle, we'd have to track (started) activities
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             connectivityRepository.isNetworkAvailableFlow.collect {
                 if (it) usersRepository.updateMatesList()
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            // todo Nino: this gets triggered only once?
             usersRepository.matesListFlow.collect {
+                Log.e("TAG", "mateslistflow update: ")
                 val num = poiRepository.fetchPOIsInList(
                     ids = it.mapNotNull { user -> user.goingAtNoon },
                     refreshExisting = false
                 )
-                viewActionSingleLiveEvent.value = MainViewAction.SnackBar(
-                    "$num POI received and updated on view"
+                // todo don't show this on launch / if zero?
+                viewActionSingleLiveEvent.postValue(
+                    MainViewAction.SnackBar("$num POI received and updated on view")
                 )
             }
         }

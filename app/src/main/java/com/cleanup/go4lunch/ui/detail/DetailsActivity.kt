@@ -63,6 +63,7 @@ class DetailsActivity : AppCompatActivity() {
             Glide.with(baseContext).load(it.bigImageUrl).into(image)
             name.text = it.name
             it.rating?.let { float ->
+                // parallax + multiplier would achieve a nice effect, but be tricky on device ddp
                 likes.visibility = View.VISIBLE
                 likes.rating = float
             }

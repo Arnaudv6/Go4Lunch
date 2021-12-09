@@ -193,7 +193,7 @@ class MapFragment : Fragment() {
                 is MapViewAction.CenterOnMe -> map.controller.animateTo(it.geoPoint, 15.0, null)
                 is MapViewAction.InitialBox -> {
                     Log.e("TAG", "onCreateView: reset")
-                    // todo: fix change theme makes a view reset. calls onStop(), even onDestroy()
+                    // fix change theme makes a view reset. calls onStop(), even onDestroy()
                     //  bellow line indeed gets ran, but map is not in a state where it obeys
                     map.zoomToBoundingBox(it.boundingBox, true)
                 }

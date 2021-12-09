@@ -15,6 +15,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.cleanup.go4lunch.ui.alarm.AlarmActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -32,9 +33,12 @@ class SettingsViewModel @Inject constructor(
     private val application: Application,
 ) : ViewModel() {
 
+    val snackBarSingleLiveEvent: SingleLiveEvent<String> = SingleLiveEvent()
+
     companion object {
         private const val REQUEST_CODE = 4444
     }
+
     // todo Arnaud -> worker route
     private val intent = Intent().setClass(application, AlarmActivity::class.java)
     @SuppressLint("UnspecifiedImmutableFlag")  // API 24+
@@ -57,6 +61,7 @@ class SettingsViewModel @Inject constructor(
     fun clearCache() {
         viewModelScope.launch(Dispatchers.IO) {
             poiRepository.clearCache()
+            snackBarSingleLiveEvent.postValue(application.getString(R.string.cache_cleared))
         }
     }
 
@@ -69,6 +74,7 @@ class SettingsViewModel @Inject constructor(
 
             val nextLunch2 = LocalDateTime.now().plusSeconds(15)
 
+/*
             alarmManager.setRepeating(
                 AlarmManager.RTC_WAKEUP,
 //                nextLunch2.toInstant(ZoneOffset.UTC).toEpochMilli(),
@@ -76,6 +82,8 @@ class SettingsViewModel @Inject constructor(
                 AlarmManager.INTERVAL_DAY,
                 pendingIntent
             )
+
+ */
         } else {
             alarmManager.cancel(pendingIntent)
         }
