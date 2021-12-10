@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
@@ -25,7 +26,7 @@ class MapViewModel @Inject constructor(
     matesByPlaceUseCase: MatesByPlaceUseCase,
     private val poiRepository: PoiRepository,
     private val settingsRepository: SettingsRepository,
-    private val ioDispatcher: CoroutineDispatcher,
+    private val allDispatchers: AllDispatchers,
     private val gpsProviderWrapper: GpsProviderWrapper
 ) : ViewModel() {
 
@@ -63,7 +64,7 @@ class MapViewModel @Inject constructor(
         }.asLiveData()
 
     fun requestPoiPins(boundingBox: BoundingBox) {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
             val numberOfPoi = poiRepository.fetchPOIsInBoundingBox(boundingBox)
             viewActionLiveEvent.postValue(MapViewAction.PoiRetrieval(numberOfPoi))
             // todo Nino : SnackBarUseCase -> activity shows snackBar for all fragments VM : bad idea?

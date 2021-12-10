@@ -1,7 +1,10 @@
 package com.cleanup.go4lunch.data.pois
 
 import android.app.Application
+import android.util.Log
 import com.cleanup.go4lunch.R
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
@@ -19,17 +22,35 @@ class PoiRepository @Inject constructor(
 
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
-    // todo Nino ensure 1_500ms delay between any request
-    suspend fun fetchPOIsInBoundingBox(boundingBox: BoundingBox): Int {
+
+    private val nominatimMutexChannel = Channel<Long>(capacity = 1).apply { trySend(0) }
+
+    suspend fun fetchPOIsInBoundingBox(box: BoundingBox): Int {
+        val previousEpoch = nominatimMutexChannel.receive()
+        val requestDelay = (1_500 - (System.currentTimeMillis() - previousEpoch))
+        if (requestDelay > 0) Log.d(
+            this.javaClass.canonicalName,
+            application.getString(R.string.log_request_delay).format(requestDelay)
+        )
+        delay(requestDelay)  // negative delays ignored no need to coerceAtLeast(0)
+
+        // todo make a decorator function for Channel ping-pong?
         val response = poiRetrofit.getPoiInBoundingBox(  // getPOICloseTo() also exists
-            viewBox = "${boundingBox.lonWest},${boundingBox.latNorth},${boundingBox.lonEast},${boundingBox.latSouth}",
+            viewBox = "${box.lonWest},${box.latNorth},${box.lonEast},${box.latSouth}",
             limit = 30
         )
+
+        nominatimMutexChannel.trySend(System.currentTimeMillis())
+
         return response.body()?.mapNotNull { toPoiEntity(it) }
             ?.onEach { poiDao.insertPoi(it) }?.size ?: 0
     }
 
     suspend fun fetchPOIsInList(ids: List<Long>, refreshExisting: Boolean): Int {
+        val previousEpoch = nominatimMutexChannel.receive()
+        val requestDelay = (1_500 - (System.currentTimeMillis() - previousEpoch))
+        delay(requestDelay)
+
         val list = if (refreshExisting) {
             ids
         } else {
@@ -47,6 +68,9 @@ class PoiRepository @Inject constructor(
                     ?.onEach { poiDao.insertPoi(it) }?.size ?: 0
             }
         }
+
+        nominatimMutexChannel.trySend(System.currentTimeMillis())
+
         return number
     }
 
@@ -79,11 +103,8 @@ class PoiRepository @Inject constructor(
     private fun toFuzzyAddress(address: PoiInBoxResponse.Address): String =
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)
-        ) {
-            application.getString(R.string.address_unknown)
-        } else {
-            "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
-        }
+        ) application.getString(R.string.address_unknown)
+        else "${address.number.orEmpty()} ${address.road} - ${address.postcode} ${address.municipality}".trim()
 
     suspend fun clearCache() = poiDao.nukePOIS()
 

@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.cleanup.go4lunch.R
-import kotlinx.coroutines.CoroutineDispatcher
+import com.cleanup.go4lunch.data.AllDispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 class SettingsRepository @Inject constructor(
     application: Application,
     private val settingsDao: SettingsDao,
-    private val ioDispatcher: CoroutineDispatcher
+    private val allDispatchers: AllDispatchers,
 ) {
 
     companion object {
@@ -30,7 +30,7 @@ class SettingsRepository @Inject constructor(
         ?.let { BoundingBox(it.north, it.east, it.south, it.west) } ?: FRANCE_BOX
 
     fun setMapBox(boxEntity: BoxEntity) {
-        CoroutineScope(ioDispatcher).launch {
+        CoroutineScope(allDispatchers.ioDispatcher).launch {
             settingsDao.setBox(boxEntity)
         }
     }

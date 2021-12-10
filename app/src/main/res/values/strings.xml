@@ -43,5 +43,6 @@
     <string name="preferences_theme_key_light">light</string>
     <string name="preferences_theme_key_dark">dark</string>
     <string name="preferences_theme_title">Application theme</string>
+    <string name="log_request_delay">delaying request by %s to be gentle on nominatim server</string>
 </resources>
 

@@ -98,16 +98,16 @@ class MainViewModel @Inject constructor(
 
     fun onLogoutClicked() {
         viewModelScope.launch(allDispatchers.ioDispatcher) {
-            usersRepository.insertUser(User(11, "Caroline", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d", null))
-            usersRepository.insertUser(User(12, "Jack", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704e", null))
-            usersRepository.insertUser(User(13, "Chloé", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704f", null))
-            usersRepository.insertUser(User(14, "Vincent", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704a", null))
-            usersRepository.insertUser(User(15, "Elodie", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704b", null))
-            usersRepository.insertUser(User(16, "Sylvain", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704c", null))
-            usersRepository.insertUser(User(17, "Laetitia", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703d", null))
-            usersRepository.insertUser(User(18, "Dan", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703b", null))
-            usersRepository.insertUser(User(19, "Joseph", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d", null))
-            usersRepository.insertUser(User(20, "Emma", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026706d", null))
+            usersRepository.insertUser(User(11, "Caroline", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d",1181634478))
+            usersRepository.insertUser(User(12, "Jack", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704e",1181635071))
+            usersRepository.insertUser(User(13, "Chloe", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704f",1223768234))
+            usersRepository.insertUser(User(14, "Vincent", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704a",1223805591))
+            usersRepository.insertUser(User(15, "Elodie", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704b",1224673311))
+            usersRepository.insertUser(User(16, "Sylvain", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704c",1473397603))
+            usersRepository.insertUser(User(17, "Laetitia", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703d",1746634556))
+            usersRepository.insertUser(User(18, "Dan", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703b",2363182980))
+            usersRepository.insertUser(User(19, "Joseph", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d",2450486148))
+            usersRepository.insertUser(User(20, "Emma", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026706d",2556945898))
         }
     }
 
