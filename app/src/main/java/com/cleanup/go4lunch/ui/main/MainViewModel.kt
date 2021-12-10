@@ -98,15 +98,16 @@ class MainViewModel @Inject constructor(
 
     fun onLogoutClicked() {
         viewModelScope.launch(allDispatchers.ioDispatcher) {
-            usersRepository.insertUser(
-                User(
-                    13,
-                    "Natasha",
-                    "Zobovich",
-                    null,
-                    null
-                )
-            )
+            usersRepository.insertUser(User(11, "Caroline", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d", null))
+            usersRepository.insertUser(User(12, "Jack", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704e", null))
+            usersRepository.insertUser(User(13, "Chloé", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704f", null))
+            usersRepository.insertUser(User(14, "Vincent", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704a", null))
+            usersRepository.insertUser(User(15, "Elodie", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704b", null))
+            usersRepository.insertUser(User(16, "Sylvain", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704c", null))
+            usersRepository.insertUser(User(17, "Laetitia", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703d", null))
+            usersRepository.insertUser(User(18, "Dan", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703b", null))
+            usersRepository.insertUser(User(19, "Joseph", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d", null))
+            usersRepository.insertUser(User(20, "Emma", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026706d", null))
         }
     }
 

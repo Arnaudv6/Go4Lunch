@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go4Lunch</string>
+    <string name="title_hungry">J\'ai faim !</string>
+    <string name="title_workmates">Mes collègues</string>
+    <string name="nav_1">Vue Carte</string>
+    <string name="nav_2">Vue Liste</string>
+    <string name="nav_3">Collègues</string>
+    <string name="open_the_drawer">ouvrir le panneau</string>
+    <string name="close_the_drawer">fermer le panneau</string>
+    <string name="logout">déconnexion</string>
+    <string name="settings">paramètres</string>
+    <string name="your_lunch">votre déjeuner</string>
+    <string name="center_on_me">Centrer sur moi</string>
+    <string name="not_connected">Non-connecté</string>
+    <string name="not_going_at_noon">Pas de restau choisi pour midi</string>
+    <string name="cache_cleared">Cache vidé</string>
+    <string name="preferences_clear_cache_caption">Vider le cache des POIs</string>
+    <string name="preferences_clear_cache_description">n\'utiliser que si l\'application est lente</string>
+    <string name="preferences_notif_title">Recevoir un rappel à midi</string>
+    <string name="preferences_notif_text">avec l\'adresse du déjeuner</string>
+    <string name="preferences_login_text">pour partager les repas avec des collègues</string>
+    <string name="preferences_login_title">Se connecter</string>
+    <string name="preferences_theme_key_system">système</string>
+    <string name="preferences_theme_key_light">clair</string>
+    <string name="preferences_theme_key_dark">sombre</string>
+    <string name="preferences_theme_title">Thème de l\'application</string>
+    <string name="not_decided_yet"><![CDATA[<i><font color=\'grey\'>%s n\'a pas encore décidé</font></i>]]></string>
+    <string name="chose_restaurant_pid">%s: déjeune au restaurant id %s</string>
+    <string name="chose_restaurant_name">%s déjeune à %s</string>
+    <string name="chose_restaurant_cuisine">%s mange %s à midi (%s)</string>
+    <string name="address_unknown">adresse inconnue</string>
+</resources>

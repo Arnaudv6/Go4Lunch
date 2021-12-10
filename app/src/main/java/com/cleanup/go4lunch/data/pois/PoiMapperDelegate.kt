@@ -11,16 +11,20 @@ import javax.inject.Singleton
 @Singleton
 class PoiMapperDelegate @Inject constructor() {
 
+    companion object{
+        private const val SEPARATOR = " - "
+    }
+
     fun cuisineAndAddress(cuisine: String, address: String): String =
         listOfNotNull(
             cuisine.ifEmpty { null },
-            address.split(" - ")[0].ifEmpty { null }
-        ).joinToString(" - ")
+            address.split(SEPARATOR)[0].ifEmpty { null }
+        ).joinToString(SEPARATOR)
 
     fun nameCuisineAndAddress(name: String, cuisine: String, address: String): String =
         listOfNotNull(
             name,
             cuisine.ifEmpty { null },
-            address.split(" - ")[0].ifEmpty { null }
-        ).joinToString(" - ")
+            address.split(SEPARATOR)[0].ifEmpty { null }
+        ).joinToString(SEPARATOR)
 }
