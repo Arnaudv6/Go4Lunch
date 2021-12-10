@@ -34,7 +34,7 @@ class DataModule {
 
     @Provides
     @Singleton
-    fun provideIoDispatcher() = Dispatchers.IO
+    fun provideAllDispatchers() = AllDispatchers(Dispatchers.Main, Dispatchers.IO)
 
     @Provides
     @Singleton

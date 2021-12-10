@@ -12,13 +12,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.cleanup.go4lunch.ui.alarm.AlarmActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -31,6 +31,7 @@ class SettingsViewModel @Inject constructor(
     settingsRepository: SettingsRepository,
     private val poiRepository: PoiRepository,
     private val application: Application,
+    private val allDispatchers: AllDispatchers,
 ) : ViewModel() {
 
     val snackBarSingleLiveEvent: SingleLiveEvent<String> = SingleLiveEvent()
@@ -59,7 +60,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun clearCache() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
             poiRepository.clearCache()
             snackBarSingleLiveEvent.postValue(application.getString(R.string.cache_cleared))
         }

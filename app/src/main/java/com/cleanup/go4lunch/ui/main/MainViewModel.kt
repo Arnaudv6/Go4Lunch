@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiRepository
@@ -15,7 +16,6 @@ import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -33,18 +33,19 @@ class MainViewModel @Inject constructor(
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val sessionUserUseCase: SessionUserUseCase,
     private val application: Application,
+    private val allDispatchers: AllDispatchers,
 ) : ViewModel() {
 
     val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
 
     init {
         // to collect from MainApp with relevant lifecycle, we'd have to track (started) activities
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
             connectivityRepository.isNetworkAvailableFlow.collect {
                 if (it) usersRepository.updateMatesList()
             }
         }
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
             // todo Nino: this gets triggered only once?
             usersRepository.matesListFlow.collect {
                 Log.e("TAG", "mateslistflow update: ")
@@ -96,7 +97,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onLogoutClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
             usersRepository.insertUser(
                 User(
                     13,
@@ -110,7 +111,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun onLunchClicked() {
-        viewModelScope.launch(Dispatchers.Main) {
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
             val job = launch {  // filterNotNull().firstOrNull(): OK
                 sessionUserUseCase.sessionUserFlow.filterNotNull()
                     .firstOrNull()?.user?.goingAtNoon?.let {

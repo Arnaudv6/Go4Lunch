@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
 import com.cleanup.go4lunch.data.pois.PoiRepository
@@ -16,7 +17,6 @@ import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +31,7 @@ class DetailsViewModel
     matesByPlaceUseCase: MatesByPlaceUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val interpolationUseCase: InterpolationUseCase,
+    private val allDispatchers: AllDispatchers,
     @ApplicationContext appContext: Context
 ) : ViewModel() {
 
@@ -150,7 +151,7 @@ class DetailsViewModel
 
     fun goingAtNoonClicked() {
         savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(allDispatchers.ioDispatcher) {
                 sessionUserLiveData.value?.user?.let { user ->
                     val initialState = user.goingAtNoon == placeId
                     interpolationUseCase.setGoingAtNoon(!initialState)
@@ -167,7 +168,7 @@ class DetailsViewModel
 
     fun likeClicked() {
         savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(allDispatchers.ioDispatcher) {
                 sessionUserLiveData.value?.let { session ->
                     val initialState = session.liked.contains(placeId)
                     interpolationUseCase.setLikeCurrentPlace(!initialState)
