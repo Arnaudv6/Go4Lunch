@@ -28,7 +28,7 @@ interface PoiRetrofit {
         @Query("extratags") extraTags: Int = 1,
         // have to specify either a mail, or User-Agent Header
         // @Query("email") email: String = EMAIL,
-    ): Response<List<PoiInBoxResponse>>
+    ): Response<List<PoiResponse>>
 
     // https://nominatim.org/release-docs/latest/api/Lookup/
     @Headers("User-Agent: ${BuildConfig.APPLICATION_ID}")
@@ -41,7 +41,7 @@ interface PoiRetrofit {
         @Query("extratags") extraTags: Int = 1,
         // have to specify either a mail, or User-Agent Header
         // @Query("email") email: String = EMAIL,
-    ): Response<List<PoiInBoxResponse>>
+    ): Response<List<PoiResponse>>
 
     @Suppress("ArrayInDataClass")
     data class IdsLongArray(val ids: LongArray) {

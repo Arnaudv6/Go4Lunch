@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
 @Keep
-data class PoiInBoxResponse(
+data class PoiResponse(
     @SerializedName("place_id")
     val placeId: Long?,
 

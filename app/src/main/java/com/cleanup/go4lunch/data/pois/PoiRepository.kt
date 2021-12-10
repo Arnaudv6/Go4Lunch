@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import org.osmdroid.util.BoundingBox
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,13 +20,13 @@ class PoiRepository @Inject constructor(
     // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
     val cachedPOIsListFlow: Flow<List<PoiEntity>> = poiDao.getPoiEntities()
+    private val nominatimMutexChannel = Channel<Long>(capacity = 1).apply { trySend(0) }
 
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
-
-    private val nominatimMutexChannel = Channel<Long>(capacity = 1).apply { trySend(0) }
-
-    suspend fun fetchPOIsInBoundingBox(box: BoundingBox): Int {
+    private suspend fun ensureGentleRequests(
+        request: suspend () -> Response<List<PoiResponse>>
+    ): Response<List<PoiResponse>> {
         val previousEpoch = nominatimMutexChannel.receive()
         val requestDelay = (1_500 - (System.currentTimeMillis() - previousEpoch))
         if (requestDelay > 0) Log.d(
@@ -34,47 +35,49 @@ class PoiRepository @Inject constructor(
         )
         delay(requestDelay)  // negative delays ignored no need to coerceAtLeast(0)
 
-        // todo make a decorator function for Channel ping-pong?
-        val response = poiRetrofit.getPoiInBoundingBox(  // getPOICloseTo() also exists
-            viewBox = "${box.lonWest},${box.latNorth},${box.lonEast},${box.latSouth}",
-            limit = 30
-        )
+        val response = request.invoke()
 
         nominatimMutexChannel.trySend(System.currentTimeMillis())
+        return response
+    }
+
+    suspend fun fetchPOIsInBoundingBox(box: BoundingBox): Int {
+        val response = ensureGentleRequests {
+            poiRetrofit.getPoiInBoundingBox(  // getPOICloseTo() also exists
+                viewBox = "${box.lonWest},${box.latNorth},${box.lonEast},${box.latSouth}",
+                limit = 30
+            )
+        }
 
         return response.body()?.mapNotNull { toPoiEntity(it) }
             ?.onEach { poiDao.insertPoi(it) }?.size ?: 0
     }
 
     suspend fun fetchPOIsInList(ids: List<Long>, refreshExisting: Boolean): Int {
-        val previousEpoch = nominatimMutexChannel.receive()
-        val requestDelay = (1_500 - (System.currentTimeMillis() - previousEpoch))
-        delay(requestDelay)
-
         val list = if (refreshExisting) {
             ids
         } else {
             val cachedPoiIds = poiDao.getPoiIds()
             ids.filter { !cachedPoiIds.contains(it) }
         }
+
         // API allows to request up to 50 IDs at a time
         var number = 0
         for (ids_chunk in list.chunked(50)) {
             if (ids_chunk.isNotEmpty()) {
-                val response = poiRetrofit.getPOIsInList(
-                    idsLongArray = PoiRetrofit.IdsLongArray(ids_chunk.toLongArray())
-                )
+                val response = ensureGentleRequests {
+                    poiRetrofit.getPOIsInList(
+                        idsLongArray = PoiRetrofit.IdsLongArray(ids_chunk.toLongArray())
+                    )
+                }
                 number += response.body()?.mapNotNull { toPoiEntity(it) }
                     ?.onEach { poiDao.insertPoi(it) }?.size ?: 0
             }
         }
-
-        nominatimMutexChannel.trySend(System.currentTimeMillis())
-
         return number
     }
 
-    private fun toPoiEntity(response: PoiInBoxResponse): PoiEntity? = if (
+    private fun toPoiEntity(response: PoiResponse): PoiEntity? = if (
         response.category != "amenity"
         || response.type != "restaurant"
         || response.osmId == null
@@ -100,7 +103,7 @@ class PoiRepository @Inject constructor(
         )
     }
 
-    private fun toFuzzyAddress(address: PoiInBoxResponse.Address): String =
+    private fun toFuzzyAddress(address: PoiResponse.Address): String =
         if ((address.number == null && address.road == null)
             || (address.postcode == null && address.municipality == null)
         ) application.getString(R.string.address_unknown)
