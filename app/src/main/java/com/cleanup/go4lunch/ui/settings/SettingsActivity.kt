@@ -55,6 +55,13 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
 
+            this.findPreference<ListPreference>(getString(R.string.preferences_locale_key))
+                ?.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { _, newValue ->
+                    viewModel.themeLocale(newValue)
+                    true
+                }
+
             this.findPreference<Preference>(getString(R.string.preferences_clear_cache_key))
                 ?.onPreferenceClickListener =
                 Preference.OnPreferenceClickListener {
@@ -76,8 +83,7 @@ class SettingsActivity : AppCompatActivity() {
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            // todo enable notifications by default
-            // todo make a ViewAction class for both those events
+            // todo enable notifications by default : observe from MainActivity? if not, 2 events => ViewAction
             viewModel.notificationsEnabledLiveData.observe(viewLifecycleOwner) {
                 viewModel.enableNotifications(it)
             }

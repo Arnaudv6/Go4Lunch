@@ -30,4 +30,5 @@
     <string name="chose_restaurant_name">%s déjeune à %s</string>
     <string name="chose_restaurant_cuisine">%s mange %s à midi (%s)</string>
     <string name="address_unknown">adresse inconnue</string>
+    <string name="preferences_locale_title">Langue de l\'application</string>
 </resources>

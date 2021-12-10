@@ -6,6 +6,7 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.LocaleList
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,6 +57,16 @@ class SettingsViewModel @Inject constructor(
                 application.getString(R.string.preferences_theme_key_dark) -> AppCompatDelegate.MODE_NIGHT_YES
                 application.getString(R.string.preferences_theme_key_light) -> AppCompatDelegate.MODE_NIGHT_NO
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }.exhaustive
+        )
+    }
+
+    fun themeLocale(locale: Any?) {
+        application.applicationContext.resources.configuration.setLocale(
+            when (locale) {
+                application.getString(R.string.preferences_locale_key_english) -> Locale.ENGLISH
+                application.getString(R.string.preferences_locale_key_french) -> Locale.FRENCH
+                else -> Locale.getDefault()
             }.exhaustive
         )
     }

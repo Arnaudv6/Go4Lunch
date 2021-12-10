@@ -13,7 +13,6 @@ import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -67,7 +66,7 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch(allDispatchers.ioDispatcher) {
             val numberOfPoi = poiRepository.fetchPOIsInBoundingBox(boundingBox)
             viewActionLiveEvent.postValue(MapViewAction.PoiRetrieval(numberOfPoi))
-            // todo Nino : SnackBarUseCase -> activity shows snackBar for all fragments VM : bad idea?
+            // todo Nino : SnackBarUseCase -> activity shows snackBar for all fragments VM: OK?
         }
     }
 

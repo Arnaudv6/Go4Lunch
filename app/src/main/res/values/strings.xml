@@ -11,14 +11,7 @@
     <string name="settings">SETTINGS</string>
     <string name="your_lunch">YOUR LUNCH</string>
     <string name="center_on_me">Center on me</string>
-    <string name="credits_text" translatable="false">© OpenStreetMap contributors\n(openstreetmap.org, nominatim.org)</string>
-    <string name="credits" translatable="false">Credits:</string>
-    <string name="going_at_noon" translatable="false">Going at noon</string>
-    <string name="call" translatable="false">CALL</string>
-    <string name="like" translatable="false">LIKE</string>
-    <string name="website" translatable="false">WEBSITE</string>
     <string name="not_connected">Not Connected</string>
-    <string name="content_loading" translatable="false">Content loading</string>
     <string name="not_going_at_noon">Not going anywhere at noon</string>
     <string name="cache_cleared">Cache cleared</string>
     <string name="not_decided_yet"><![CDATA[<i><font color=\'grey\'>%s has not decided yet</font></i>]]></string>
@@ -43,6 +36,23 @@
     <string name="preferences_theme_key_light">light</string>
     <string name="preferences_theme_key_dark">dark</string>
     <string name="preferences_theme_title">Application theme</string>
-    <string name="log_request_delay">delaying request by %s to be gentle on nominatim server</string>
+    <string name="preferences_locale_key" translatable="false">locale</string>
+    <string name="preferences_locale_title">Application locale</string>
+    <string name="preferences_locale_key_system" translatable="false">system_locale</string>
+    <string name="preferences_locale_key_english" translatable="false">english</string>
+    <string name="preferences_locale_key_french" translatable="false">french</string>
+
+
+    <!-- Non Translatable -->
+    <string name="log_request_delay" translatable="false">delaying request by %s to be gentle on nominatim server</string>
+    <string name="credits_text" translatable="false">© OpenStreetMap contributors\n(openstreetmap.org, nominatim.org)</string>
+    <string name="credits" translatable="false">Credits:</string>
+    <string name="going_at_noon" translatable="false">Going at noon</string>
+    <string name="call" translatable="false">CALL</string>
+    <string name="like" translatable="false">LIKE</string>
+    <string name="website" translatable="false">WEBSITE</string>
+    <string name="content_loading" translatable="false">Content loading</string>
+
+
 </resources>
 

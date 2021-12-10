@@ -53,8 +53,7 @@ class MainViewModel @Inject constructor(
                     ids = it.mapNotNull { user -> user.goingAtNoon },
                     refreshExisting = false
                 )
-                // todo don't show this on launch / if zero?
-                viewActionSingleLiveEvent.postValue(
+                if (num != 0) viewActionSingleLiveEvent.postValue(
                     MainViewAction.SnackBar("$num POI received and updated on view")
                 )
             }
@@ -98,6 +97,8 @@ class MainViewModel @Inject constructor(
 
     fun onLogoutClicked() {
         viewModelScope.launch(allDispatchers.ioDispatcher) {
+            usersRepository.insertUser(User(1, "Arnaud", "v6", "https://avatars.githubusercontent.com/u/6125315",1181634478))
+
             usersRepository.insertUser(User(11, "Caroline", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d",1181634478))
             usersRepository.insertUser(User(12, "Jack", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704e",1181635071))
             usersRepository.insertUser(User(13, "Chloe", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704f",1223768234))
@@ -106,7 +107,7 @@ class MainViewModel @Inject constructor(
             usersRepository.insertUser(User(16, "Sylvain", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704c",1473397603))
             usersRepository.insertUser(User(17, "Laetitia", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703d",1746634556))
             usersRepository.insertUser(User(18, "Dan", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703b",2363182980))
-            usersRepository.insertUser(User(19, "Joseph", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d",2450486148))
+            usersRepository.insertUser(User(19, "Joseph", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29a26704e",2450486148))
             usersRepository.insertUser(User(20, "Emma", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026706d",2556945898))
         }
     }
@@ -128,3 +129,5 @@ class MainViewModel @Inject constructor(
         }
     }
 }
+
+

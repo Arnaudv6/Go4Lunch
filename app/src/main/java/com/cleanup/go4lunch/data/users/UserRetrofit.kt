@@ -2,7 +2,6 @@ package com.cleanup.go4lunch.data.users
 
 import retrofit2.Response
 import retrofit2.http.*
-import java.util.*
 
 interface UserRetrofit {
     companion object {
@@ -23,8 +22,7 @@ interface UserRetrofit {
     suspend fun insertUser(@Body userBody: UserBody)
 
     // todo Nino fix that deletion, null gets invisible simple-quoting it seems
-    //  (based on postgres message when I run
-    //   ALTER TABLE
+    //  (based on postgres message when I run ALTER TABLE command in psql)
     @FormUrlEncoded
     @PATCH(USERS)
     suspend fun setGoingAtNoon(

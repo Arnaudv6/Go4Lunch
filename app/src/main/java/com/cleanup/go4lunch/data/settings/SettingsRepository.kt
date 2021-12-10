@@ -39,6 +39,7 @@ class SettingsRepository @Inject constructor(
     private val notificationKey = application.getString(R.string.preferences_notif_key)
     private val initialValue = preferences.getBoolean(notificationKey, true)
 
+    // todo Nino : et je fais la même chose pour theme et locale?
     @ExperimentalCoroutinesApi
     val notificationsEnabledFlow: Flow<Boolean> = callbackFlow {
         trySend(initialValue)
