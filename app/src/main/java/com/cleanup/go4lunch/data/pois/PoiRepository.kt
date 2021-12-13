@@ -24,6 +24,7 @@ class PoiRepository @Inject constructor(
 
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
+    // todo Nino : OK?
     private suspend fun ensureGentleRequests(
         request: suspend () -> Response<List<PoiResponse>>
     ): Response<List<PoiResponse>> {
