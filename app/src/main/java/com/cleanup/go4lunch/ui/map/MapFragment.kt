@@ -117,7 +117,7 @@ class MapFragment : Fragment() {
         // display user location on map
         val icon =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_my_location_24, null)
-                ?.toBitmap(64, 64)
+                ?.toBitmap()  // toBitmap() its size parameters are pixels => dpi dependant
         // SimpleLocationOverlay is noop
         val locationOverlay = MyLocationNewOverlay(gpsProviderWrapper, map)
 

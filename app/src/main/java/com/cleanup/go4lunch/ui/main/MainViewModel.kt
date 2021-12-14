@@ -111,6 +111,8 @@ class MainViewModel @Inject constructor(
             usersRepository.insertUser(User(18, "Dan", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026703b",2363182980))
             usersRepository.insertUser(User(19, "Joseph", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29a26704e",2450486148))
             usersRepository.insertUser(User(20, "Emma", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026706d",2556945898))
+
+            usersRepository.insertUser(User(21, "Mariah", "Dupont", "https://i.pravatar.cc/150?u=a042123f4e654867123",null))
         }
     }
 

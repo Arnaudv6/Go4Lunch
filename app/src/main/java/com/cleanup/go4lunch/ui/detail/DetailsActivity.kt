@@ -5,12 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import android.widget.RatingBar
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatRatingBar
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
@@ -46,13 +47,13 @@ class DetailsActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        val image: ImageView = findViewById(R.id.app_bar_image)
-        val name: TextView = findViewById(R.id.details_name)
-        val likes: RatingBar = findViewById(R.id.details_likes)
-        val address: TextView = findViewById(R.id.details_address)
-        val call: TextView = findViewById(R.id.details_call)
-        val like: TextView = findViewById(R.id.details_like)
-        val website: TextView = findViewById(R.id.details_website)
+        val image: AppCompatImageView = findViewById(R.id.app_bar_image)
+        val name: AppCompatTextView = findViewById(R.id.details_name)
+        val likes: AppCompatRatingBar = findViewById(R.id.details_likes)
+        val address: AppCompatTextView = findViewById(R.id.details_address)
+        val call: AppCompatTextView = findViewById(R.id.details_call)
+        val like: AppCompatTextView = findViewById(R.id.details_like)
+        val website: AppCompatTextView = findViewById(R.id.details_website)
         val button: FloatingActionButton = findViewById(R.id.details_floatingActionButton)
         val recycler: RecyclerView = findViewById(R.id.details_recycler_view)
 

@@ -31,12 +31,16 @@ class MatesFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_mates, container, false)
 
         val recycler: RecyclerView = view.findViewById(R.id.mates_recycler_view)
-        val adapter = MatesAdapter(activity as DetailsActivityLauncher)
+        val adapter = MatesAdapter(viewModel)
         recycler.adapter = adapter
 
         viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {
-            Log.e("TAG", "onCreateView: coucou", )
+            Log.e("TAG", "displayed even when recycler view stays blank")
             adapter.submitList(it)
+        }
+
+        viewModel.mateClickSingleLiveEvent.observe(viewLifecycleOwner){
+            (activity as DetailsActivityLauncher).onClicked(it)
         }
 
         view.findViewById<SwipeRefreshLayout>(R.id.mates_swipe_refresh_layout).let {

@@ -3,8 +3,8 @@ package com.cleanup.go4lunch.ui.detail
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +24,7 @@ class DetailsAdapter :
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
-        private val textView: TextView = itemView.findViewById(R.id.mates_item_text)
+        private val textView: AppCompatTextView = itemView.findViewById(R.id.mates_item_text)
 
         fun bind(viewState: DetailsViewState.Item) {
             textView.text = viewState.text
