@@ -82,11 +82,18 @@ class MapFragment : Fragment() {
             Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_NIGHT_NO
         */
 
+        // search if we can have shadow on drawn map canvas
         map.setMinZoomLevel(null) // null: use Tile Provider's value
         map.setMultiTouchControls(true)
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.isTilesScaledToDpi = true
         map.isVerticalMapRepetitionEnabled = false
+
+        // loading grid colors
+        map.overlayManager.tilesOverlay.loadingBackgroundColor =
+            ContextCompat.getColor(requireContext(), R.color.colorSurface)
+        map.overlayManager.tilesOverlay.loadingLineColor =
+            ContextCompat.getColor(requireContext(), R.color.androidListDivider)
 
         @Suppress("DEPRECATION") // This is just because of bad naming for this CONSTANT
         map.setScrollableAreaLimitLatitude(

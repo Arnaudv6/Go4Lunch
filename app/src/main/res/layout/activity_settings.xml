@@ -25,15 +25,23 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <View
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/image_limit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/orange_background"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:background="@drawable/ic_drawing_l"
-        android:backgroundTint="@color/brown_lighter"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_drawing_l"
+        android:tint="@color/drawerSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/image_limit" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
