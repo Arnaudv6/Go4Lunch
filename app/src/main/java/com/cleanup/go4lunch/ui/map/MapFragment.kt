@@ -31,6 +31,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.TileSystem
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.ScaleBarOverlay
@@ -122,6 +123,10 @@ class MapFragment : Fragment() {
         locationOverlay.setPersonIcon(icon) // used when Location has no bearing
         locationOverlay.setDirectionArrow(icon, icon)  // when Location does have bearing
         map.overlays.add(locationOverlay)
+
+        // copyright
+        val copyrightOverlay = CopyrightOverlay(requireContext())
+        map.overlays.add(copyrightOverlay)
 
         // POIs
         val poiMarkers = FolderOverlay()

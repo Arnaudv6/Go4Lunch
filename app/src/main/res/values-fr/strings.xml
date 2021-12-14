@@ -8,9 +8,9 @@
     <string name="nav_3">Collègues</string>
     <string name="open_the_drawer">ouvrir le panneau</string>
     <string name="close_the_drawer">fermer le panneau</string>
-    <string name="logout">déconnexion</string>
-    <string name="settings">paramètres</string>
-    <string name="your_lunch">votre déjeuner</string>
+    <string name="logout">DECONNEXION</string>
+    <string name="settings">PARAMETRES</string>
+    <string name="your_lunch">VOTRE DEJEUNER</string>
     <string name="center_on_me">Centrer sur moi</string>
     <string name="not_connected">Non-connecté</string>
     <string name="not_going_at_noon">Pas de restau choisi pour midi</string>
@@ -31,4 +31,7 @@
     <string name="chose_restaurant_cuisine">%s mange %s à midi (%s)</string>
     <string name="address_unknown">adresse inconnue</string>
     <string name="preferences_locale_title">Langue de l\'application</string>
+    <string name="call">APPELER</string>
+    <string name="like">J\'AIME</string>
+    <string name="website">SITE WEB</string>
 </resources>

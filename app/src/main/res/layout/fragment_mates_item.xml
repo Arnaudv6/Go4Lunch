@@ -21,10 +21,14 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:ellipsize="end"
+        android:maxLines="3"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/mates_item_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/mates_item_image"
         app:layout_constraintTop_toTopOf="@id/mates_item_image"
         tools:text="@tools:sample/first_names" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

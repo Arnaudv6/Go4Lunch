@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.mates
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,9 +20,7 @@ class MatesFragment : Fragment() {
     private val viewModel: MatesViewModel by viewModels()
 
     companion object {
-        fun newInstance(): MatesFragment {
-            return MatesFragment()
-        }
+        fun newInstance() = MatesFragment()
     }
 
     override fun onCreateView(
@@ -36,6 +35,7 @@ class MatesFragment : Fragment() {
         recycler.adapter = adapter
 
         viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {
+            Log.e("TAG", "onCreateView: coucou", )
             adapter.submitList(it)
         }
 

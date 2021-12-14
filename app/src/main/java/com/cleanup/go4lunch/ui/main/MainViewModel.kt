@@ -54,7 +54,9 @@ class MainViewModel @Inject constructor(
                     refreshExisting = false
                 )
                 if (num != 0) viewActionSingleLiveEvent.postValue(
-                    MainViewAction.SnackBar("$num POI received and updated on view")
+                    MainViewAction.SnackBar(
+                        application.getString(R.string.received_mates_pois).format(num)
+                    )
                 )
             }
         }
@@ -117,14 +119,15 @@ class MainViewModel @Inject constructor(
             val job = launch {  // filterNotNull().firstOrNull(): OK
                 sessionUserUseCase.sessionUserFlow.filterNotNull()
                     .firstOrNull()?.user?.goingAtNoon?.let {
-                        viewActionSingleLiveEvent.value = MainViewAction.LaunchDetail(it)
+                        viewActionSingleLiveEvent.postValue(MainViewAction.LaunchDetail(it))
                     }
             }
             delay(2_000) // there may be other places where a timeout is relevant.
             if (job.isActive) {
                 job.cancel("Do not start activity as we get connection over 2 secs later")
-                viewActionSingleLiveEvent.value =
+                viewActionSingleLiveEvent.postValue(
                     MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))
+                )
             }
         }
     }

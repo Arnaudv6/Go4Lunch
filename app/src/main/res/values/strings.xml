@@ -48,10 +48,11 @@
     <string name="credits_text" translatable="false">© OpenStreetMap contributors\n(openstreetmap.org, nominatim.org)</string>
     <string name="credits" translatable="false">Credits:</string>
     <string name="going_at_noon" translatable="false">Going at noon</string>
-    <string name="call" translatable="false">CALL</string>
-    <string name="like" translatable="false">LIKE</string>
-    <string name="website" translatable="false">WEBSITE</string>
+    <string name="call">CALL</string>
+    <string name="like">LIKE</string>
+    <string name="website">WEBSITE</string>
     <string name="content_loading" translatable="false">Content loading</string>
+    <string name="received_mates_pois">%d mates their POIs received and updated on view</string>
 
 
 </resources>

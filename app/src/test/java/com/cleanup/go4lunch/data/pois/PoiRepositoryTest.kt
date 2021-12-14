@@ -64,7 +64,7 @@ class PoiRepositoryTest {
     }
 
     @Test
-    fun clearCache() {
+    fun clearCache() {  // todo Nino this fails
         // given
         val repository = getPoiRepository()
 
