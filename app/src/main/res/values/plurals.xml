@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="received_mates_pois">
+        <item quantity="one">%d mate\'s POI received and updated on view</item>
+        <item quantity="other">%d mates their POIs received and updated on view</item>
+    </plurals>
+</resources>
+
+

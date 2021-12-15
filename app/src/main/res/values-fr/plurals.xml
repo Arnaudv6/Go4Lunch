@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="received_mates_pois">
+        <item quantity="one">%d POI de collègue reçu et affiché</item>
+        <item quantity="other">%d POIs de collègues reçus et affichés</item>
+    </plurals>
+</resources>
+

@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.ui.mates
 
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.cleanup.go4lunch.R
 
 // todo Nino: in listAdapter, I pass activity's listener as argument, here I pass the viewModel. VM?
+//  or just Inject VM in adapter too?
 class MatesAdapter(private val viewModel: MatesViewModel) :
     ListAdapter<MatesViewStateItem, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
 
@@ -30,9 +30,7 @@ class MatesAdapter(private val viewModel: MatesViewModel) :
         private val textView: AppCompatTextView = itemView.findViewById(R.id.mates_item_text)
 
         fun bind(viewModel: MatesViewModel, viewState: MatesViewStateItem) {
-            @Suppress("DEPRECATION") // Html.FROM_HTML_MODE_LEGACY is API24+
-            textView.text = Html.fromHtml(viewState.text)  // https://stackoverflow.com/a/2938184
-            // should there be more than just this span in the project, consider using spannable-ktx
+            textView.text = viewState.text
             Glide.with(itemView).load(viewState.imageUrl)
                 .apply(RequestOptions.circleCropTransform()).into(image)
             itemView.setOnClickListener { viewModel.mateClicked(viewState.mateId) }

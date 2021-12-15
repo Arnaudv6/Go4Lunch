@@ -13,7 +13,6 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,8 +20,9 @@ import javax.inject.Inject
 class MatesFragment : Fragment() {
 
     private val viewModel: MatesViewModel by viewModels()
+
     @Inject
-    lateinit var allDispatchers:AllDispatchers
+    lateinit var allDispatchers: AllDispatchers
 
     companion object {
         fun newInstance() = MatesFragment()

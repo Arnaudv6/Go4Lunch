@@ -1,6 +1,8 @@
 package com.cleanup.go4lunch.ui.mates
 
 import android.app.Application
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -27,6 +29,7 @@ class MatesViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
 ) : ViewModel() {
 
+    val greyColor = ContextCompat.getColor(application,R.color.grey)
     val mateClickSingleLiveEvent: SingleLiveEvent<Long> = SingleLiveEvent()
 
     suspend fun swipeRefresh() = usersRepository.updateMatesList()
@@ -59,9 +62,14 @@ class MatesViewModel @Inject constructor(
         }
     }.filterNotNull().asLiveData()
 
-    private fun getText(user: User, places: List<PoiEntity>): String {
-        if (user.goingAtNoon == null) return application.getString(R.string.not_decided_yet)
-            .format(user.firstName)
+    private fun getText(user: User, places: List<PoiEntity>): CharSequence {
+        if (user.goingAtNoon == null) {
+            val text = application.getString(R.string.not_decided_yet).format(user.firstName)
+            return HtmlCompat.fromHtml(
+                "<i><font color='$greyColor'>$text</font></i>",
+                HtmlCompat.FROM_HTML_MODE_COMPACT
+            )
+        }
         val restaurant = places.firstOrNull { it.id == user.goingAtNoon }
             ?: return application.getString(R.string.chose_restaurant_pid)
                 .format(user.firstName, user.goingAtNoon)

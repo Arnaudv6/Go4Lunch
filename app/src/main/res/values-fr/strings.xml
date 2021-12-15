@@ -25,7 +25,7 @@
     <string name="preferences_theme_key_light">clair</string>
     <string name="preferences_theme_key_dark">sombre</string>
     <string name="preferences_theme_title">Thème de l\'application</string>
-    <string name="not_decided_yet"><![CDATA[<i><font color=\'grey\'>%s n\'a pas encore décidé</font></i>]]></string>
+    <string name="not_decided_yet">%s n\'a pas encore décidé</string>
     <string name="chose_restaurant_pid">%s: déjeune au restaurant id %s</string>
     <string name="chose_restaurant_name">%s déjeune à %s</string>
     <string name="chose_restaurant_cuisine">%s mange %s à midi (%s)</string>
@@ -35,3 +35,4 @@
     <string name="like">J\'AIME</string>
     <string name="website">SITE WEB</string>
 </resources>
+
