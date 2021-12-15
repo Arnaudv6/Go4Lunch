@@ -48,11 +48,8 @@
 
     <!-- Non Translatable -->
     <string name="log_request_delay" translatable="false">delaying request by %s to be gentle on nominatim server</string>
-    <string name="credits_text" translatable="false">© OpenStreetMap contributors\n(openstreetmap.org, nominatim.org)</string>
-    <string name="credits" translatable="false">Credits:</string>
     <string name="going_at_noon" translatable="false">Going at noon</string>
     <string name="content_loading" translatable="false">Content loading</string>
-
 
 </resources>
 

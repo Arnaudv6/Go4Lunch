@@ -33,7 +33,8 @@ class MatesAdapter(private val viewModel: MatesViewModel) :
             textView.text = viewState.text
             Glide.with(itemView).load(viewState.imageUrl)
                 .apply(RequestOptions.circleCropTransform()).into(image)
-            itemView.setOnClickListener { viewModel.mateClicked(viewState.mateId) }
+            itemView.setOnClickListener { viewModel.mateClicked(viewState.placeId) }
+            itemView.isEnabled = viewState.placeId != null
         }
     }
 

@@ -6,7 +6,6 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
@@ -14,12 +13,8 @@ import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,23 +24,12 @@ class MatesViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
 ) : ViewModel() {
 
-    val greyColor = ContextCompat.getColor(application,R.color.grey)
+    private val greyColor = ContextCompat.getColor(application, R.color.grey)
     val mateClickSingleLiveEvent: SingleLiveEvent<Long> = SingleLiveEvent()
 
     suspend fun swipeRefresh() = usersRepository.updateMatesList()
 
-    fun mateClicked(mateId: Long) {
-        viewModelScope.launch {
-            val job = launch {
-                usersRepository.matesListFlow.first().first { it.id == mateId }.goingAtNoon
-                    ?.let { mateClickSingleLiveEvent.postValue(it) }
-            }
-            delay(2_000)
-            if (job.isActive) {
-                job.cancel("Do not start activity as we get connection over 2 secs later")
-            }
-        }
-    }
+    fun mateClicked(placeId: Long?) = placeId?.let { mateClickSingleLiveEvent.postValue(it) }
 
     // don't filter sessionUser out (nor in detailsVM) as list would refresh when not networkIsAvailable
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> = combine(
