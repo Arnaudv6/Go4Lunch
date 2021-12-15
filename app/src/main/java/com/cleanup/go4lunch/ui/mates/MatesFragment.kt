@@ -1,7 +1,6 @@
 package com.cleanup.go4lunch.ui.mates
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +10,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MatesFragment : Fragment() {
 
     private val viewModel: MatesViewModel by viewModels()
+    @Inject
+    lateinit var allDispatchers:AllDispatchers
 
     companion object {
         fun newInstance() = MatesFragment()
@@ -35,11 +40,12 @@ class MatesFragment : Fragment() {
         recycler.adapter = adapter
 
         viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {
-            Log.e("TAG", "displayed even when recycler view stays blank")
-            adapter.submitList(it)
+            lifecycleScope.launch(allDispatchers.mainDispatcher) {
+                adapter.submitList(it)  // if not on main thread, RV is blank until screen touched.
+            }
         }
 
-        viewModel.mateClickSingleLiveEvent.observe(viewLifecycleOwner){
+        viewModel.mateClickSingleLiveEvent.observe(viewLifecycleOwner) {
             (activity as DetailsActivityLauncher).onClicked(it)
         }
 

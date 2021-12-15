@@ -33,7 +33,6 @@ class MatesAdapter(private val viewModel: MatesViewModel) :
             @Suppress("DEPRECATION") // Html.FROM_HTML_MODE_LEGACY is API24+
             textView.text = Html.fromHtml(viewState.text)  // https://stackoverflow.com/a/2938184
             // should there be more than just this span in the project, consider using spannable-ktx
-            // W/View: requestLayout() improperly called by androidx.appcompat.widget.AppCompatTextView{43a4f78 V.ED..... ......ID 189,38-465,109} during layout: running second layout pass
             Glide.with(itemView).load(viewState.imageUrl)
                 .apply(RequestOptions.circleCropTransform()).into(image)
             itemView.setOnClickListener { viewModel.mateClicked(viewState.mateId) }
