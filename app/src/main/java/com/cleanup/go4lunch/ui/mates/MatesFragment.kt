@@ -36,7 +36,7 @@ class MatesFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_mates, container, false)
 
         val recycler: RecyclerView = view.findViewById(R.id.mates_recycler_view)
-        val adapter = MatesAdapter(viewModel)
+        val adapter = MatesAdapter { viewModel.mateClicked(it) }
         recycler.adapter = adapter
 
         viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {

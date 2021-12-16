@@ -64,12 +64,12 @@ class PoiRepositoryTest {
     }
 
     @Test
-    fun clearCache() {  // todo Nino this fails
+    fun clearCache() = testCoroutineRule.runBlockingTest {
         // given
         val repository = getPoiRepository()
 
         // when
-        coEvery { repository.clearCache() }
+        repository.clearCache()
 
         // then
         coVerify(exactly = 1) { poiDaoMock.nukePOIS() }

@@ -12,9 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.cleanup.go4lunch.R
 
-// todo Nino: in listAdapter, I pass activity's listener as argument, here I pass the viewModel. VM?
-//  or just Inject VM in adapter too?
-class MatesAdapter(private val viewModel: MatesViewModel) :
+class MatesAdapter(private val onMateClicked: (Long?) -> Unit) :
     ListAdapter<MatesViewStateItem, MatesAdapter.ViewHolder>(MatesDiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
@@ -22,18 +20,18 @@ class MatesAdapter(private val viewModel: MatesViewModel) :
     )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-        holder.bind(viewModel, getItem(position))
+        holder.bind(onMateClicked, getItem(position))
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // could give itemView another name in constructor for clarity, or keep it, for clarity also
         private val image: AppCompatImageView = itemView.findViewById(R.id.mates_item_image)
         private val textView: AppCompatTextView = itemView.findViewById(R.id.mates_item_text)
 
-        fun bind(viewModel: MatesViewModel, viewState: MatesViewStateItem) {
+        fun bind(onMateClicked: (Long?) -> Unit, viewState: MatesViewStateItem) {
             textView.text = viewState.text
             Glide.with(itemView).load(viewState.imageUrl)
                 .apply(RequestOptions.circleCropTransform()).into(image)
-            itemView.setOnClickListener { viewModel.mateClicked(viewState.placeId) }
+            itemView.setOnClickListener { onMateClicked(viewState.placeId) }
             itemView.isEnabled = viewState.placeId != null
         }
     }
