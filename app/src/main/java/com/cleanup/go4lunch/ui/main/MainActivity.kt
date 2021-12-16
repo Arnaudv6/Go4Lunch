@@ -209,7 +209,7 @@ class MainActivity :
         )
     }
 
-    override fun onClicked(osmId: Long) {
+    override fun launch(osmId: Long) {
         startActivity(DetailsActivity.navigate(this, osmId))
     }
 }

@@ -67,7 +67,7 @@ class MapFragment : Fragment() {
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
         Configuration.getInstance().load(
             context,
-            androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+            androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())
         )
 
         val view: View = inflater.inflate(R.layout.fragment_map, container, false)

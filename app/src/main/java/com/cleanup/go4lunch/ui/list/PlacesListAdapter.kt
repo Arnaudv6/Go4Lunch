@@ -34,7 +34,7 @@ class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
         private val image: AppCompatImageView = itemView.findViewById(R.id.list_item_image)
 
         fun bind(activityLauncher: DetailsActivityLauncher, viewState: PlacesListViewState) {
-            itemView.setOnClickListener { activityLauncher.onClicked(viewState.id) }
+            itemView.setOnClickListener { activityLauncher.launch(viewState.id) }
             name.text = viewState.name
             distance.text = viewState.distanceText
             address.text = viewState.address

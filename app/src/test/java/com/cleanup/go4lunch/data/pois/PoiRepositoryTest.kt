@@ -4,10 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.cleanup.go4lunch.MainApplication
 import com.cleanup.go4lunch.utils.Constants.Companion.POI_ENTITY
 import com.cleanup.go4lunch.utils.TestCoroutineRule
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Assert.assertEquals
@@ -33,8 +30,8 @@ class PoiRepositoryTest {
     @Before
     fun setUp() {
         coJustRun { poiDaoMock.nukePOIS() }
-        coEvery { poiDaoMock.getPoiById(any()) }.returns(POI_ENTITY)
-        coEvery { poiDaoMock.getPoiEntities() }.returns(flowOf(emptyList()))  // Todo Nino: coEvery, ici?
+        coEvery { poiDaoMock.getPoiById(POI_ENTITY.id) }.returns(POI_ENTITY)
+        every { poiDaoMock.getPoiEntities() }.returns(flowOf(emptyList()))
     }
 
     @Test
@@ -42,13 +39,12 @@ class PoiRepositoryTest {
     }
 
     @Test
-    fun getPoiById() = testCoroutineRule.runBlockingTest {  // todo Nino: Blocking, vraiment?
+    fun getPoiById() = testCoroutineRule.runBlockingTest {  // runBlockingTest() -> runTest() with 1.6 kotlin tests.
         // given
         val repository = getPoiRepository()
 
         // when
-        val result =
-            repository.getPoiById(POI_ENTITY.id)  // todo Nino, la je suis border pour l'ID?
+        val result = repository.getPoiById(POI_ENTITY.id)
 
         // then
         assertEquals(POI_ENTITY, result)

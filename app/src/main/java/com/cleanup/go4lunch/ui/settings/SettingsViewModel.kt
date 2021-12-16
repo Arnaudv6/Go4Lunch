@@ -9,7 +9,6 @@ import android.content.Intent
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
@@ -19,7 +18,7 @@ import com.cleanup.go4lunch.exhaustive
 import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.cleanup.go4lunch.ui.alarm.AlarmActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -41,8 +40,16 @@ class SettingsViewModel @Inject constructor(
         private const val REQUEST_CODE = 4444
     }
 
+    init {
+        // todo enable notifications by default : observe from MainActivity? if not, 2 events => ViewAction
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
+            settingsRepository.notifsEnabledChangeFlow.collect { enableNotifications(it) }
+        }
+    }
+
     // todo Arnaud -> worker route
     private val intent = Intent().setClass(application, AlarmActivity::class.java)
+
     @SuppressLint("UnspecifiedImmutableFlag")  // API 24+
     private val pendingIntent = PendingIntent.getActivity(
         application, REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT
@@ -100,9 +107,5 @@ class SettingsViewModel @Inject constructor(
             alarmManager.cancel(pendingIntent)
         }
     }
-
-    @ExperimentalCoroutinesApi
-    val notificationsEnabledLiveData = settingsRepository.notificationsEnabledFlow.asLiveData()
-
 }
 

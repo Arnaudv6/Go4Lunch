@@ -66,7 +66,7 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch(allDispatchers.ioDispatcher) {
             val numberOfPoi = poiRepository.fetchPOIsInBoundingBox(boundingBox)
             viewActionLiveEvent.postValue(MapViewAction.PoiRetrieval(numberOfPoi))
-            // todo Nino : SnackBarUseCase -> activity shows snackBar for all fragments VM: OK?
+            // no SnackBarUseCase. Limit back-and-forth ping-ping to any of view-VM-usecase-repo
         }
     }
 

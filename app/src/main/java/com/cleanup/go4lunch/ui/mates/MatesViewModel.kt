@@ -11,7 +11,6 @@ import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
-import com.cleanup.go4lunch.ui.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
@@ -25,11 +24,8 @@ class MatesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val greyColor = ContextCompat.getColor(application, R.color.grey)
-    val mateClickSingleLiveEvent: SingleLiveEvent<Long> = SingleLiveEvent()
 
     suspend fun swipeRefresh() = usersRepository.updateMatesList()
-
-    fun mateClicked(placeId: Long?) = placeId?.let { mateClickSingleLiveEvent.postValue(it) }
 
     // don't filter sessionUser out (nor in detailsVM) as list would refresh when not networkIsAvailable
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> = combine(

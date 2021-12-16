@@ -36,17 +36,14 @@ class MatesFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_mates, container, false)
 
         val recycler: RecyclerView = view.findViewById(R.id.mates_recycler_view)
-        val adapter = MatesAdapter { viewModel.mateClicked(it) }
+        // below: alternative to what is in PlacesListFragment / PlacesListAdapter
+        val adapter = MatesAdapter { it?.let { (activity as DetailsActivityLauncher).launch(it) } }
         recycler.adapter = adapter
 
         viewModel.mMatesListLiveData.observe(viewLifecycleOwner) {
             lifecycleScope.launch(allDispatchers.mainDispatcher) {
                 adapter.submitList(it)  // if not on main thread, RV is blank until screen touched.
             }
-        }
-
-        viewModel.mateClickSingleLiveEvent.observe(viewLifecycleOwner) {
-            (activity as DetailsActivityLauncher).onClicked(it)
         }
 
         view.findViewById<SwipeRefreshLayout>(R.id.mates_swipe_refresh_layout).let {

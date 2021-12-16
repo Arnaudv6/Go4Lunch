@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
+import com.cleanup.go4lunch.exhaustive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -40,17 +41,19 @@ class SettingsRepository @Inject constructor(
     private val preferencesKeyTheme = application.getString(R.string.preferences_theme_key)
     private val preferencesKeyLocale = application.getString(R.string.preferences_locale_key)
 
-
-    // todo Nino : monitoring changes from here and pushing them back up to settingsVM: OK?
+    // nice generic way. The trade off is one OnSharedPreferenceChangeListener() per watched value
     @ExperimentalCoroutinesApi
-    val notificationsEnabledFlow: Flow<Any> = callbackFlow {
-        // trySend(getNotificationEnabled())
-
-        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            when (key) {
-                preferencesKeyNotifications -> trySend(getNotificationEnabled())
-                preferencesKeyTheme -> trySend(getTheme())
-                preferencesKeyLocale -> trySend(getLocale())
+    private inline fun <reified T> getNewValuesAsFlow(askedKey: String): Flow<T> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+            if (key == askedKey) {
+                trySend(
+                    when (T::class) {
+                        // seemingly useless default values. But preference just changed: it is set.
+                        Boolean::class -> prefs.getBoolean(askedKey, true) as T
+                        String::class -> prefs.getString(askedKey, String()) as T
+                        else -> throw UnsupportedOperationException("no code for type ${T::class}")
+                    }.exhaustive
+                )
             }
         }
 
@@ -58,6 +61,9 @@ class SettingsRepository @Inject constructor(
         awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
+    val notifsEnabledChangeFlow = getNewValuesAsFlow<Boolean>(preferencesKeyNotifications)
+    val themeChangeFlow = getNewValuesAsFlow<String>(preferencesKeyTheme)
+    val localeChangeFlow = getNewValuesAsFlow<String>(preferencesKeyLocale)
 
     fun getNotificationEnabled(): Boolean =
         preferences.getBoolean(preferencesKeyNotifications, true)
@@ -65,12 +71,12 @@ class SettingsRepository @Inject constructor(
     fun getTheme(): String = preferences.getString(
         preferencesKeyTheme,
         application.getString(R.string.preferences_theme_key_system)
-    ).orEmpty() // todo Nino : or double Bang
+    ).orEmpty() // until preferences-ktx allows for dropping orEmpty()
 
     fun getLocale(): String = preferences.getString(
         preferencesKeyLocale,
         application.getString(R.string.preferences_locale_key_system)
-    ).orEmpty() // todo Nino : or double Bang
+    ).orEmpty() // until preferences-ktx allows for dropping orEmpty()
 
 }
 

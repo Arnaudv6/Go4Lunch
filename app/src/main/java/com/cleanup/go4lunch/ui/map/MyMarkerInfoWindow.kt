@@ -22,7 +22,7 @@ class MyMarkerInfoWindow(
         val title = mView.findViewById<TextView>(R.id.bubble_title)
         title.paintFlags = title.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         title.setOnClickListener {
-            detailsActivityLauncher.get()?.onClicked(osmId)
+            detailsActivityLauncher.get()?.launch(osmId)
         }
     }
 }

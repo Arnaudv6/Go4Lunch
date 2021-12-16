@@ -7,7 +7,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import org.osmdroid.util.BoundingBox
-import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,10 +23,8 @@ class PoiRepository @Inject constructor(
 
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
-    // todo Nino : OK?
-    private suspend fun ensureGentleRequests(
-        request: suspend () -> Response<List<PoiResponse>>
-    ): Response<List<PoiResponse>> {
+    // this fun can be moved to utils class and injected
+    private suspend inline fun <reified T> ensureGentleRequests(request: () -> T): T {
         val previousEpoch = nominatimMutexChannel.receive()
         val requestDelay = (1_500 - (System.currentTimeMillis() - previousEpoch))
         if (requestDelay > 0) Log.d(
@@ -38,6 +35,7 @@ class PoiRepository @Inject constructor(
 
         val response = request.invoke()
 
+        // todo pour les tests, injecter la Clock
         nominatimMutexChannel.trySend(System.currentTimeMillis())
         return response
     }

@@ -80,13 +80,8 @@ class SettingsActivity : AppCompatActivity() {
             // saves the value in defaultSharedPreferences, and settings repo has a callBack.
         }
 
-
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            // todo enable notifications by default : observe from MainActivity? if not, 2 events => ViewAction
-            viewModel.notificationsEnabledLiveData.observe(viewLifecycleOwner) {
-                viewModel.enableNotifications(it)
-            }
 
             viewModel.snackBarSingleLiveEvent.observe(viewLifecycleOwner) {
                 Snackbar.make(view, it, Snackbar.LENGTH_SHORT).setAction("Dismiss") {}.show()
