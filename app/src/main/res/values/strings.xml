@@ -36,15 +36,21 @@
     <string name="preferences_login_title">Login</string>
     <string name="preferences_login_key" translatable="false">login</string>
     <string name="preferences_theme_key" translatable="false">theme</string>
-    <string name="preferences_theme_key_system">system</string>
-    <string name="preferences_theme_key_light">light</string>
-    <string name="preferences_theme_key_dark">dark</string>
+    <string name="preferences_theme_value_system">match system theme</string>
+    <string name="preferences_theme_value_light">use light theme</string>
+    <string name="preferences_theme_value_dark">use dark theme</string>
+    <string name="preferences_theme_key_system" translatable="false">system</string>
+    <string name="preferences_theme_key_light" translatable="false">light</string>
+    <string name="preferences_theme_key_dark" translatable="false">dark</string>
     <string name="preferences_theme_title">Application theme</string>
     <string name="preferences_locale_key" translatable="false">locale</string>
     <string name="preferences_locale_title">Application locale</string>
     <string name="preferences_locale_key_system" translatable="false">system_locale</string>
     <string name="preferences_locale_key_english" translatable="false">english</string>
     <string name="preferences_locale_key_french" translatable="false">french</string>
+    <string name="preferences_locale_value_system">match system locale</string>
+    <string name="preferences_locale_value_english">use English</string>
+    <string name="preferences_locale_value_french">use French</string>
 
     <!-- Non Translatable -->
     <string name="log_request_delay" translatable="false">delaying request by %s to be gentle on nominatim server</string>

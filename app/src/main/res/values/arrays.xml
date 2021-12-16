@@ -1,27 +1,26 @@
 <resources>
+    <!-- references as strings here, to access them from code -->
     <!-- Theme Preference -->
     <string-array name="theme_entries">
-        <item>match system theme</item>
-        <item>force light theme</item>
-        <item>force dark theme</item>
+        <item>@string/preferences_theme_value_system</item>
+        <item>@string/preferences_theme_value_light</item>
+        <item>@string/preferences_theme_value_dark</item>
     </string-array>
 
     <string-array name="theme_values">:
-        <!-- references as strings here, to access them from code -->
         <item>@string/preferences_theme_key_system</item>
         <item>@string/preferences_theme_key_light</item>
         <item>@string/preferences_theme_key_dark</item>
     </string-array>
 
-
+    <!-- Locale Preference -->
     <string-array name="locale_entries">
-        <item>match system locale</item>
-        <item>English</item>
-        <item>French</item>
+        <item>@string/preferences_locale_value_system</item>
+        <item>@string/preferences_locale_value_english</item>
+        <item>@string/preferences_locale_value_french</item>
     </string-array>
 
     <string-array name="locale_values">:
-        <!-- references as strings here, to access them from code -->
         <item>@string/preferences_locale_key_system</item>
         <item>@string/preferences_locale_key_english</item>
         <item>@string/preferences_locale_key_french</item>

@@ -21,9 +21,6 @@
     <string name="preferences_notif_text">avec l\'adresse du déjeuner</string>
     <string name="preferences_login_text">pour partager les repas avec des collègues</string>
     <string name="preferences_login_title">Se connecter</string>
-    <string name="preferences_theme_key_system">système</string>
-    <string name="preferences_theme_key_light">clair</string>
-    <string name="preferences_theme_key_dark">sombre</string>
     <string name="preferences_theme_title">Thème de l\'application</string>
     <string name="not_decided_yet">%s n\'a pas encore décidé</string>
     <string name="chose_restaurant_pid">%s: déjeune au restaurant id %s</string>
@@ -34,5 +31,11 @@
     <string name="call">APPELER</string>
     <string name="like">J\'AIME</string>
     <string name="website">SITE WEB</string>
+    <string name="preferences_theme_value_system">suivre le thème système</string>
+    <string name="preferences_theme_value_light">utiliser le thème clair</string>
+    <string name="preferences_theme_value_dark">utiliser le thème sombre</string>
+    <string name="preferences_locale_value_system">suivre le langue du système</string>
+    <string name="preferences_locale_value_english">utiliser l\'anglais</string>
+    <string name="preferences_locale_value_french">utiliser le français</string>
 </resources>
 

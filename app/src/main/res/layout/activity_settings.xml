@@ -5,6 +5,8 @@
     android:clipChildren="false"
     android:theme="@style/Theme.Go4Lunch.preferences">
 
+    <!-- todo fix colors -->
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"

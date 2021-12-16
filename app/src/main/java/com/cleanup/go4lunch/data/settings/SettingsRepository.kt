@@ -17,7 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SettingsRepository @Inject constructor(
-    application: Application,
+    private val application: Application,
     private val settingsDao: SettingsDao,
     private val allDispatchers: AllDispatchers,
 ) {
@@ -36,23 +36,42 @@ class SettingsRepository @Inject constructor(
     }
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
-    private val notificationKey = application.getString(R.string.preferences_notif_key)
-    private val initialValue = preferences.getBoolean(notificationKey, true)
+    private val preferencesKeyNotifications = application.getString(R.string.preferences_notif_key)
+    private val preferencesKeyTheme = application.getString(R.string.preferences_theme_key)
+    private val preferencesKeyLocale = application.getString(R.string.preferences_locale_key)
 
-    // todo Nino : et je fais la même chose pour theme et locale?
+
+    // todo Nino : monitoring changes from here and pushing them back up to settingsVM: OK?
     @ExperimentalCoroutinesApi
-    val notificationsEnabledFlow: Flow<Boolean> = callbackFlow {
-        trySend(initialValue)
+    val notificationsEnabledFlow: Flow<Any> = callbackFlow {
+        // trySend(getNotificationEnabled())
 
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key.equals(notificationKey)) {
-                trySend(preferences.getBoolean(notificationKey, true))
+            when (key) {
+                preferencesKeyNotifications -> trySend(getNotificationEnabled())
+                preferencesKeyTheme -> trySend(getTheme())
+                preferencesKeyLocale -> trySend(getLocale())
             }
         }
 
         preferences.registerOnSharedPreferenceChangeListener(listener)
         awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
+
+
+    fun getNotificationEnabled(): Boolean =
+        preferences.getBoolean(preferencesKeyNotifications, true)
+
+    fun getTheme(): String = preferences.getString(
+        preferencesKeyTheme,
+        application.getString(R.string.preferences_theme_key_system)
+    ).orEmpty() // todo Nino : or double Bang
+
+    fun getLocale(): String = preferences.getString(
+        preferencesKeyLocale,
+        application.getString(R.string.preferences_locale_key_system)
+    ).orEmpty() // todo Nino : or double Bang
+
 }
 
 
