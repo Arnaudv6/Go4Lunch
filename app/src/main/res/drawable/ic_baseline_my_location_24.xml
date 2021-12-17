@@ -1,8 +1,8 @@
+<!-- can't get rid of transparency if set with alpha property instead of tint -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="32dp"
     android:height="32dp"
-    android:alpha="0.72"
-    android:tint="#00C4FF"
+    android:tint="#B700C4FF"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path

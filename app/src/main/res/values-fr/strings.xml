@@ -37,5 +37,6 @@
     <string name="preferences_locale_value_system">suivre le langue du système</string>
     <string name="preferences_locale_value_english">utiliser l\'anglais</string>
     <string name="preferences_locale_value_french">utiliser le français</string>
+    <string name="load_pois_in_this_zone">charger les POIs dans cette zone</string>
 </resources>
 

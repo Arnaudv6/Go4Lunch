@@ -56,6 +56,7 @@
     <string name="log_request_delay" translatable="false">delaying request by %s to be gentle on nominatim server</string>
     <string name="going_at_noon" translatable="false">Going at noon</string>
     <string name="content_loading" translatable="false">Content loading</string>
+    <string name="load_pois_in_this_zone">load POIs in this zone</string>
 
 </resources>
 
