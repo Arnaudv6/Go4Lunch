@@ -1,4 +1,4 @@
-package com.cleanup.go4lunch.ui;
+package com.cleanup.go4lunch.ui.utils;
 
 import android.util.Log;
 

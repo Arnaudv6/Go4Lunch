@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -38,12 +39,10 @@ class MainActivity :
         private const val LAST_VIEW_PAGER_ITEM = "LAST_VIEW_PAGER_ITEM"
     }
 
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var navBar: BottomNavigationView
     private lateinit var viewPager: ViewPager2
-    private val viewModel: MainViewModel by viewModels()
-    private var goingAtNoon: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +54,7 @@ class MainActivity :
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true) for drawer
 
         drawerLayout = findViewById(R.id.drawer_layout)
-        navBar = findViewById(R.id.bottom_nav_view)
+        val navBar = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
 
         toggle = ActionBarDrawerToggle(
             this,
@@ -81,11 +80,10 @@ class MainActivity :
             }
             headerView.findViewById<TextView>(R.id.drawer_user_name).text = viewState.name
             headerView.findViewById<TextView>(R.id.drawer_user_email).text = viewState.connectedVia
-            goingAtNoon = viewState.goingAtNoon
         }
 
         viewModel.viewActionSingleLiveEvent.observe(this) {
-            when (it){
+            when (it) {
                 is MainViewAction.LaunchDetail ->
                     startActivity(DetailsActivity.navigate(this, it.osmId))
                 is MainViewAction.SnackBar ->

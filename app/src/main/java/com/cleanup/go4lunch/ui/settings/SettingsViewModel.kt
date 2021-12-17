@@ -14,11 +14,9 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.SettingsRepository
-import com.cleanup.go4lunch.exhaustive
-import com.cleanup.go4lunch.ui.SingleLiveEvent
 import com.cleanup.go4lunch.ui.alarm.AlarmActivity
+import com.cleanup.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,7 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    settingsRepository: SettingsRepository,
+    private val settingsRepository: SettingsRepository,
     private val poiRepository: PoiRepository,
     private val application: Application,
     private val allDispatchers: AllDispatchers,
@@ -40,12 +38,7 @@ class SettingsViewModel @Inject constructor(
         private const val REQUEST_CODE = 4444
     }
 
-    init {
-        // todo enable notifications by default : observe from MainActivity? if not, 2 events => ViewAction
-        viewModelScope.launch(allDispatchers.ioDispatcher) {
-            settingsRepository.notifsEnabledChangeFlow.collect { enableNotifications(it) }
-        }
-    }
+    // todo enable notifications by default : observe from MainActivity? if not, 2 events => ViewAction
 
     // todo Arnaud -> worker route
     private val intent = Intent().setClass(application, AlarmActivity::class.java)
@@ -59,21 +52,17 @@ class SettingsViewModel @Inject constructor(
 
     fun themeSet(theme: Any) {
         AppCompatDelegate.setDefaultNightMode(
-            when (theme) {
-                application.getString(R.string.preferences_theme_key_dark) -> AppCompatDelegate.MODE_NIGHT_YES
-                application.getString(R.string.preferences_theme_key_light) -> AppCompatDelegate.MODE_NIGHT_NO
-                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            }.exhaustive
+            settingsRepository.themes.getOrDefault(
+                theme,  // settingsRepository.getTheme() takes some time to reflect new value
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            )
         )
     }
 
     fun themeLocale(locale: Any?) {
         application.applicationContext.resources.configuration.setLocale(
-            when (locale) {
-                application.getString(R.string.preferences_locale_key_english) -> Locale.ENGLISH
-                application.getString(R.string.preferences_locale_key_french) -> Locale.FRENCH
-                else -> Locale.getDefault()
-            }.exhaustive
+            // settingsRepository.getLocale() takes some time to reflect new value
+            settingsRepository.locales.getOrDefault(locale, Locale.getDefault())
         )
     }
 
@@ -101,8 +90,8 @@ class SettingsViewModel @Inject constructor(
                 AlarmManager.INTERVAL_DAY,
                 pendingIntent
             )
+*/
 
- */
         } else {
             alarmManager.cancel(pendingIntent)
         }

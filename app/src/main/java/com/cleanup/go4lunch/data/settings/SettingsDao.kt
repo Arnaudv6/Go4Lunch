@@ -8,11 +8,10 @@ import androidx.room.Query
 @Dao
 interface SettingsDao {
 
-    // box is a structured object, not a _single_ primitive:
-    //  belongs in SQL rather than SharedPreferences
+    // box is a structured object, belongs in SQL, not in (primitives) SharedPreferences
     @Query("SELECT * FROM box LIMIT 1")
     suspend fun getBox(): BoxEntity?
-    // OK: result does not have to be a list, nor a Flow
+    // OK. result does not have to be a list, nor a Flow
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun setBox(boxEntity: BoxEntity)

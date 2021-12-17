@@ -14,7 +14,7 @@ import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
-import com.cleanup.go4lunch.ui.SingleLiveEvent
+import com.cleanup.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
@@ -29,7 +29,7 @@ class DetailsViewModel
     private val poiMapperDelegate: PoiMapperDelegate,
     sessionUserUseCase: SessionUserUseCase,
     matesByPlaceUseCase: MatesByPlaceUseCase,
-    private val savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle, //
     private val interpolationUseCase: InterpolationUseCase,
     private val allDispatchers: AllDispatchers,
     @ApplicationContext appContext: Context
@@ -39,7 +39,8 @@ class DetailsViewModel
     private val colorInactive = ContextCompat.getColor(appContext, R.color.grey)
     private val colorGold = ContextCompat.getColor(appContext, R.color.gold)
 
-    val intentSingleLiveEvent = SingleLiveEvent<DetailsViewAction>()
+    val intentSingleLiveEvent =
+        SingleLiveEvent<DetailsViewAction>()
 
     private val osmIdLiveData = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID)
 

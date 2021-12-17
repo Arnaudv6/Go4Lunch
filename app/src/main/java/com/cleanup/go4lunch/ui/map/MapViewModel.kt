@@ -11,7 +11,7 @@ import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.MatesByPlaceUseCase
-import com.cleanup.go4lunch.ui.SingleLiveEvent
+import com.cleanup.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine

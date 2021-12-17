@@ -3,14 +3,14 @@ package com.cleanup.go4lunch.data.pois
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// this function belongs neither in
-//  Entity (which must be a POJO)
-//  Util class (which would be static = non testable/injectable)
-//  Object "class" as (not testable/injectable)
-// so we une a singleton (for static) delegate (for injection).
+/* those fun belongs neither in
+    - Entity (which must be a POJO)
+    - Util class (which would be static = non testable/injectable)
+    - Object-class (not testable/injectable)
+   so we use a singleton (for static) delegate (for injection).
+*/
 @Singleton
 class PoiMapperDelegate @Inject constructor() {
-
     companion object{
         private const val SEPARATOR = " - "
     }

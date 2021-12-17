@@ -12,35 +12,31 @@ interface PoiRetrofit {
         private const val LOOKUP = "lookup"
     }
 
-    // beware: Android Studio tends to generate "abstract", non-suspend methods. We want the opposite
+    // Android Studio tends to generate "abstract", non-suspend methods. We want the opposite
 
     // https://nominatim.openstreetmap.org/search?viewbox=-0.91187%2C46.74362%2C6.06445%2C44.99200&format=json&q=[restaurant]&limit=20&bounded=1
     @Headers("User-Agent: ${BuildConfig.APPLICATION_ID}")
     @GET(SEARCH_IN_BOX)
     suspend fun getPoiInBoundingBox(
         @Query("q") query: String = "[restaurant]",
-        @Query("viewbox") viewBox: String, // "<x1>,<y1>,<x2>,<y2>"
+        @Query("viewbox") viewBox: String,
         @Query("bounded") bounded: Int = 1,
         @Query("limit") limit: Int = 20,
         @Query("format") format: String = "jsonv2",  // [xml|json|jsonv2|geojson|geocodejson]
-        @Query("accept-language") lang: String = "EN",  // "fr"
+        @Query("accept-language") lang: String = "EN",  // "fr" for localization
         @Query("addressdetails") addressDetails: Int = 1,
         @Query("extratags") extraTags: Int = 1,
-        // have to specify either a mail, or User-Agent Header
-        // @Query("email") email: String = EMAIL,
+        // @Query("email") email: String = EMAIL,  // should we rather give a mail than a user-agent
     ): Response<List<PoiResponse>>
 
-    // https://nominatim.org/release-docs/latest/api/Lookup/
     @Headers("User-Agent: ${BuildConfig.APPLICATION_ID}")
     @GET(LOOKUP)
     suspend fun getPOIsInList(
         @Query("osm_ids", encoded = true) idsLongArray: IdsLongArray,
-        @Query("format") format: String = "jsonv2",  // [xml|json|jsonv2|geojson|geocodejson]
-        @Query("accept-language") lang: String = "EN",  // "fr"
+        @Query("format") format: String = "jsonv2",
+        @Query("accept-language") lang: String = "EN",
         @Query("addressdetails") addressDetails: Int = 1,
         @Query("extratags") extraTags: Int = 1,
-        // have to specify either a mail, or User-Agent Header
-        // @Query("email") email: String = EMAIL,
     ): Response<List<PoiResponse>>
 
     @Suppress("ArrayInDataClass")

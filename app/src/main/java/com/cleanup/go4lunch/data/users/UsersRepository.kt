@@ -30,7 +30,7 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
         placesIdRatings
     }
 
-    // this list also depends on current hour for goingAtNoon
+    // this list could also depends on current hour (for goingAtNoon)
     suspend fun updateMatesList() {
         matesListMutableStateFlow.value =
             userRetrofit.getUsers().body()?.mapNotNull { toUser(it) } ?: emptyList()

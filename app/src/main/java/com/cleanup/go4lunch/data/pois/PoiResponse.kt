@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 @Keep
 data class PoiResponse(
+    // those can be generated from json by plugins
     @SerializedName("place_id")
     val placeId: Long?,
 

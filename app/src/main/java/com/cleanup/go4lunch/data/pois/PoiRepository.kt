@@ -23,7 +23,7 @@ class PoiRepository @Inject constructor(
 
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
-    // this fun can be moved to utils class and injected
+    // this fun could be moved to a utils class which would be injected here in repo
     private suspend inline fun <reified T> ensureGentleRequests(request: () -> T): T {
         val previousEpoch = nominatimMutexChannel.receive()
         val requestDelay = (1_500 - (System.currentTimeMillis() - previousEpoch))
@@ -35,14 +35,15 @@ class PoiRepository @Inject constructor(
 
         val response = request.invoke()
 
-        // todo pour les tests, injecter la Clock
+        // todo inject Clock for tests
         nominatimMutexChannel.trySend(System.currentTimeMillis())
         return response
     }
 
+    // osmDroid also boasts getPOICloseTo()
     suspend fun fetchPOIsInBoundingBox(box: BoundingBox): Int {
         val response = ensureGentleRequests {
-            poiRetrofit.getPoiInBoundingBox(  // getPOICloseTo() also exists
+            poiRetrofit.getPoiInBoundingBox(
                 viewBox = "${box.lonWest},${box.latNorth},${box.lonEast},${box.latSouth}",
                 limit = 30
             )

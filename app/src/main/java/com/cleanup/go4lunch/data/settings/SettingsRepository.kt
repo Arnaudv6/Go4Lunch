@@ -1,18 +1,16 @@
 package com.cleanup.go4lunch.data.settings
 
 import android.app.Application
-import android.content.SharedPreferences
+import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.exhaustive
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,6 +25,27 @@ class SettingsRepository @Inject constructor(
         private val FRANCE_BOX = BoundingBox(51.404, 8.341, 42.190, -4.932)
     }
 
+    val themes: Map<String, Int> = hashMapOf(
+        Pair(
+            application.getString(R.string.preferences_theme_key_dark),
+            AppCompatDelegate.MODE_NIGHT_YES
+        ),
+        Pair(
+            application.getString(R.string.preferences_theme_key_light),
+            AppCompatDelegate.MODE_NIGHT_NO
+        ),
+        Pair(
+            application.getString(R.string.preferences_theme_key_system),
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        ),
+    )
+
+    val locales: Map<String, Locale> = hashMapOf(
+        Pair(application.getString(R.string.preferences_locale_key_english), Locale.ENGLISH),
+        Pair(application.getString(R.string.preferences_locale_key_french), Locale.FRENCH),
+        Pair(application.getString(R.string.preferences_locale_key_system), Locale.getDefault()),
+    )
+
     suspend fun getInitialBox(): BoundingBox = settingsDao.getBox()
         ?.let { BoundingBox(it.north, it.east, it.south, it.west) } ?: FRANCE_BOX
 
@@ -37,11 +56,25 @@ class SettingsRepository @Inject constructor(
     }
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
-    private val preferencesKeyNotifications = application.getString(R.string.preferences_notif_key)
-    private val preferencesKeyTheme = application.getString(R.string.preferences_theme_key)
-    private val preferencesKeyLocale = application.getString(R.string.preferences_locale_key)
 
-    // nice generic way. The trade off is one OnSharedPreferenceChangeListener() per watched value
+    fun getNotificationEnabled(): Boolean = preferences.getBoolean(
+        application.getString(R.string.preferences_notif_key),
+        true
+    )
+
+    fun getTheme(): Int = themes[preferences.getString(
+        application.getString(R.string.preferences_theme_key),
+        application.getString(R.string.preferences_theme_key_system)
+    )] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM  // until preferences-ktx fix
+
+    fun getLocale(): Locale = locales[preferences.getString(
+        application.getString(R.string.preferences_locale_key),
+        application.getString(R.string.preferences_locale_key_system)
+    )] ?: Locale.getDefault()  // until preferences-ktx fix
+
+    /* no need for flows. onPreferenceChangeListener() in preferenceActivity for changes
+
+    // Generic. Trade-off: one OnSharedPreferenceChangeListener() per watched value
     @ExperimentalCoroutinesApi
     private inline fun <reified T> getNewValuesAsFlow(askedKey: String): Flow<T> = callbackFlow {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
@@ -64,20 +97,7 @@ class SettingsRepository @Inject constructor(
     val notifsEnabledChangeFlow = getNewValuesAsFlow<Boolean>(preferencesKeyNotifications)
     val themeChangeFlow = getNewValuesAsFlow<String>(preferencesKeyTheme)
     val localeChangeFlow = getNewValuesAsFlow<String>(preferencesKeyLocale)
-
-    fun getNotificationEnabled(): Boolean =
-        preferences.getBoolean(preferencesKeyNotifications, true)
-
-    fun getTheme(): String = preferences.getString(
-        preferencesKeyTheme,
-        application.getString(R.string.preferences_theme_key_system)
-    ).orEmpty() // until preferences-ktx allows for dropping orEmpty()
-
-    fun getLocale(): String = preferences.getString(
-        preferencesKeyLocale,
-        application.getString(R.string.preferences_locale_key_system)
-    ).orEmpty() // until preferences-ktx allows for dropping orEmpty()
-
+    */
 }
 
 

@@ -2,6 +2,7 @@ package com.cleanup.go4lunch.ui.main
 
 import android.app.Application
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -11,10 +12,11 @@ import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
 import com.cleanup.go4lunch.data.pois.PoiRepository
+import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.data.users.User
 import com.cleanup.go4lunch.data.users.UsersRepository
-import com.cleanup.go4lunch.ui.SingleLiveEvent
+import com.cleanup.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -30,6 +32,7 @@ class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
     poiRepository: PoiRepository,
     connectivityRepository: ConnectivityRepository,
+    private val settingsRepository: SettingsRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val sessionUserUseCase: SessionUserUseCase,
     private val application: Application,
@@ -39,6 +42,9 @@ class MainViewModel @Inject constructor(
     val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
 
     init {
+        AppCompatDelegate.setDefaultNightMode(settingsRepository.getTheme())
+        // todo resources.configuration.setLocale(settingsRepository.getLocale())
+
         // to collect from MainApp with relevant lifecycle, we'd have to track (started) activities
         viewModelScope.launch(allDispatchers.ioDispatcher) {
             connectivityRepository.isNetworkAvailableFlow.collect {

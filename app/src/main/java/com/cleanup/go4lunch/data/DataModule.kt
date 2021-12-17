@@ -66,6 +66,7 @@ class DataModule {
     @Singleton
     @Provides
     fun provideSurvivalInterceptor(): Interceptor = Interceptor {
+        // an event listener on client does not work so we intercept.
         // finally: https://stackoverflow.com/questions/58697459
         try {
             it.proceed(it.request())
@@ -94,7 +95,7 @@ class DataModule {
         survivalInterceptor: Interceptor,
     ): PoiRetrofit {
         val client = OkHttpClient.Builder()
-            .addInterceptor(survivalInterceptor)  // event listener avails not here
+            .addInterceptor(survivalInterceptor)
             .addInterceptor(httpLoggingInterceptor)
             .build()
 

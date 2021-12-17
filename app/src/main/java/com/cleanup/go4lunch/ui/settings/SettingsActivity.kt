@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -14,7 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -41,7 +41,6 @@ class SettingsActivity : AppCompatActivity() {
 
     @AndroidEntryPoint
     class SettingsFragment : PreferenceFragmentCompat() {
-
         private val viewModel: SettingsViewModel by viewModels()
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

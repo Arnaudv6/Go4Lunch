@@ -13,12 +13,7 @@ data class BoxEntity @Deprecated("Room constructor") constructor(
     val east: Double,
 ) {
     @Suppress("DEPRECATION")
-    constructor(north: Double, south: Double, west: Double, east: Double) : this(
-        0,
-        north,
-        south,
-        west,
-        east
-    )
+    constructor(north: Double, south: Double, west: Double, east: Double) :
+            this(0, north, south, west, east)
 }
 
