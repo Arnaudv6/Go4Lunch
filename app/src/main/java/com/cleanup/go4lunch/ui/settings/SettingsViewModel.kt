@@ -59,7 +59,7 @@ class SettingsViewModel @Inject constructor(
         )
     }
 
-    // todo Nino : not sure we actually want can set app locale ? seems VM-wide setting ?
+    // todo Nino : not sure we actually can set app locale ? seems VM-wide setting ?
     fun themeLocale(locale: Any?) {
         application.applicationContext.resources.configuration.setLocale(
             // settingsRepository.getLocale() takes some time to reflect new value

@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.data
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.room.Room
 import com.cleanup.go4lunch.data.pois.PoiDao
 import com.cleanup.go4lunch.data.pois.PoiRetrofit
@@ -107,6 +108,7 @@ class DataModule {
             .create(PoiRetrofit::class.java)
     }
 
+    @Keep  // annotated so we don't indefinitely wait for unreachable service in release builds.
     @Singleton
     @Provides
     fun provideUsersRetrofit(

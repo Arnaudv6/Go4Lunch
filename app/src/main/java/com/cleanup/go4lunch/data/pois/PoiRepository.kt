@@ -24,6 +24,7 @@ class PoiRepository @Inject constructor(
     suspend fun getPoiById(osmId: Long): PoiEntity? = poiDao.getPoiById(osmId)
 
     // this fun could be moved to a utils class which would be injected here in repo
+    // also delay and channel could be arguments maybe.
     private suspend inline fun <reified T> ensureGentleRequests(request: () -> T): T {
         val previousEpoch = nominatimMutexChannel.receive()
         val requestDelay = (1_500 - (System.currentTimeMillis() - previousEpoch))

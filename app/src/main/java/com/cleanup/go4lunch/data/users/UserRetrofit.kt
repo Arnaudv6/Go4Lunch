@@ -21,7 +21,7 @@ interface UserRetrofit {
     @POST(USERS)
     suspend fun insertUser(@Body userBody: UserBody)
 
-    // todo Nino fix that deletion, null gets invisible simple-quoting it seems
+    // todo null gets invisible simple-quoting it seems
     //  (based on postgres message when I run ALTER TABLE command in psql)
     @FormUrlEncoded
     @PATCH(USERS)
@@ -52,7 +52,8 @@ interface UserRetrofit {
     suspend fun getLikedById(@Query("userid") userId: EqualId): Response<List<LikedResponse>>
 
     @FormUrlEncoded
-    @Headers("Prefer: resolution=merge-duplicates")  // todo fix duplicates.
+    @Headers("Prefer: resolution=merge-duplicates")
+    // todo fix duplicates. (primary key auto-assigned)
     @POST(LIKED)
     suspend fun insertLiked(
         @Field("userid") userId: Long,

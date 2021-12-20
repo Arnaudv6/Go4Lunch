@@ -34,8 +34,14 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     suspend fun updateMatesList() {
         matesListMutableStateFlow.value =
             userRetrofit.getUsers().body()?.mapNotNull { toUser(it) } ?: emptyList()
-        getLikedPlaceIds()
-        getVisitedPlaceIds()
+
+        likedPlacesFlow.emit(userRetrofit.getLikedPlaceIds().body()
+            ?.map { it.likedPlaceId }?.toLongArray()
+        )
+
+        visitedPlacesFlow.emit(userRetrofit.getVisitedPlaceIds().body()
+            ?.map { it.visitedId }?.toLongArray()
+        )
     }
 
     suspend fun insertUser(user: User) = userRetrofit.insertUser(
@@ -97,13 +103,6 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
 
     suspend fun getLikedById(userId: Long): LongArray? = userRetrofit
         .getLikedById(UserRetrofit.EqualId(userId)).body()?.map { it.likedPlaceId }?.toLongArray()
-
-    // retry + delay loop?
-    private suspend fun getLikedPlaceIds() = likedPlacesFlow
-        .emit(userRetrofit.getLikedPlaceIds().body()?.map { it.likedPlaceId }?.toLongArray())
-
-    private suspend fun getVisitedPlaceIds() = visitedPlacesFlow
-        .emit(userRetrofit.getVisitedPlaceIds().body()?.map { it.visitedId }?.toLongArray())
 
 }
 
