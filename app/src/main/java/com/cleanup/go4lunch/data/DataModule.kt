@@ -22,7 +22,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-
+@Keep  // annotated so we don't indefinitely wait for unreachable service in release builds.
 @Module
 @InstallIn(SingletonComponent::class)
 class DataModule {
@@ -108,7 +108,6 @@ class DataModule {
             .create(PoiRetrofit::class.java)
     }
 
-    @Keep  // annotated so we don't indefinitely wait for unreachable service in release builds.
     @Singleton
     @Provides
     fun provideUsersRetrofit(
