@@ -1,5 +1,6 @@
 package com.cleanup.go4lunch.data.users
 
+import android.util.Log
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -7,8 +8,10 @@ import javax.inject.Singleton
 @Singleton
 class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit) {
 
-    private val matesListMutableStateFlow = MutableStateFlow<List<User>>(emptyList())
-    val matesListFlow: Flow<List<User>> = matesListMutableStateFlow.asStateFlow()
+    private val matesListMutableSharedFlow = MutableSharedFlow<List<User>>(replay = 1).apply {
+        tryEmit(emptyList())
+    }
+    val matesListFlow: Flow<List<User>> = matesListMutableSharedFlow.asSharedFlow()
 
     private val visitedPlacesFlow = MutableStateFlow<LongArray?>(longArrayOf())
     private val likedPlacesFlow = MutableStateFlow<LongArray?>(longArrayOf())
@@ -32,8 +35,13 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
 
     // this list could also depends on current hour (for goingAtNoon)
     suspend fun updateMatesList() {
-        matesListMutableStateFlow.value =
-            userRetrofit.getUsers().body()?.mapNotNull { toUser(it) } ?: emptyList()
+        Log.d("Nino", "updateMatesList() called")
+
+        matesListMutableSharedFlow.tryEmit(
+            userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }.also {
+                Log.d("Nino", "updateMatesList().map called with $it")
+            } ?: emptyList()
+        )
 
         likedPlacesFlow.emit(userRetrofit.getLikedPlaceIds().body()
             ?.map { it.likedPlaceId }?.toLongArray()
@@ -83,9 +91,9 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
     private suspend fun refreshUser(userId: Long) {
         val user = toUser(userRetrofit.getUserById(UserRetrofit.EqualId(userId)).body())
         // execution order matters as getUserById() is suspend and list is heavy on memory
-        val list = ArrayList(matesListMutableStateFlow.value.filter { it.id != userId })
+        val list = ArrayList(matesListMutableSharedFlow.replayCache.first().filter { it.id != userId })
         list.add(user)
-        matesListMutableStateFlow.value = list
+        matesListMutableSharedFlow.tryEmit(list)
     }
 
     private fun toUser(userResponse: UserResponse?): User? =

@@ -11,7 +11,7 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (intent.action == Intent.ACTION_SEARCH) {
-            intent.getStringExtra(SearchManager.QUERY)?.also { searchTermRepo.setTerm(it) }
+            //intent.getStringExtra(SearchManager.QUERY)?.also { searchTermRepo.setTerm(it) }
         }
     }
 

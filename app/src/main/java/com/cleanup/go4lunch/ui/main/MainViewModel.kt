@@ -52,10 +52,12 @@ class MainViewModel @Inject constructor(
             }
         }
         viewModelScope.launch(allDispatchers.ioDispatcher) {
+            Log.d("Nino", "matesListFlow.collect launched")
             // todo fix: this gets triggered only once
             usersRepository.matesListFlow.collect {
                 // launch {
                 Log.e("TAG", "mateslistflow update: ")
+                Log.d("Nino", "matesListFlow.collect() called")
                 val num = poiRepository.fetchPOIsInList(
                     ids = it.mapNotNull { user -> user.goingAtNoon },
                     refreshExisting = false
