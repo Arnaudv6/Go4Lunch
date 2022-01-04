@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.detail
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -28,8 +29,8 @@ class DetailsActivity : AppCompatActivity() {
     companion object {
         const val OSM_ID = "osm_id"
 
-        fun navigate(caller: Activity, osmId: Long): Intent =
-            Intent(caller, DetailsActivity::class.java).apply { putExtra(OSM_ID, osmId) }
+        fun navigate(context: Context, osmId: Long): Intent =
+            Intent(context, DetailsActivity::class.java).apply { putExtra(OSM_ID, osmId) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
