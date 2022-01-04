@@ -10,11 +10,12 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequest
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.SettingsRepository
-import com.cleanup.go4lunch.ui.alarm.AlarmActivity
+import com.cleanup.go4lunch.ui.alarm.NotificationWorker
 import com.cleanup.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -41,7 +42,8 @@ class SettingsViewModel @Inject constructor(
     // todo enable notifications by default : observe from MainActivity? if not, 2 events => ViewAction
 
     // todo Arnaud -> worker route
-    private val intent = Intent().setClass(application, AlarmActivity::class.java)
+    private val moi = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+    private val intent = Intent().setClass(application, NotificationWorker::class.java)
 
     @SuppressLint("UnspecifiedImmutableFlag")  // API 24+
     private val pendingIntent = PendingIntent.getActivity(

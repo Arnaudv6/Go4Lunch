@@ -9,8 +9,8 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -117,10 +117,18 @@ class MainActivity :
 
         findViewById<TouchEventInterceptor>(R.id.touch_interceptor_view_group).viewPager = viewPager
 
+        val searchView = findViewById<SearchView>(R.id.search_view)
+
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                setTitle(if (position == 2) R.string.title_workmates else R.string.title_hungry)
+                if (position == 2) {
+                    setTitle(R.string.title_workmates)
+                    searchView.queryHint = getString(R.string.search_a_mate)
+                } else {
+                    setTitle(R.string.title_hungry)
+                    searchView.queryHint = getString(R.string.search_a_place)
+                }
                 navBar.menu.findItem(
                     when (position) {
                         0 -> R.id.nav_map

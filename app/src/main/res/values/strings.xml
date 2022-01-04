@@ -18,6 +18,8 @@
     <string name="like">LIKE</string>
     <string name="website">WEBSITE</string>
     <string name="address_unknown">address unknown</string>
+    <string name="search_a_place">search a place</string>
+    <string name="search_a_mate">search a mate</string>
 
     <!-- mates list -->
     <string name="not_decided_yet">%s has not decided yet</string>
