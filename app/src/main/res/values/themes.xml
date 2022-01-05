@@ -40,6 +40,8 @@
 
     <style name="Theme.Go4Lunch.titleBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorControlNormal">@color/white</item>
+        <item name="android:editTextColor">@color/white</item>
+        <item name="android:textColorHint">@color/white_ish</item>
     </style>
 
     <style name="Theme.Go4Lunch.preferences" parent="Theme.MaterialComponents.DayNight.NoActionBar">

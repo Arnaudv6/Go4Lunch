@@ -28,9 +28,10 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorSurface"
+                android:background="@color/colorSurface"
                 android:elevation="7dp"
-                app:titleTextColor="?attr/colorOnSurface">
+                android:theme="@style/Theme.Go4Lunch.titleBar"
+                app:titleTextColor="@color/white">
 
                 <androidx.appcompat.widget.SearchView
                     android:id="@+id/search_view"
@@ -93,6 +94,7 @@
         app:itemTextColor="@color/white"
         app:menu="@menu/drawer_menu">
 
+        <!-- todo Nino : que ca ne remonte jamais au dela de "logout" -->
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="120dp"
