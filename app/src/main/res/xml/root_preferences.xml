@@ -25,15 +25,6 @@
         app:title="@string/preferences_theme_title"
         app:useSimpleSummaryProvider="true" />
 
-    <ListPreference
-        app:defaultValue="@string/preferences_locale_key_system"
-        app:entries="@array/locale_entries"
-        app:entryValues="@array/locale_values"
-        app:icon="@drawable/ic_baseline_public_24"
-        app:key="@string/preferences_locale_key"
-        app:title="@string/preferences_locale_title"
-        app:useSimpleSummaryProvider="true" />
-
     <Preference
         app:icon="@drawable/ic_baseline_delete_24"
         app:key="@string/preferences_clear_cache_key"

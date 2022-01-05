@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.NonNull
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -26,27 +25,29 @@ import java.time.LocalDate
 // https://developer.android.com/reference/androidx/hilt/work/HiltWorker
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
+    private val application: Application,
     @Assisted private val context: Context,
     @Assisted @NonNull parameters: WorkerParameters,
     private val poiMapperDelegate: PoiMapperDelegate,
     private val sessionUserUseCase: SessionUserUseCase,
     private val poiRepository: PoiRepository,
-    private val application: Application
 ) : CoroutineWorker(context, parameters) {
-
     companion object {
         private const val CHANNEL_ID = "GO4LUNCH_NOTIFICATION_CHANNEL"
         private const val REQUEST_CODE = 4445
     }
+
+    // TODO NINO
+    //  java.lang.RuntimeException: Unable to create service androidx.work.impl.background.systemjob.SystemJobService: java.lang.IllegalStateException: WorkManager needs to be initialized via a ContentProvider#onCreate() or an Application#onCreate().
+    //  pourquoi on ne laisse pas android initialiser lui-même le workManager?
+    //  pourquoi il ne sait pas utiliser mon Provider (dans DataModule) ici?
+    //  annoter @AndroidEntryPoint, ça règlerait le PB?
 
     override suspend fun doWork(): Result {
         val session = sessionUserUseCase.sessionUserFlow.filterNotNull().first()
         val list = poiRepository.cachedPOIsListFlow.filterNotNull().first()
 
         session.user.goingAtNoon?.let { list.firstOrNull { poi -> poi.id == it } }?.let {
-
-            Log.e(this.javaClass.canonicalName, "init")
-
             val text = poiMapperDelegate.nameCuisineAndAddress(it.name, it.cuisine, it.address)
 
 

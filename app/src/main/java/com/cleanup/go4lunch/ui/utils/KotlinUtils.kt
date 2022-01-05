@@ -1,4 +1,4 @@
-package com.cleanup.go4lunch
+package com.cleanup.go4lunch.ui.utils
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner

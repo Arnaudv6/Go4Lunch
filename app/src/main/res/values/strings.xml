@@ -45,14 +45,6 @@
     <string name="preferences_theme_key_light" translatable="false">light</string>
     <string name="preferences_theme_key_dark" translatable="false">dark</string>
     <string name="preferences_theme_title">Application theme</string>
-    <string name="preferences_locale_key" translatable="false">locale</string>
-    <string name="preferences_locale_title">Application locale</string>
-    <string name="preferences_locale_key_system" translatable="false">system_locale</string>
-    <string name="preferences_locale_key_english" translatable="false">english</string>
-    <string name="preferences_locale_key_french" translatable="false">french</string>
-    <string name="preferences_locale_value_system">match system locale</string>
-    <string name="preferences_locale_value_english">use English</string>
-    <string name="preferences_locale_value_french">use French</string>
 
     <!-- Non Translatable -->
     <string name="log_request_delay" translatable="false">delaying request by %s to be gentle on nominatim server</string>

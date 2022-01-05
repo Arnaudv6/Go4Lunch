@@ -13,17 +13,4 @@
         <item>@string/preferences_theme_key_dark</item>
     </string-array>
 
-    <!-- Locale Preference -->
-    <string-array name="locale_entries">
-        <item>@string/preferences_locale_value_system</item>
-        <item>@string/preferences_locale_value_english</item>
-        <item>@string/preferences_locale_value_french</item>
-    </string-array>
-
-    <string-array name="locale_values">:
-        <item>@string/preferences_locale_key_system</item>
-        <item>@string/preferences_locale_key_english</item>
-        <item>@string/preferences_locale_key_french</item>
-    </string-array>
-
 </resources>

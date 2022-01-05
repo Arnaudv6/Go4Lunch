@@ -14,7 +14,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.utils.exhaustive
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint

@@ -3,10 +3,10 @@ package com.cleanup.go4lunch.data.pois
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.cleanup.go4lunch.MainApplication
 import com.cleanup.go4lunch.utils.Constants.Companion.POI_ENTITY
-import com.cleanup.go4lunch.utils.TestCoroutineRule
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -17,10 +17,6 @@ class PoiRepositoryTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
 
     // mock PoiRepository constructor parameters for getPoiRepository() fun bellow
     private val applicationMock = mockk<MainApplication>()
@@ -39,7 +35,7 @@ class PoiRepositoryTest {
     }
 
     @Test
-    fun getPoiById() = testCoroutineRule.runBlockingTest {  // runBlockingTest() -> runTest() with 1.6 kotlin tests.
+    fun getPoiById() = runTest {
         // given
         val repository = getPoiRepository()
 
@@ -60,7 +56,7 @@ class PoiRepositoryTest {
     }
 
     @Test
-    fun clearCache() = testCoroutineRule.runBlockingTest {
+    fun clearCache() = runTest {
         // given
         val repository = getPoiRepository()
 

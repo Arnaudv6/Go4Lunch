@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.data.users
 
-import android.util.Log
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton

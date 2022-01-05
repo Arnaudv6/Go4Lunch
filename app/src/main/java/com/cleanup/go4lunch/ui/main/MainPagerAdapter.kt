@@ -2,7 +2,7 @@ package com.cleanup.go4lunch.ui.main
 
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.utils.exhaustive
 import com.cleanup.go4lunch.ui.list.PlacesListFragment
 import com.cleanup.go4lunch.ui.map.MapFragment
 import com.cleanup.go4lunch.ui.mates.MatesFragment

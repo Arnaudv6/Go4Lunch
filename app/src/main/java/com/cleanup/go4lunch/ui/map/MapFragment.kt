@@ -16,9 +16,9 @@ import androidx.fragment.app.viewModels
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.collectWithLifecycle
+import com.cleanup.go4lunch.ui.utils.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.utils.exhaustive
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar

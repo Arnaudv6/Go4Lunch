@@ -20,7 +20,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.utils.exhaustive
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
 import com.cleanup.go4lunch.ui.settings.SettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
