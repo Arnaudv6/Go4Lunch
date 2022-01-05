@@ -40,25 +40,25 @@
         android:ellipsize="end"
         android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/list_item_hours"
-        app:layout_constraintEnd_toStartOf="@+id/list_item_colleagues_image"
+        app:layout_constraintEnd_toStartOf="@+id/list_item_mates_image"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/list_item_name"
         tools:text="@sample/restaurants.json/data/address" />
 
     <ImageView
-        android:id="@+id/list_item_colleagues_image"
+        android:id="@+id/list_item_mates_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/list_item_margin"
         android:src="@drawable/ic_baseline_group_24"
-        app:layout_constraintEnd_toStartOf="@id/list_item_colleagues"
+        app:layout_constraintEnd_toStartOf="@id/list_item_mates"
         app:layout_constraintStart_toEndOf="@id/list_item_address"
         app:layout_constraintTop_toTopOf="@id/list_item_address"
         app:tint="?attr/colorOnSecondary"
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/list_item_colleagues"
+        android:id="@+id/list_item_mates"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/list_item_margin"
@@ -67,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="@id/list_item_address"
         app:layout_constraintEnd_toStartOf="@id/list_item_image"
         app:layout_constraintTop_toTopOf="@id/list_item_address"
-        tools:text="@sample/restaurants.json/data/colleagues" />
+        tools:text="@sample/restaurants.json/data/mates" />
 
     <TextView
         android:id="@+id/list_item_hours"

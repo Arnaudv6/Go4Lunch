@@ -20,7 +20,7 @@ data class DetailsViewState(
     val websiteColor: Int,
     val websiteActive: Boolean,
 
-    val colleaguesList: List<Item>
+    val matesList: List<Item>
 ) {
     data class Item(
         val mateId: Long,

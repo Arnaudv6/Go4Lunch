@@ -148,7 +148,7 @@ class MapFragment : Fragment() {
             for (pin in it.pinList) {
                 val poiMarker = Marker(map).apply {
                     this.title = pin.name
-                    this.snippet = pin.colleagues
+                    this.snippet = pin.mates
                     this.position = pin.location
                     this.setPanToView(true)  // onClick, animate to map center?
                     this.setInfoWindow(  // null to disable

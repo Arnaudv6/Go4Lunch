@@ -34,7 +34,7 @@
     <string name="preferences_notif_key" translatable="false">notifications</string>
     <string name="preferences_notif_title">Receive notifications at noon</string>
     <string name="preferences_notif_text">as a reminder of where you\'re taking lunch.</string>
-    <string name="preferences_login_text">to share meals with your colleagues</string>
+    <string name="preferences_login_text">to share meals with your workmates</string>
     <string name="preferences_login_title">Login</string>
     <string name="preferences_login_key" translatable="false">login</string>
     <string name="preferences_theme_key" translatable="false">theme</string>

@@ -2,7 +2,7 @@
 'https://plantuml.com/use-case-diagram
 
 'left to right direction
-'(FireBase backend) right of (Colleague1)
+'(FireBase backend) right of (WorkMate1)
 
 usecase backend as "FireBase backend
 ==
@@ -13,12 +13,12 @@ credentials
 favorite places
 place to eat today"
 
-package colleagues {
-Colleague1 -> (backend)
-Colleague2 -> (backend)
-Colleague3 -> (backend)
-Colleague4 -> (backend)
-Colleague5 -> (backend)
+package WorkMates {
+WorkMate1 -> (backend)
+WorkMate2 -> (backend)
+WorkMate3 -> (backend)
+WorkMate4 -> (backend)
+WorkMate5 -> (backend)
 }
 
 User -> (backend)

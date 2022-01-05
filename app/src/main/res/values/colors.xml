@@ -19,4 +19,5 @@
     <color name="androidStatusBarColor">@color/orange_darker</color>
     <color name="androidListDivider">@color/grey</color>
     <color name="drawerSurface">@color/orange_lighter</color>
+    <color name="controlActivated">@color/white</color>
 </resources>

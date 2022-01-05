@@ -48,7 +48,7 @@ class MapViewModel @Inject constructor(
                     MapViewState.Pin(
                         id = it.id,
                         name = it.name,
-                        colleagues = matesByPlace[it.id]?.joinToString(
+                        mates = matesByPlace[it.id]?.joinToString(
                             separator = ", ",
                             prefix = "going: "
                         ) { user -> user.firstName } ?: "",

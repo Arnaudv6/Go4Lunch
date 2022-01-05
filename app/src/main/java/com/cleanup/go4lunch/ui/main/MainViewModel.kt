@@ -11,6 +11,7 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.ConnectivityRepository
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.SearchRepository
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.SettingsRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
@@ -33,6 +34,7 @@ class MainViewModel @Inject constructor(
     poiRepository: PoiRepository,
     connectivityRepository: ConnectivityRepository,
     settingsRepository: SettingsRepository,
+    private val searchRepository: SearchRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val sessionUserUseCase: SessionUserUseCase,
     private val application: Application,
@@ -145,6 +147,13 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun searchSubmit(query: String?) {
+        TODO("Not yet implemented")
+    }
+
+    fun searchTermChange(newText: String?) = searchRepository.setSearchTerms(newText)
+
 }
 
 

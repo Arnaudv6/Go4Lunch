@@ -9,6 +9,7 @@ import androidx.lifecycle.asLiveData
 import ch.poole.openinghoursparser.OpeningHoursParser
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.SearchRepository
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
 import com.cleanup.go4lunch.data.pois.PoiRepository
@@ -28,6 +29,7 @@ class PlacesListViewModel @Inject constructor(
     matesByPlaceUseCase: MatesByPlaceUseCase,
     poiRepository: PoiRepository,
     usersRepository: UsersRepository,
+    searchRepository: SearchRepository,
     gpsProviderWrapper: GpsProviderWrapper,
     private val application: Application,
     private val poiMapperDelegate: PoiMapperDelegate
@@ -45,13 +47,24 @@ class PlacesListViewModel @Inject constructor(
         }.sortedBy { it.first }
     }
 
-    val viewStateListLiveData: LiveData<List<PlacesListViewState>> = combine(
+    private val viewStateListFlow = combine(
         orderedPoiListFlow,
         matesByPlaceUseCase.matesByPlaceFlow,
         usersRepository.placesRatingsFlow
     ) { list, mates, ratings ->
         list.map {
             viewStateFromPoi(it.second, it.first, mates, ratings)
+        }
+    }
+
+    // filtering in the end, so view feels reactive, on ViewState object, actually simpler
+    val viewStateListLiveData: LiveData<List<PlacesListViewState>> = combine(
+        viewStateListFlow,
+        searchRepository.searchStateFlow
+    ) { viewStates, terms ->
+        viewStates.filter {
+            if (terms.isNullOrEmpty()) true
+            else it.address.contains(terms) or it.mates.contains(terms) or it.name.contains(terms)
         }
     }.asLiveData()
 
@@ -72,7 +85,7 @@ class PlacesListViewModel @Inject constructor(
                 dist > 1_000 -> "${"%.1f".format(dist / 1000.0)}km"
                 else -> "${dist}m"
             },
-            colleagues = "(${mates[poi.id]?.size ?: 0})",
+            mates = "(${mates[poi.id]?.size ?: 0})",
             image = poi.imageUrl,
             hours = coloredHours.first,
             hoursColor = coloredHours.second,

@@ -28,7 +28,7 @@ class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
         private val name: TextView = itemView.findViewById(R.id.list_item_name)
         private val distance: TextView = itemView.findViewById(R.id.list_item_distance)
         private val address: TextView = itemView.findViewById(R.id.list_item_address)
-        private val colleagues: TextView = itemView.findViewById(R.id.list_item_colleagues)
+        private val mates: TextView = itemView.findViewById(R.id.list_item_mates)
         private val hours: TextView = itemView.findViewById(R.id.list_item_hours)
         private val likes: RatingBar = itemView.findViewById(R.id.list_item_likes)
         private val image: AppCompatImageView = itemView.findViewById(R.id.list_item_image)
@@ -38,7 +38,7 @@ class PlacesListAdapter(private val activityLauncher: DetailsActivityLauncher) :
             name.text = viewState.name
             distance.text = viewState.distanceText
             address.text = viewState.address
-            colleagues.text = viewState.colleagues
+            mates.text = viewState.mates
             hours.text = viewState.hours
             hours.setTextColor(viewState.hoursColor)
             likes.visibility = View.GONE

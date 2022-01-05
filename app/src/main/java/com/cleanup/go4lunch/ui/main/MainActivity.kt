@@ -102,10 +102,6 @@ class MainActivity :
             true
         }
 
-        // todo spindle search:
-        //  can't do filter-as-you-type + one dropdown element "enter to search online"
-        //  as autocomplete is in requirements
-
         // supportFragmentManager retainedFragments is incompatible with Hilt. ViewPager it is.
         viewPager = findViewById(R.id.view_pager)
 
@@ -117,7 +113,21 @@ class MainActivity :
 
         findViewById<TouchEventInterceptor>(R.id.touch_interceptor_view_group).viewPager = viewPager
 
+        // todo spindle search: filter-as-you-type
+        //  autocomplete a la chrome?
         val searchView = findViewById<SearchView>(R.id.search_view)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.searchSubmit(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.searchTermChange(newText)
+                return true
+            }
+        })
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {

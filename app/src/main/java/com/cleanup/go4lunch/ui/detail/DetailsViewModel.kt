@@ -121,7 +121,7 @@ class DetailsViewModel
     private fun toViewState(
         poiEntity: PoiEntity?,
         session: SessionUser?,
-        colleagues: List<DetailsViewState.Item>?,
+        mates: List<DetailsViewState.Item>?,
         interpolatedValues: InterpolationUseCase.Values?,
         ratings: Map<Long, Int>?
     ): DetailsViewState? {
@@ -144,7 +144,7 @@ class DetailsViewModel
                 likeActive = session?.liked?.contains(poi.id) ?: false,
                 websiteColor = if (poi.site.isNullOrEmpty()) colorInactive else colorActive,
                 websiteActive = !poi.site.isNullOrEmpty(),
-                colleaguesList = colleagues ?: emptyList()
+                matesList = mates ?: emptyList()
             )
         }
         return null

@@ -48,6 +48,7 @@
         <item name="colorPrimary">@color/white</item><!-- Scroll end indicator -->
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorSecondary">@color/white_ish</item>
+        <item name="android:colorControlActivated">@color/controlActivated</item>
         <item name="android:tint">@color/white</item>
         <item name="android:windowBackground">@color/colorSurface</item>
         <item name="alertDialogTheme">@style/Theme.Go4Lunch.alertDialog</item>

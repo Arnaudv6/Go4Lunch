@@ -100,7 +100,7 @@ class DetailsActivity : AppCompatActivity() {
 
                      */
                 })
-            adapter.submitList(it.colleaguesList)
+            adapter.submitList(it.matesList)
         }
 
         viewModel.intentSingleLiveEvent.observe(this) {

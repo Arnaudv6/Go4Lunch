@@ -10,7 +10,7 @@ data class MapViewState(
     data class Pin(
         val id: Long,
         val name: String,
-        val colleagues: String,
+        val mates: String,
         @DrawableRes val icon: Int,
         val location: GeoPoint
     )

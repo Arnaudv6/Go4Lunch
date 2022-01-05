@@ -4,7 +4,7 @@
       "name": "Ô Kebab",
       "distance": "203m",
       "address": "Kebab - 3 rue d'Agadir",
-      "colleagues": "(2)",
+      "mates": "(2)",
       "hours": "ferme à 23h30",
       "color": "#4CAF50",
       "stars": 1
@@ -13,7 +13,7 @@
       "name": "Ti amo pizza",
       "distance": "251m",
       "address": "Pizza - 45 bd de Rome",
-      "colleagues": "(4)",
+      "mates": "(4)",
       "hours": "ouvert indéfiniment",
       "color": "#4CAF50",
       "stars": 3
@@ -22,7 +22,7 @@
       "name": "Le torchon",
       "distance": "275m",
       "address": "Regional - 13 rue de la république",
-      "colleagues": "(2)",
+      "mates": "(2)",
       "hours": "hours unknown",
       "color": "#7A7A7A",
       "stars": 1
@@ -31,7 +31,7 @@
       "name": "Les délices de Sebastopolis",
       "distance": "320m",
       "address": "Greek - 21 bd de la Libération",
-      "colleagues": "(3)",
+      "mates": "(3)",
       "hours": "ferme, ouvre à 16h",
       "color": "#c41b00",
       "stars": 2
@@ -40,7 +40,7 @@
       "name": "Brasserie le Léon",
       "distance": "324m",
       "address": "French - Place George Pompidou",
-      "colleagues": "(3)",
+      "mates": "(3)",
       "hours": "ferme à 23h",
       "color": "#4CAF50",
       "stars": 3
