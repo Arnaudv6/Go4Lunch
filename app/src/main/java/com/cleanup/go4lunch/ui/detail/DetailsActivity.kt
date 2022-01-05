@@ -1,6 +1,5 @@
 package com.cleanup.go4lunch.ui.detail
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri

@@ -1,4 +1,4 @@
-package com.cleanup.go4lunch.ui.alarm
+package com.cleanup.go4lunch.ui.utils
 
 import android.app.Application
 import android.app.PendingIntent
@@ -17,15 +17,17 @@ import com.cleanup.go4lunch.data.pois.PoiMapperDelegate
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.useCase.SessionUserUseCase
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
-import javax.inject.Inject
 
+// https://developer.android.com/reference/androidx/hilt/work/HiltWorker
 @HiltWorker
-class NotificationWorker @Inject constructor(
-    private val context: Context,
-    @NonNull parameters: WorkerParameters,
+class NotificationWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted @NonNull parameters: WorkerParameters,
     private val poiMapperDelegate: PoiMapperDelegate,
     private val sessionUserUseCase: SessionUserUseCase,
     private val poiRepository: PoiRepository,
@@ -38,23 +40,20 @@ class NotificationWorker @Inject constructor(
     }
 
     override suspend fun doWork(): Result {
-        Log.d(this.javaClass.canonicalName, "AlarmActivity init.")
-
         val session = sessionUserUseCase.sessionUserFlow.filterNotNull().first()
         val list = poiRepository.cachedPOIsListFlow.filterNotNull().first()
 
         session.user.goingAtNoon?.let { list.firstOrNull { poi -> poi.id == it } }?.let {
 
+            Log.e(this.javaClass.canonicalName, "init")
+
             val text = poiMapperDelegate.nameCuisineAndAddress(it.name, it.cuisine, it.address)
 
-            val notificationUID = LocalDate.now().toEpochDay().toInt()
-
-            val intent = DetailsActivity.navigate(context, it.id)
 
             val pendingIntent = PendingIntent.getActivity(
                 context,
                 REQUEST_CODE,
-                intent,
+                DetailsActivity.navigate(application, it.id),
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 } else {
@@ -77,6 +76,8 @@ class NotificationWorker @Inject constructor(
                     pendingIntent
                 )
                 .build()
+
+            val notificationUID = LocalDate.now().toEpochDay().toInt()
 
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.cancelAll()

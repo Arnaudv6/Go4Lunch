@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -54,13 +53,6 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
 
-            this.findPreference<ListPreference>(getString(R.string.preferences_locale_key))
-                ?.onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener { _, newValue ->
-                    viewModel.themeLocale(newValue)
-                    true
-                }
-
             this.findPreference<Preference>(getString(R.string.preferences_clear_cache_key))
                 ?.onPreferenceClickListener =
                 Preference.OnPreferenceClickListener {
@@ -75,8 +67,12 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
 
-            // no binding for notifications SwitchPreference, as Android automagically
-            // saves the value in defaultSharedPreferences, and settings repo has a callBack.
+            this.findPreference<Preference>(getString(R.string.preferences_notif_key))
+                ?.onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { _, value ->
+                    viewModel.enableNotifications(value as Boolean)
+                    true
+                }
         }
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
     poiRepository: PoiRepository,
     connectivityRepository: ConnectivityRepository,
-    private val settingsRepository: SettingsRepository,
+    settingsRepository: SettingsRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
     private val sessionUserUseCase: SessionUserUseCase,
     private val application: Application,
@@ -52,12 +52,10 @@ class MainViewModel @Inject constructor(
             }
         }
         viewModelScope.launch(allDispatchers.ioDispatcher) {
-            Log.d("Nino", "matesListFlow.collect launched")
             // todo fix: this gets triggered only once
             usersRepository.matesListFlow.collect {
                 // launch {
                 Log.e("TAG", "mateslistflow update: ")
-                Log.d("Nino", "matesListFlow.collect() called")
                 val num = poiRepository.fetchPOIsInList(
                     ids = it.mapNotNull { user -> user.goingAtNoon },
                     refreshExisting = false

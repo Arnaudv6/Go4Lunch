@@ -35,12 +35,8 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
 
     // this list could also depends on current hour (for goingAtNoon)
     suspend fun updateMatesList() {
-        Log.d("Nino", "updateMatesList() called")
-
         matesListMutableSharedFlow.tryEmit(
-            userRetrofit.getUsers().body()?.mapNotNull { toUser(it) }.also {
-                Log.d("Nino", "updateMatesList().map called with $it")
-            } ?: emptyList()
+            userRetrofit.getUsers().body()?.mapNotNull { toUser(it) } ?: emptyList()
         )
 
         likedPlacesFlow.emit(userRetrofit.getLikedPlaceIds().body()

@@ -4,13 +4,20 @@ import android.app.Application
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
-import com.cleanup.go4lunch.exhaustive
+import com.cleanup.go4lunch.ui.utils.NotificationWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
-import java.util.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,10 +26,12 @@ class SettingsRepository @Inject constructor(
     private val application: Application,
     private val settingsDao: SettingsDao,
     private val allDispatchers: AllDispatchers,
+    private val workManager: WorkManager
 ) {
 
     companion object {
         private val FRANCE_BOX = BoundingBox(51.404, 8.341, 42.190, -4.932)
+        private const val WORKER_ID_NAME = "NOTIFICATION WORKER"
     }
 
     val themes: Map<String, Int> = hashMapOf(
@@ -40,12 +49,6 @@ class SettingsRepository @Inject constructor(
         ),
     )
 
-    val locales: Map<String, Locale> = hashMapOf(
-        Pair(application.getString(R.string.preferences_locale_key_english), Locale.ENGLISH),
-        Pair(application.getString(R.string.preferences_locale_key_french), Locale.FRENCH),
-        Pair(application.getString(R.string.preferences_locale_key_system), Locale.getDefault()),
-    )
-
     suspend fun getInitialBox(): BoundingBox = settingsDao.getBox()
         ?.let { BoundingBox(it.north, it.east, it.south, it.west) } ?: FRANCE_BOX
 
@@ -57,20 +60,31 @@ class SettingsRepository @Inject constructor(
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
 
-    fun getNotificationEnabled(): Boolean = preferences.getBoolean(
-        application.getString(R.string.preferences_notif_key),
-        true
-    )
+    fun setNotification(enable: Boolean) {
+        Log.d(this.javaClass.canonicalName, "enableNotifications: $enable")
+
+        if (enable) {
+            val nextLunch =
+                if (LocalDateTime.now().hour < 12) LocalDate.now().atTime(LocalTime.NOON)
+                else LocalDate.now().plusDays(1).atTime(LocalTime.NOON)
+
+            val seconds = LocalDateTime.now().until(nextLunch, ChronoUnit.SECONDS)
+
+            val work = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+                .setInitialDelay(7, TimeUnit.SECONDS).build() // setInputData()
+
+            workManager.beginUniqueWork(WORKER_ID_NAME, ExistingWorkPolicy.REPLACE, work).enqueue()
+
+            // todo this worker is one shot, and cares not about weekends.
+        } else {
+            workManager.cancelUniqueWork(WORKER_ID_NAME)
+        }
+    }
 
     fun getTheme(): Int = themes[preferences.getString(
         application.getString(R.string.preferences_theme_key),
         application.getString(R.string.preferences_theme_key_system)
     )] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM  // until preferences-ktx fix
-
-    fun getLocale(): Locale = locales[preferences.getString(
-        application.getString(R.string.preferences_locale_key),
-        application.getString(R.string.preferences_locale_key_system)
-    )] ?: Locale.getDefault()  // until preferences-ktx fix
 
     /* no need for flows. onPreferenceChangeListener() in preferenceActivity for changes
 

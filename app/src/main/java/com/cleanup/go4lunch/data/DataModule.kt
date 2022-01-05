@@ -2,7 +2,10 @@ package com.cleanup.go4lunch.data
 
 import android.content.Context
 import androidx.annotation.Keep
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.room.Room
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.cleanup.go4lunch.data.pois.PoiDao
 import com.cleanup.go4lunch.data.pois.PoiRetrofit
 import com.cleanup.go4lunch.data.settings.SettingsDao
@@ -57,6 +60,19 @@ class DataModule {
     @Singleton
     @Provides
     fun providePoiDao(appDatabase: AppDatabase): PoiDao = appDatabase.poiDao
+
+    @Singleton
+    @Provides
+    fun provideWorkManager(
+        @ApplicationContext context: Context,
+        workerFactory: HiltWorkerFactory
+    ): WorkManager {
+        WorkManager.initialize(
+            context,
+            Configuration.Builder().setWorkerFactory(workerFactory).build()
+        )
+        return WorkManager.getInstance(context)
+    }
 
     @Singleton
     @Provides
