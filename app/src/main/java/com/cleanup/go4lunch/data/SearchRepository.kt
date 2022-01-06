@@ -3,6 +3,7 @@ package com.cleanup.go4lunch.data
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,6 +18,11 @@ class SearchRepository @Inject constructor() {
         searchMutableStateFlow.value = terms
     }
 
+    /* make a matcher Flow?
+    val REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"
+    val PATTERN = Pattern.compile(REGEX)
+    PATTERN.matcher(string).matches()
+    */
 }
 
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.cleanup.go4lunch.R
+import com.cleanup.go4lunch.data.SearchRepository
 import com.cleanup.go4lunch.data.pois.PoiEntity
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.users.User
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class MatesViewModel @Inject constructor(
     private val application: Application,  // appContext notation gives a harmless "leak" linter warning.
     poiRepository: PoiRepository,
+    searchRepository: SearchRepository,
     private val usersRepository: UsersRepository,
 ) : ViewModel() {
 
@@ -28,7 +30,7 @@ class MatesViewModel @Inject constructor(
     suspend fun swipeRefresh() = usersRepository.updateMatesList()
 
     // don't filter sessionUser out (nor in detailsVM) as list would refresh when not networkIsAvailable
-    val mMatesListLiveData: LiveData<List<MatesViewStateItem>> = combine(
+    private val unfilteredMatesList = combine(
         usersRepository.matesListFlow.filterNotNull(),
         poiRepository.cachedPOIsListFlow.filterNotNull()
     ) { mates, places ->
@@ -40,7 +42,15 @@ class MatesViewModel @Inject constructor(
                 text = getText(user, places)
             )
         }
-    }.filterNotNull().asLiveData()
+    }.filterNotNull()
+
+    val mMatesListLiveData: LiveData<List<MatesViewStateItem>> = combine(
+        unfilteredMatesList,
+        searchRepository.searchStateFlow,
+    ){ viewState, terms ->
+        if (terms.isNullOrEmpty()) viewState
+        else viewState.filter { it.text.contains(terms, ignoreCase = true) }
+    }.asLiveData()
 
     private fun getText(user: User, places: List<PoiEntity>): CharSequence {
         if (user.goingAtNoon == null) {

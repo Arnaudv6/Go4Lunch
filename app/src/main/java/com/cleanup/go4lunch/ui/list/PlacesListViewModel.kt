@@ -62,9 +62,11 @@ class PlacesListViewModel @Inject constructor(
         viewStateListFlow,
         searchRepository.searchStateFlow
     ) { viewStates, terms ->
-        viewStates.filter {
-            if (terms.isNullOrEmpty()) true
-            else it.address.contains(terms) or it.mates.contains(terms) or it.name.contains(terms)
+        if (terms.isNullOrEmpty()) viewStates
+        else viewStates.filter {
+            it.name.contains(terms, ignoreCase = true) or
+                    it.mates.contains(terms, ignoreCase = true) or
+                    it.address.contains(terms, ignoreCase = true)
         }
     }.asLiveData()
 

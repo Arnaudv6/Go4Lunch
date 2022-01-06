@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.data.AllDispatchers
 import com.cleanup.go4lunch.data.GpsProviderWrapper
+import com.cleanup.go4lunch.data.SearchRepository
 import com.cleanup.go4lunch.data.pois.PoiRepository
 import com.cleanup.go4lunch.data.settings.BoxEntity
 import com.cleanup.go4lunch.data.settings.SettingsRepository
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     matesByPlaceUseCase: MatesByPlaceUseCase,
+    searchRepository: SearchRepository,
     private val poiRepository: PoiRepository,
     private val settingsRepository: SettingsRepository,
     private val allDispatchers: AllDispatchers,
@@ -38,29 +40,42 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    val viewStateLiveData: LiveData<MapViewState> =
+    private val unfilteredPinsListFlow =
         combine(
             poiRepository.cachedPOIsListFlow,
             matesByPlaceUseCase.matesByPlaceFlow
         ) { poiList, matesByPlace ->
-            MapViewState(
-                poiList.map {
-                    MapViewState.Pin(
-                        id = it.id,
-                        name = it.name,
-                        mates = matesByPlace[it.id]?.joinToString(
-                            separator = ", ",
-                            prefix = "going: "
-                        ) { user -> user.firstName } ?: "",
-                        icon = if (matesByPlace[it.id].isNullOrEmpty()) {
-                            R.drawable.poi_orange
-                        } else {
-                            R.drawable.poi_green
-                        },
-                        location = GeoPoint(it.latitude, it.longitude)
-                    )
-                })
-        }.asLiveData()
+            poiList.map {
+                MapViewState.Pin(
+                    id = it.id,
+                    name = it.name,
+                    mates = matesByPlace[it.id]?.joinToString(
+                        separator = ", ",
+                        prefix = "going: "
+                    ) { user -> user.firstName } ?: "",
+                    icon = if (matesByPlace[it.id].isNullOrEmpty()) {
+                        R.drawable.poi_orange
+                    } else {
+                        R.drawable.poi_green
+                    },
+                    location = GeoPoint(it.latitude, it.longitude)
+                )
+            }
+        }
+
+
+    val viewStateLiveData: LiveData<MapViewState> = combine(
+        unfilteredPinsListFlow,
+        searchRepository.searchStateFlow
+    ) { pins, terms ->
+        MapViewState(
+            if (terms.isNullOrEmpty()) pins
+            else pins.filter {
+                it.name.contains(terms, ignoreCase = true) or
+                        it.mates.contains(terms, ignoreCase = true)
+            }
+        )
+    }.asLiveData()
 
     fun requestPoiPins(boundingBox: BoundingBox) {
         viewModelScope.launch(allDispatchers.ioDispatcher) {
