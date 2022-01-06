@@ -94,7 +94,6 @@
         app:itemTextColor="@color/white"
         app:menu="@menu/drawer_menu">
 
-        <!-- todo Nino : que ca ne remonte jamais au dela de "logout" -->
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="120dp"
