@@ -36,5 +36,6 @@
     <string name="load_pois_in_this_zone">charger les POIs dans cette zone</string>
     <string name="search_a_place">chercher un lieu</string>
     <string name="search_a_mate">chercher un collègue</string>
+    <string name="dismiss">Ignorer</string>
 </resources>
 

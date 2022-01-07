@@ -31,7 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
-    poiRepository: PoiRepository,
+    private val poiRepository: PoiRepository,
     connectivityRepository: ConnectivityRepository,
     settingsRepository: SettingsRepository,
     private val searchRepository: SearchRepository,
@@ -45,7 +45,6 @@ class MainViewModel @Inject constructor(
 
     init {
         AppCompatDelegate.setDefaultNightMode(settingsRepository.getTheme())
-        // todo resources.configuration.setLocale(settingsRepository.getLocale())
 
         // to collect from MainApp with relevant lifecycle, we'd have to track (started) activities
         viewModelScope.launch(allDispatchers.ioDispatcher) {
@@ -54,10 +53,7 @@ class MainViewModel @Inject constructor(
             }
         }
         viewModelScope.launch(allDispatchers.ioDispatcher) {
-            // todo fix: this gets triggered only once
             usersRepository.matesListFlow.collect {
-                // launch {
-                Log.e("TAG", "mateslistflow update: ")
                 val num = poiRepository.fetchPOIsInList(
                     ids = it.mapNotNull { user -> user.goingAtNoon },
                     refreshExisting = false
@@ -71,7 +67,6 @@ class MainViewModel @Inject constructor(
                         )
                     )
                 )
-//                }
             }
         }
     }
@@ -148,8 +143,22 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun searchSubmit(query: String?) {
-        TODO("Not yet implemented")
+    fun searchSubmit(query: String?, searchMates: Boolean) {
+        if (!searchMates && !query.isNullOrEmpty()) {
+            viewModelScope.launch(allDispatchers.ioDispatcher) {
+                poiRepository.fetchPOIsByName(query).let {
+                    viewActionSingleLiveEvent.postValue(
+                        MainViewAction.SnackBar(
+                            application.resources.getQuantityString(
+                                R.plurals.received_pois,
+                                it,
+                                it
+                            )
+                        )
+                    )
+                }
+            }
+        }
     }
 
     fun searchTermChange(newText: String?) = searchRepository.setSearchTerms(newText)

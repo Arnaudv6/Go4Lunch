@@ -3,7 +3,6 @@ package com.cleanup.go4lunch.data
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.util.regex.Pattern
 import javax.inject.Inject
 import javax.inject.Singleton
 

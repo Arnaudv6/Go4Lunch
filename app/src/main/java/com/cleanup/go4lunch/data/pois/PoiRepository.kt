@@ -6,6 +6,7 @@ import com.cleanup.go4lunch.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import org.apache.commons.text.similarity.FuzzyScore
 import org.osmdroid.util.BoundingBox
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,7 +15,8 @@ import javax.inject.Singleton
 class PoiRepository @Inject constructor(
     private val application: Application,
     private val poiRetrofit: PoiRetrofit,
-    private val poiDao: PoiDao
+    private val poiDao: PoiDao,
+    private val fuzzyScore: FuzzyScore,
 ) {
     // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
@@ -76,6 +78,17 @@ class PoiRepository @Inject constructor(
             }
         }
         return number
+    }
+
+    suspend fun fetchPOIsByName(query: String): Int {
+        val response = ensureGentleRequests {
+            poiRetrofit.getPoiByName(query = PoiRetrofit.RestaurantName(query), limit = 30)
+        }
+        val score = query.length * 2 - 2
+        return response.body()?.mapNotNull {
+            if (fuzzyScore.fuzzyScore(it.address?.amenity.orEmpty(), query) > score) toPoiEntity(it)
+            else null
+        }?.onEach { poiDao.insertPoi(it) }?.size ?: 0
     }
 
     private fun toPoiEntity(response: PoiResponse): PoiEntity? = if (

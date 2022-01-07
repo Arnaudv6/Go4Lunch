@@ -16,12 +16,12 @@ import androidx.fragment.app.viewModels
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.cleanup.go4lunch.BuildConfig
 import com.cleanup.go4lunch.R
-import com.cleanup.go4lunch.ui.utils.collectWithLifecycle
 import com.cleanup.go4lunch.data.GpsProviderWrapper
-import com.cleanup.go4lunch.ui.utils.exhaustive
 import com.cleanup.go4lunch.ui.main.DetailsActivityLauncher
+import com.cleanup.go4lunch.ui.utils.collectWithLifecycle
+import com.cleanup.go4lunch.ui.utils.exhaustive
+import com.cleanup.go4lunch.ui.utils.mySnackBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
@@ -101,6 +101,8 @@ class MapFragment : Fragment() {
             -TileSystem.MaxLatitude,
             0
         )
+
+        // todo clear cache does not hide MarkerInfoWindow: we should hide them when POIs update to empty list
 
         map.addMapListener(object : MapListener {
             override fun onScroll(event: ScrollEvent?): Boolean {
@@ -212,10 +214,14 @@ class MapFragment : Fragment() {
                 is MapViewAction.PoiRetrieval -> {
                     progress.stop()
                     progressButton.visibility = View.GONE
-                    Snackbar.make(
-                        view, "${it.results} POI received and updated on view",
-                        Snackbar.LENGTH_SHORT
-                    ).setAction("Dismiss") { /* empty action: dismiss.*/ }.show()
+                    mySnackBar(
+                        resources.getQuantityString(
+                            R.plurals.received_pois,
+                            it.results,
+                            it.results
+                        ),
+                        requireActivity().findViewById(R.id.snackbar_anchor_layout)
+                    )
                 }
                 else -> Unit
             }.exhaustive

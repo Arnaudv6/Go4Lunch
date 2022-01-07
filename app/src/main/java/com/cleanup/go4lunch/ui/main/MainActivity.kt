@@ -23,9 +23,9 @@ import com.cleanup.go4lunch.R
 import com.cleanup.go4lunch.ui.detail.DetailsActivity
 import com.cleanup.go4lunch.ui.settings.SettingsActivity
 import com.cleanup.go4lunch.ui.utils.exhaustive
+import com.cleanup.go4lunch.ui.utils.mySnackBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -87,8 +87,7 @@ class MainActivity :
                 is MainViewAction.LaunchDetail ->
                     startActivity(DetailsActivity.navigate(this, it.osmId))
                 is MainViewAction.SnackBar ->
-                    Snackbar.make(drawerLayout, it.message, Snackbar.LENGTH_SHORT)
-                        .setAction("Dismiss") {}.show() // empty action will dismiss.
+                    mySnackBar(it.message, findViewById(R.id.snackbar_anchor_layout))
             }.exhaustive
         }
 
@@ -113,15 +112,15 @@ class MainActivity :
 
         findViewById<TouchEventInterceptor>(R.id.touch_interceptor_view_group).viewPager = viewPager
 
-        // todo spindle search: filter-as-you-type
-        //  autocomplete a la chrome?
+        // todo spindle search: autocomplete / type-ahead
         val searchView = findViewById<SearchView>(R.id.search_view)
 
         toolbar.setOnClickListener { searchView.isIconified = false }
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.searchSubmit(query)
+                searchView.clearFocus()  // to prevent double trigger with hardware keyboard
+                viewModel.searchSubmit(query, viewPager.currentItem == 2)
                 return true
             }
 

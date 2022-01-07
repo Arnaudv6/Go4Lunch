@@ -1,5 +1,6 @@
 package com.cleanup.go4lunch.data
 
+import android.app.Application
 import android.content.Context
 import androidx.annotation.Keep
 import androidx.hilt.work.HiltWorkerFactory
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import okhttp3.*
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import org.apache.commons.text.similarity.FuzzyScore
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -60,6 +62,12 @@ class DataModule {
     @Singleton
     @Provides
     fun providePoiDao(appDatabase: AppDatabase): PoiDao = appDatabase.poiDao
+
+    @Singleton
+    @Provides
+    @Suppress("DEPRECATION") // deprecated in API 24+, we target 21
+    fun provideFuzzyScore(application: Application): FuzzyScore =
+        FuzzyScore(application.resources.configuration.locale)
 
     @Singleton
     @Provides
