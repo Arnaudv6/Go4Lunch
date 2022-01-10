@@ -2,8 +2,10 @@ package com.cleanup.go4lunch.data
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.annotation.Keep
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.preference.PreferenceManager
 import androidx.room.Room
 import androidx.work.Configuration
 import androidx.work.WorkManager
@@ -157,5 +159,11 @@ class DataModule {
             .build()
             .create(UserRetrofit::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(
+        @ApplicationContext context: Context
+    ): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 }
 

@@ -1,9 +1,9 @@
 package com.cleanup.go4lunch.ui.utils
 
-import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.NonNull
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -25,7 +25,6 @@ import java.time.LocalDate
 // https://developer.android.com/reference/androidx/hilt/work/HiltWorker
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
-    private val application: Application,
     @Assisted private val context: Context,
     @Assisted @NonNull parameters: WorkerParameters,
     private val poiMapperDelegate: PoiMapperDelegate,
@@ -54,7 +53,7 @@ class NotificationWorker @AssistedInject constructor(
             val pendingIntent = PendingIntent.getActivity(
                 context,
                 REQUEST_CODE,
-                DetailsActivity.navigate(application, it.id),
+                DetailsActivity.navigate(context, it.id),
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 } else {
@@ -69,11 +68,11 @@ class NotificationWorker @AssistedInject constructor(
             val notification = NotificationCompat
                 .Builder(context, channel.id)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
-                .setContentTitle(application.getString(R.string.app_name))
+                .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(text)
                 .addAction(
                     R.drawable.ic_baseline_restaurant_menu_24,
-                    application.getString(R.string.your_lunch),
+                    context.getString(R.string.your_lunch),
                     pendingIntent
                 )
                 .build()

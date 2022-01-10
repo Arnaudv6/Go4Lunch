@@ -71,7 +71,8 @@ class PoiRepositoryTest {
     private fun getPoiRepository() = PoiRepository(
         application = applicationMock,
         poiRetrofit = poiRetrofitMock,
-        poiDao = poiDaoMock
+        poiDao = poiDaoMock,
+        mockk() // TODO Arnaud
     )
 
 
