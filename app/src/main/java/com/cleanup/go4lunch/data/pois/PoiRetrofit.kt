@@ -39,7 +39,6 @@ interface PoiRetrofit {
         @Query("extratags") extraTags: Int = 1,
     ): Response<List<PoiResponse>>
 
-    // todo restrain to exact matches : "ravioli" will return random results, not shown with filter, which feels like a bug
     @Headers("User-Agent: ${BuildConfig.APPLICATION_ID}")
     @GET(SEARCH)
     suspend fun getPoiByName(

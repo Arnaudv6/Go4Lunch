@@ -102,8 +102,6 @@ class MapFragment : Fragment() {
             0
         )
 
-        // todo clear cache does not hide MarkerInfoWindow: we should hide them when POIs update to empty list
-
         map.addMapListener(object : MapListener {
             override fun onScroll(event: ScrollEvent?): Boolean {
                 viewModel.mapBoxChanged(map.boundingBox)
@@ -145,8 +143,8 @@ class MapFragment : Fragment() {
         map.overlays.add(0, poiMarkers)
 
         viewModel.viewStateLiveData.observe(viewLifecycleOwner) {
-            poiMarkers.items?.clear()
-            // shown marker must be closed and shown again to see new names applied
+            poiMarkers.closeAllInfoWindows() // cache cleared or new mates names to display...
+            poiMarkers.items?.clear() // closeAllInfoWindows() before: won't work after
             for (pin in it.pinList) {
                 val poiMarker = Marker(map).apply {
                     this.title = pin.name

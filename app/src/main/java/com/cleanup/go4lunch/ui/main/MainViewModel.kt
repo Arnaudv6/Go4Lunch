@@ -135,7 +135,7 @@ class MainViewModel @Inject constructor(
             }
             delay(2_000) // there may be other places where a timeout is relevant.
             if (job.isActive) {
-                job.cancel("Do not start activity as we get connection over 2 secs later")
+                job.cancel(">2secs wait. Still no connection. Do not start activity")
                 viewActionSingleLiveEvent.postValue(
                     MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))
                 )

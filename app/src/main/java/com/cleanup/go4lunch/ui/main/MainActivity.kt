@@ -112,7 +112,7 @@ class MainActivity :
 
         findViewById<TouchEventInterceptor>(R.id.touch_interceptor_view_group).viewPager = viewPager
 
-        // todo spindle search: autocomplete / type-ahead
+        // we could add search spindle with autocomplete / type-ahead
         val searchView = findViewById<SearchView>(R.id.search_view)
 
         toolbar.setOnClickListener { searchView.isIconified = false }
