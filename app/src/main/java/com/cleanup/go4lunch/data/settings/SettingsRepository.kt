@@ -1,9 +1,9 @@
 package com.cleanup.go4lunch.data.settings
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.preference.PreferenceManager
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
@@ -26,7 +26,8 @@ class SettingsRepository @Inject constructor(
     private val application: Application,
     private val settingsDao: SettingsDao,
     private val allDispatchers: AllDispatchers,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val sharedPreferences: SharedPreferences
 ) {
 
     companion object {
@@ -58,8 +59,6 @@ class SettingsRepository @Inject constructor(
         }
     }
 
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
-
     fun setNotification(enable: Boolean) {
         Log.d(this.javaClass.canonicalName, "enableNotifications: $enable")
 
@@ -81,7 +80,7 @@ class SettingsRepository @Inject constructor(
         }
     }
 
-    fun getTheme(): Int = themes[preferences.getString(
+    fun getTheme(): Int = themes[sharedPreferences.getString(
         application.getString(R.string.preferences_theme_key),
         application.getString(R.string.preferences_theme_key_system)
     )] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM  // until preferences-ktx fix
