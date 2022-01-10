@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
+        android:textColor="@color/colorOnSecondary"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/list_item_address"
         app:layout_constraintEnd_toStartOf="@+id/list_item_distance"

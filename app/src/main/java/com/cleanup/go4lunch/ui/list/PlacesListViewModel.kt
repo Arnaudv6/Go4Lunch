@@ -35,7 +35,7 @@ class PlacesListViewModel @Inject constructor(
     private val poiMapperDelegate: PoiMapperDelegate
 ) : ViewModel() {
     // using grey as R.color.colorOnSecondary don't refresh on theme change
-    private val colorOnSecondary = ContextCompat.getColor(application, R.color.grey)
+    private val grey = ContextCompat.getColor(application, R.color.grey)
 
     private val orderedPoiListFlow: Flow<List<Pair<Int, PoiEntity>>> = combine(
         poiRepository.cachedPOIsListFlow,
@@ -95,12 +95,10 @@ class PlacesListViewModel @Inject constructor(
         )
     }
 
+    // todo extraire les strings
     private fun fuzzyHours(hours: String): Pair<String, Int> {
         // https://github.com/leonardehrenfried/opening-hours-evaluator
-        if (hours.isEmpty()) return Pair(
-            "hours unknown",
-            colorOnSecondary
-        )
+        if (hours.isEmpty()) return Pair(application.getString(R.string.hours_unknown), grey)
         try {
             val parser = OpeningHoursParser(hours.byteInputStream())
             val rules = parser.rules(true)
@@ -116,14 +114,11 @@ class PlacesListViewModel @Inject constructor(
                 "Closed, opens ${fuzzyInstant(opens.get(), now)}",
                 ContextCompat.getColor(application, R.color.orange_darker)
             )
-            return Pair(
-                "Closed indefinitely",
-                colorOnSecondary
-            )
+            return Pair("Closed indefinitely", grey)
         } catch (e: Exception) {
             Log.d("PlacesListViewModel", "Failed to parse time")
         }
-        return Pair(hours, colorOnSecondary)
+        return Pair(hours, grey)
     }
 
     private fun fuzzyInstant(instant: LocalDateTime, now: LocalDateTime): String {

@@ -37,5 +37,6 @@
     <string name="search_a_place">chercher un lieu</string>
     <string name="search_a_mate">chercher un collègue</string>
     <string name="dismiss">Ignorer</string>
+    <string name="hours_unknown">horaires inconnus</string>
 </resources>
 

@@ -1,6 +1,7 @@
 package com.cleanup.go4lunch.ui.mates
 
 import android.app.Application
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
@@ -47,7 +48,7 @@ class MatesViewModel @Inject constructor(
     val mMatesListLiveData: LiveData<List<MatesViewStateItem>> = combine(
         unfilteredMatesList,
         searchRepository.searchStateFlow,
-    ){ viewState, terms ->
+    ) { viewState, terms ->
         if (terms.isNullOrEmpty()) viewState
         else viewState.filter { it.text.contains(terms, ignoreCase = true) }
     }.asLiveData()
