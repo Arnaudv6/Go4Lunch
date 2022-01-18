@@ -44,7 +44,7 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.cleanup.go4lunch.ui.main.TouchEventInterceptor
+        <com.freemyip.arnaudv6.go4lunch.ui.main.TouchEventInterceptor
             android:id="@+id/touch_interceptor_view_group"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -68,7 +68,7 @@
                 android:layout_height="match_parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </com.cleanup.go4lunch.ui.main.TouchEventInterceptor>
+        </com.freemyip.arnaudv6.go4lunch.ui.main.TouchEventInterceptor>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav_view"

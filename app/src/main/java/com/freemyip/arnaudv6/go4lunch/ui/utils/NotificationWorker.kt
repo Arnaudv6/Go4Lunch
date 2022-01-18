@@ -1,5 +1,6 @@
 package com.freemyip.arnaudv6.go4lunch.ui.utils
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
@@ -81,6 +82,7 @@ class NotificationWorker @AssistedInject constructor(
 
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.cancelAll()
+//            notificationManager.createNotificationChannel(channel) TODO ARNAUD
             notificationManager.notify(notificationUID, notification)
 
         }
