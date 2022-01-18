@@ -5,6 +5,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.freemyip.arnaudv6.go4lunch.R
 import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
+import com.freemyip.arnaudv6.go4lunch.data.ConnectivityRepository
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiEntity
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiMapperDelegate
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
@@ -18,6 +19,7 @@ import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,6 +28,7 @@ class DetailsViewModel
 @Inject constructor(
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
+    private val connectivityRepository: ConnectivityRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
     sessionUserUseCase: SessionUserUseCase,
     matesByPlaceUseCase: MatesByPlaceUseCase,
@@ -39,8 +42,16 @@ class DetailsViewModel
     private val colorInactive = ContextCompat.getColor(appContext, R.color.grey)
     private val colorGold = ContextCompat.getColor(appContext, R.color.gold)
 
-    val intentSingleLiveEvent =
-        SingleLiveEvent<DetailsViewAction>()
+    val intentSingleLiveEvent = SingleLiveEvent<DetailsViewAction>()
+
+    init {
+        // same code as in MainViewModel, applies only when launched from notification.
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
+            connectivityRepository.isNetworkAvailableFlow.collect {
+                if (it) usersRepository.updateMatesList()
+            }
+        }
+    }
 
     private val osmIdLiveData = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID)
 

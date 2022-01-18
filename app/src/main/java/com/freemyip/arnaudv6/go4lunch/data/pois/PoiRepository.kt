@@ -8,6 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import org.apache.commons.text.similarity.FuzzyScore
 import org.osmdroid.util.BoundingBox
+import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,6 +18,7 @@ class PoiRepository @Inject constructor(
     private val poiRetrofit: PoiRetrofit,
     private val poiDao: PoiDao,
     private val fuzzyScore: FuzzyScore,
+    private val clock: Clock
 ) {
     // OK: 1 repo for 2 sources (PoiDao and OsmDroidBonusPack functions), with POIs in common
 
@@ -38,8 +40,7 @@ class PoiRepository @Inject constructor(
 
         val response = request.invoke()
 
-        // todo inject Clock for tests
-        nominatimMutexChannel.trySend(System.currentTimeMillis())
+        nominatimMutexChannel.trySend(clock.millis())
         return response
     }
 

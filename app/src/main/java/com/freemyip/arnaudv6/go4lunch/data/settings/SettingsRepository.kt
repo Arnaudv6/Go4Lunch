@@ -77,6 +77,7 @@ class SettingsRepository @Inject constructor(
             // todo this worker is one shot, and cares not about weekends.
         } else {
             workManager.cancelUniqueWork(WORKER_ID_NAME)
+            NotificationWorker.cancelAllNotifications(application)
         }
     }
 

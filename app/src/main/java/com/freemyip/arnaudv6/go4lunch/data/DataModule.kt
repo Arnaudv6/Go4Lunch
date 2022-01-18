@@ -7,7 +7,6 @@ import androidx.annotation.Keep
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.preference.PreferenceManager
 import androidx.room.Room
-import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiDao
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRetrofit
@@ -27,6 +26,7 @@ import org.apache.commons.text.similarity.FuzzyScore
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.Clock
 import javax.inject.Singleton
 
 @Keep  // annotated so we don't indefinitely wait for unreachable service in release builds.
@@ -39,6 +39,10 @@ class DataModule {
         private const val BASE_DOMAIN_USERS: String = "192.168.1.79"
         private const val BASE_URL_USERS: String = "https://192.168.1.79:22280/"
     }
+
+    @Provides
+    @Singleton
+    fun provideClock(): Clock = Clock.systemDefaultZone()
 
     @Provides
     @Singleton
@@ -76,19 +80,12 @@ class DataModule {
     fun provideWorkManager(
         @ApplicationContext context: Context,
         workerFactory: HiltWorkerFactory
-    ): WorkManager {
-        WorkManager.initialize(
-            context,
-            Configuration.Builder().setWorkerFactory(workerFactory).build()
-        )
-        return WorkManager.getInstance(context)
-    }
+    ): WorkManager = WorkManager.getInstance(context)
 
     @Singleton
     @Provides
-    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
-        setLevel(HttpLoggingInterceptor.Level.BODY)
-    }
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) }
 
     @Singleton
     @Provides

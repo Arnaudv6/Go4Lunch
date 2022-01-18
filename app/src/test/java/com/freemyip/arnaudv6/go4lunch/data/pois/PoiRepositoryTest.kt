@@ -72,7 +72,8 @@ class PoiRepositoryTest {
         application = applicationMock,
         poiRetrofit = poiRetrofitMock,
         poiDao = poiDaoMock,
-        mockk() // TODO Arnaud
+        mockk(), // TODO Arnaud
+        mockk()
     )
 
 
