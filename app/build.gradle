@@ -18,7 +18,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.cleanup.go4lunch"
+        applicationId "com.freemyip.go4lunch"
         minSdk 21
         targetSdk 31
         versionCode 1
