@@ -1,10 +1,10 @@
 package com.freemyip.arnaudv6.go4lunch.ui.utils
 
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.NonNull
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -33,15 +33,11 @@ class NotificationWorker @AssistedInject constructor(
     private val poiRepository: PoiRepository,
 ) : CoroutineWorker(context, parameters) {
     companion object {
-        private const val CHANNEL_ID = "GO4LUNCH_NOTIFICATION_CHANNEL"
+        private const val CHANNEL_ID = "GO4LUNCH_NOTIFICATION_CHANNEL_ID"
         private const val REQUEST_CODE = 4445
     }
 
-    // TODO NINO
-    //  java.lang.RuntimeException: Unable to create service androidx.work.impl.background.systemjob.SystemJobService: java.lang.IllegalStateException: WorkManager needs to be initialized via a ContentProvider#onCreate() or an Application#onCreate().
-    //  pourquoi on ne laisse pas android initialiser lui-même le workManager?
-    //  pourquoi il ne sait pas utiliser mon Provider (dans DataModule) ici?
-    //  annoter @AndroidEntryPoint, ça règlerait le PB?
+    // todo Nino : si je quitte l'appli, la notif ne vient qu'au lancement !
 
     override suspend fun doWork(): Result {
         val session = sessionUserUseCase.sessionUserFlow.filterNotNull().first()
@@ -49,7 +45,6 @@ class NotificationWorker @AssistedInject constructor(
 
         session.user.goingAtNoon?.let { list.firstOrNull { poi -> poi.id == it } }?.let {
             val text = poiMapperDelegate.nameCuisineAndAddress(it.name, it.cuisine, it.address)
-
 
             val pendingIntent = PendingIntent.getActivity(
                 context,
@@ -70,25 +65,34 @@ class NotificationWorker @AssistedInject constructor(
                 .Builder(context, channel.id)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle(context.getString(R.string.app_name))
+                .setAutoCancel(true)
                 .setContentText(text)
-                .addAction(
-                    R.drawable.ic_baseline_restaurant_menu_24,
-                    context.getString(R.string.your_lunch),
-                    pendingIntent
-                )
+                .setContentIntent(pendingIntent)
                 .build()
 
             val notificationUID = LocalDate.now().toEpochDay().toInt()
 
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.cancelAll()
-//            notificationManager.createNotificationChannel(channel) TODO ARNAUD
+            createNotificationChannel(notificationManager)
             notificationManager.notify(notificationUID, notification)
-
         }
 
         return Result.success()
     }
+
+    private fun createNotificationChannel(notificationManagerCompat: NotificationManagerCompat) {
+        // crappy google code. NotificationChannelCompat() works not.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "CHANNEL_NAME",  // put this in string, should other notifications be needed
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply { description = "descriptionText" }
+            notificationManagerCompat.createNotificationChannel(channel)
+        }
+    }
+
 }
 
 
