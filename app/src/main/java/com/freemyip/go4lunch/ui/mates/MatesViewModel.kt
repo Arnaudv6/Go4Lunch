@@ -58,6 +58,7 @@ class MatesViewModel @Inject constructor(
             val text = application.getString(R.string.not_decided_yet).format(user.firstName)
             return HtmlCompat.fromHtml(
                 "<i><font color='$greyColor'>$text</font></i>",
+                // better use span... or even 2 textviews, hiding one or the other!
                 HtmlCompat.FROM_HTML_MODE_COMPACT
             )
         }
