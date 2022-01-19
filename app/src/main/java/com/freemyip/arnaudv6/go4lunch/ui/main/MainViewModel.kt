@@ -16,7 +16,6 @@ import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionRepository
 import com.freemyip.arnaudv6.go4lunch.data.settings.SettingsRepository
 import com.freemyip.arnaudv6.go4lunch.data.useCase.SessionUserUseCase
-import com.freemyip.arnaudv6.go4lunch.data.users.User
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +32,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
     private val poiRepository: PoiRepository,
-    sessionRepository: SessionRepository,
+    private val sessionRepository: SessionRepository,
     connectivityRepository: ConnectivityRepository,
     settingsRepository: SettingsRepository,
     private val searchRepository: SearchRepository,
@@ -44,8 +43,6 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
-
-    val authorizationRequestLiveData = sessionRepository.authorizationRequestFlow.asLiveData()
 
     init {
         AppCompatDelegate.setDefaultNightMode(settingsRepository.getTheme())
@@ -112,6 +109,22 @@ class MainViewModel @Inject constructor(
 
     fun onLogoutClicked() {
         viewModelScope.launch(allDispatchers.ioDispatcher) {
+            val job = launch {  // filterNotNull().firstOrNull(): OK
+                sessionRepository.authorizationRequestFlow.filterNotNull()
+                    .firstOrNull()?.let {
+                        viewActionSingleLiveEvent.postValue(MainViewAction.InitAuthorization(it))
+                    }
+            }
+            delay(2_000) // todo Nino : generify and mutualize this code with onLunchClicked() ?
+            if (job.isActive) {
+                job.cancel(">2secs wait. Still no connection. Do not start activity")
+                viewActionSingleLiveEvent.postValue(
+                    MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))
+                )
+            }
+        }
+        /*
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
             usersRepository.insertUser(User(1, "Arnaud", "v6", "https://avatars.githubusercontent.com/u/6125315",1181634478))
 
             usersRepository.insertUser(User(11, "Caroline", "Dupont", "https://i.pravatar.cc/150?u=a042581f4e29026704d",1181634478))
@@ -127,17 +140,18 @@ class MainViewModel @Inject constructor(
 
             usersRepository.insertUser(User(21, "Mariah", "Dupont", "https://i.pravatar.cc/150?u=a042123f4e654867123",null))
         }
+        */
     }
 
     fun onLunchClicked() {
         viewModelScope.launch(allDispatchers.ioDispatcher) {
-            val job = launch {  // filterNotNull().firstOrNull(): OK
+            val job = launch {
                 sessionUserUseCase.sessionUserFlow.filterNotNull()
                     .firstOrNull()?.user?.goingAtNoon?.let {
                         viewActionSingleLiveEvent.postValue(MainViewAction.LaunchDetail(it))
                     }
             }
-            delay(2_000) // there may be other places where a timeout is relevant.
+            delay(2_000)
             if (job.isActive) {
                 job.cancel(">2secs wait. Still no connection. Do not start activity")
                 viewActionSingleLiveEvent.postValue(

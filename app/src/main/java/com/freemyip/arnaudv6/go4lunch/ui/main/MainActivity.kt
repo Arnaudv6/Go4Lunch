@@ -1,13 +1,12 @@
 package com.freemyip.arnaudv6.go4lunch.ui.main
 
 import android.Manifest
-import android.app.Activity
+import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +28,7 @@ import com.freemyip.arnaudv6.go4lunch.ui.utils.mySnackBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationService
 
 
@@ -47,8 +47,6 @@ class MainActivity :
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var viewPager: ViewPager2
 
-    // private val authService = AuthorizationService(this)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,18 +55,6 @@ class MainActivity :
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true) for drawer
-
-        /*
-        // authentication
-        viewModel.authorizationRequestLiveData.observe(this) { authorizationRequest ->
-            // startActivityForResult() being deprecated
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == Activity.RESULT_OK) {
-                    val value = it.data?.getStringExtra("input")
-                }
-            }.launch(authService.getAuthorizationRequestIntent(authorizationRequest))
-        }
-        */
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navBar = findViewById<BottomNavigationView>(R.id.bottom_nav_view)
@@ -105,6 +91,7 @@ class MainActivity :
                     startActivity(DetailsActivity.navigate(this, it.osmId))
                 is MainViewAction.SnackBar ->
                     mySnackBar(it.message, findViewById(R.id.snackbar_anchor_layout))
+                is MainViewAction.InitAuthorization -> initAuthorization(it.authorizationRequest)
             }.exhaustive
         }
 
@@ -175,6 +162,14 @@ class MainActivity :
             }.exhaustive
             true
         }
+    }
+
+    private fun initAuthorization(authorizationRequest: AuthorizationRequest) {
+        AuthorizationService(this).performAuthorizationRequest(
+            authorizationRequest,
+            PendingIntent.getActivity(this, 0, Intent(this, this::class.java), 0),
+            PendingIntent.getActivity(this, 0, Intent(this, this::class.java), 0)
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

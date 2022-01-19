@@ -28,7 +28,7 @@ class SettingsViewModel @Inject constructor(
 
     val snackBarSingleLiveEvent: SingleLiveEvent<String> = SingleLiveEvent()
 
-    fun themeSet(theme: Any) {
+    fun themeSet(theme: String) {
         AppCompatDelegate.setDefaultNightMode(
             settingsRepository.themes.getOrDefault(
                 theme,  // settingsRepository.getTheme() takes some time to reflect new value

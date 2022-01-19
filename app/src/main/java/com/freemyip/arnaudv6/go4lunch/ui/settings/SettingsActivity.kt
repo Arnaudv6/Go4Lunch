@@ -49,7 +49,7 @@ class SettingsActivity : AppCompatActivity() {
             this.findPreference<ListPreference>(getString(R.string.preferences_theme_key))
                 ?.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { _, newValue ->
-                    viewModel.themeSet(newValue)
+                    viewModel.themeSet(newValue as String)
                     true
                 }
 

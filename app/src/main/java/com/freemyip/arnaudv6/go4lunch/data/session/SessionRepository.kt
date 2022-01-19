@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.freemyip.arnaudv6.go4lunch.data.ConnectivityRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationServiceConfiguration
@@ -33,10 +34,12 @@ class SessionRepository @Inject constructor(
             Uri.parse(URL),
             AuthorizationServiceConfiguration.RetrieveConfigurationCallback { serviceConfiguration, ex ->
                 if (ex != null || serviceConfiguration == null) {
-                    Log.d(this.javaClass.canonicalName, "failed to fetch configuration")
+                    Log.d(this::class.java.canonicalName, "failed to fetch configuration")
                     return@RetrieveConfigurationCallback
                     // todo Nino: proper way to retry?
                 } else {
+                    val log = "Retrieved endpoint: ${serviceConfiguration.authorizationEndpoint}"
+                    Log.d(this::class.java.canonicalName, log)
                     trySend(
                         AuthorizationRequest.Builder(
                             serviceConfiguration,
@@ -47,6 +50,7 @@ class SessionRepository @Inject constructor(
                     )
                 }
             })
+        awaitClose { /* Todo Nino Nothing to do I think? */ }
     }
 
 }
