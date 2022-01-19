@@ -1,4 +1,4 @@
-package com.freemyip.arnaudv6.go4lunch.data.useCase
+package com.freemyip.arnaudv6.go4lunch.domain.useCase
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -6,6 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+// TODO découper : une seule méthode "invoke / execute" avec un nom de class "métier"
 class InterpolationUseCase @Inject constructor() {
     private val interpolatedValuesMutableLiveData = MutableLiveData(Values(null, null))
     val interpolatedValuesLiveData: LiveData<Values> = interpolatedValuesMutableLiveData

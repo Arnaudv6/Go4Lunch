@@ -19,15 +19,14 @@ import com.freemyip.arnaudv6.go4lunch.data.useCase.SessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
@@ -108,20 +107,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun onLogoutClicked() {
-        viewModelScope.launch(allDispatchers.ioDispatcher) {
-            val job = launch {  // filterNotNull().firstOrNull(): OK
-                sessionRepository.authorizationRequestFlow.filterNotNull()
-                    .firstOrNull()?.let {
-                        viewActionSingleLiveEvent.postValue(MainViewAction.InitAuthorization(it))
-                    }
-            }
-            delay(2_000) // todo Nino : generify and mutualize this code with onLunchClicked() ?
-            if (job.isActive) {
-                job.cancel(">2secs wait. Still no connection. Do not start activity")
-                viewActionSingleLiveEvent.postValue(
-                    MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))
-                )
-            }
+        suspendOrElse(onErrorAction = MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))) {
+            sessionRepository.authorizationRequestFlow.filterNotNull()
+                .firstOrNull()?.let {
+                    viewActionSingleLiveEvent.postValue(MainViewAction.InitAuthorization(it))
+                }
         }
         /*
         viewModelScope.launch(allDispatchers.ioDispatcher) {
@@ -144,20 +134,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun onLunchClicked() {
-        viewModelScope.launch(allDispatchers.ioDispatcher) {
-            val job = launch {
-                sessionUserUseCase.sessionUserFlow.filterNotNull()
-                    .firstOrNull()?.user?.goingAtNoon?.let {
-                        viewActionSingleLiveEvent.postValue(MainViewAction.LaunchDetail(it))
-                    }
-            }
-            delay(2_000)
-            if (job.isActive) {
-                job.cancel(">2secs wait. Still no connection. Do not start activity")
-                viewActionSingleLiveEvent.postValue(
-                    MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))
-                )
-            }
+        suspendOrElse(onErrorAction =  MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))) {
+            sessionUserUseCase.sessionUserFlow.filterNotNull()
+                .firstOrNull()?.user?.goingAtNoon?.let {
+                    viewActionSingleLiveEvent.postValue(MainViewAction.LaunchDetail(it))
+                }
         }
     }
 
@@ -181,6 +162,18 @@ class MainViewModel @Inject constructor(
 
     fun searchTermChange(newText: String?) = searchRepository.setSearchTerms(newText)
 
+
+
+    private fun suspendOrElse(timeout : Long = 2_000, onErrorAction: MainViewAction, block: suspend CoroutineScope.() -> Unit) {
+        viewModelScope.launch(allDispatchers.ioDispatcher) {
+            val job = launch(allDispatchers.ioDispatcher) { block() }
+            delay(timeout)
+            if (job.isActive) {
+                job.cancel(">2secs wait. Still no connection. Do not start activity")
+                viewActionSingleLiveEvent.postValue(onErrorAction)
+            }
+        }
+    }
 }
 
 

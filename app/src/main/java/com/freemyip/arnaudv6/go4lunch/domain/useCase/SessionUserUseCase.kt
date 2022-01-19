@@ -1,4 +1,4 @@
-package com.freemyip.arnaudv6.go4lunch.data.useCase
+package com.freemyip.arnaudv6.go4lunch.domain.useCase
 
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionRepository
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionUser
@@ -15,6 +15,7 @@ class SessionUserUseCase
     sessionRepository: SessionRepository,
     usersRepository: UsersRepository,
 ) {
+    // TODO invoke plutôt
     val sessionUserFlow: Flow<SessionUser?> = combine(
         sessionRepository.sessionFlow,
         usersRepository.matesListFlow
