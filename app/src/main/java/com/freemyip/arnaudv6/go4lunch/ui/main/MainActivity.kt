@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
@@ -167,8 +168,26 @@ class MainActivity :
     private fun initAuthorization(authorizationRequest: AuthorizationRequest) {
         AuthorizationService(this).performAuthorizationRequest(
             authorizationRequest,
-            PendingIntent.getActivity(this, 0, Intent(this, this::class.java), 0),
-            PendingIntent.getActivity(this, 0, Intent(this, this::class.java), 0)
+            PendingIntent.getActivity(
+                this,
+                0,
+                Intent(this, this::class.java),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+            ),
+            PendingIntent.getActivity(
+                this,
+                0,
+                Intent(this, this::class.java),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+            )
         )
     }
 

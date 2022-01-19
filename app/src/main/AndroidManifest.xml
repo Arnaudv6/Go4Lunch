@@ -24,7 +24,7 @@
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             tools:node="remove" />
-
+        <!-- Todo Nino app code inspection goes mad here -->
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"

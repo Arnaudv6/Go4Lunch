@@ -2,22 +2,12 @@ package com.freemyip.arnaudv6.go4lunch.data.settings
 
 import android.app.Application
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
 import com.freemyip.arnaudv6.go4lunch.R
 import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
-import com.freemyip.arnaudv6.go4lunch.ui.utils.NotificationWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 

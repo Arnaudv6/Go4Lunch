@@ -73,8 +73,6 @@ class PoiRepositoryTest {
         poiRetrofit = poiRetrofitMock,
         poiDao = poiDaoMock,
         mockk(), // TODO Arnaud
-        mockk()
+        mockk() // todo advanceTimeBy()
     )
-
-
 }

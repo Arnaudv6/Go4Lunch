@@ -1,7 +1,6 @@
 package com.freemyip.arnaudv6.go4lunch.ui.mates
 
 import android.app.Application
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.LiveData
