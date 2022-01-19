@@ -4,13 +4,16 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.freemyip.arnaudv6.go4lunch.R
 import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.settings.SettingsRepository
+import com.freemyip.arnaudv6.go4lunch.ui.utils.NotificationWorker
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.Clock
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,6 +21,8 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val poiRepository: PoiRepository,
     private val application: Application,
+    private val workManager: WorkManager,
+    private val clock: Clock,
     private val allDispatchers: AllDispatchers,
 ) : ViewModel() {
 
@@ -39,7 +44,8 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun enableNotifications(enable: Boolean) = settingsRepository.setNotification(enable)
+    fun enableNotifications(enable: Boolean) =
+        NotificationWorker.setNotification(application, workManager, clock, enable)
 
 }
 

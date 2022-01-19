@@ -1,11 +1,13 @@
 package com.freemyip.arnaudv6.go4lunch.ui.main
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +29,7 @@ import com.freemyip.arnaudv6.go4lunch.ui.utils.mySnackBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import net.openid.appauth.AuthorizationService
 
 
 @AndroidEntryPoint
@@ -44,6 +47,8 @@ class MainActivity :
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var viewPager: ViewPager2
 
+    // private val authService = AuthorizationService(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,6 +57,18 @@ class MainActivity :
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setHomeButtonEnabled(true)  // not setDisplayHomeAsUpEnabled(true) for drawer
+
+        /*
+        // authentication
+        viewModel.authorizationRequestLiveData.observe(this) { authorizationRequest ->
+            // startActivityForResult() being deprecated
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == Activity.RESULT_OK) {
+                    val value = it.data?.getStringExtra("input")
+                }
+            }.launch(authService.getAuthorizationRequestIntent(authorizationRequest))
+        }
+        */
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navBar = findViewById<BottomNavigationView>(R.id.bottom_nav_view)

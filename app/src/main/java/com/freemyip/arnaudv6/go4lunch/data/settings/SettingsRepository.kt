@@ -26,13 +26,11 @@ class SettingsRepository @Inject constructor(
     private val application: Application,
     private val settingsDao: SettingsDao,
     private val allDispatchers: AllDispatchers,
-    private val workManager: WorkManager,
     private val sharedPreferences: SharedPreferences
 ) {
 
     companion object {
         private val FRANCE_BOX = BoundingBox(51.404, 8.341, 42.190, -4.932)
-        private const val WORKER_ID_NAME = "NOTIFICATION WORKER"
     }
 
     val themes: Map<String, Int> = hashMapOf(
@@ -56,28 +54,6 @@ class SettingsRepository @Inject constructor(
     fun setMapBox(boxEntity: BoxEntity) {
         CoroutineScope(allDispatchers.ioDispatcher).launch {
             settingsDao.setBox(boxEntity)
-        }
-    }
-
-    fun setNotification(enable: Boolean) {
-        Log.d(this.javaClass.canonicalName, "enableNotifications: $enable")
-
-        if (enable) {
-            val nextLunch =
-                if (LocalDateTime.now().hour < 12) LocalDate.now().atTime(LocalTime.NOON)
-                else LocalDate.now().plusDays(1).atTime(LocalTime.NOON)
-
-            val seconds = LocalDateTime.now().until(nextLunch, ChronoUnit.SECONDS)
-
-            val work = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
-                .setInitialDelay(7, TimeUnit.SECONDS).build() // setInputData()
-
-            workManager.beginUniqueWork(WORKER_ID_NAME, ExistingWorkPolicy.REPLACE, work).enqueue()
-
-            // todo this worker is one shot, and cares not about weekends.
-        } else {
-            workManager.cancelUniqueWork(WORKER_ID_NAME)
-            NotificationWorker.cancelAllNotifications(application)
         }
     }
 

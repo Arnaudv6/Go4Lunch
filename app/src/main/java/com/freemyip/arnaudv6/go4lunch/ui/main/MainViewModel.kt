@@ -13,6 +13,7 @@ import com.freemyip.arnaudv6.go4lunch.data.ConnectivityRepository
 import com.freemyip.arnaudv6.go4lunch.data.GpsProviderWrapper
 import com.freemyip.arnaudv6.go4lunch.data.SearchRepository
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
+import com.freemyip.arnaudv6.go4lunch.data.session.SessionRepository
 import com.freemyip.arnaudv6.go4lunch.data.settings.SettingsRepository
 import com.freemyip.arnaudv6.go4lunch.data.useCase.SessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.data.users.User
@@ -32,6 +33,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val usersRepository: UsersRepository,
     private val poiRepository: PoiRepository,
+    sessionRepository: SessionRepository,
     connectivityRepository: ConnectivityRepository,
     settingsRepository: SettingsRepository,
     private val searchRepository: SearchRepository,
@@ -42,6 +44,8 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val viewActionSingleLiveEvent: SingleLiveEvent<MainViewAction> = SingleLiveEvent()
+
+    val authorizationRequestLiveData = sessionRepository.authorizationRequestFlow.asLiveData()
 
     init {
         AppCompatDelegate.setDefaultNightMode(settingsRepository.getTheme())
