@@ -42,13 +42,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
+                <!-- todo: autoverify = true https://developer.android.com/training/app-links -->
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:host="arnaudv6.freemyip.com"
-                    android:path="/go4lunch/oauth2redirect"
-                    android:scheme="https" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="arnaudv6.freemyip.com" />
+                <data android:path="/go4lunch/oauth2redirect" />
             </intent-filter>
         </activity>
         <activity

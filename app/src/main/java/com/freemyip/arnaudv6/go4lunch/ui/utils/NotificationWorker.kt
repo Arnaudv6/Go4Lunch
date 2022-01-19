@@ -6,98 +6,54 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.annotation.NonNull
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.WorkerParameters
 import com.freemyip.arnaudv6.go4lunch.R
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiEntity
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiMapperDelegate
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
-import com.freemyip.arnaudv6.go4lunch.data.useCase.SessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.detail.DetailsActivity
 import com.freemyip.arnaudv6.go4lunch.ui.main.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import java.time.Clock
+import kotlinx.coroutines.withTimeoutOrNull
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
 // https://developer.android.com/reference/androidx/hilt/work/HiltWorker
 @HiltWorker
-class NotificationWorker @AssistedInject constructor(
+@ExperimentalCoroutinesApi
+class NotificationWorker
+@AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted @NonNull parameters: WorkerParameters,
     private val poiMapperDelegate: PoiMapperDelegate,
-    private val sessionUserUseCase: SessionUserUseCase,
+    private val sessionUserUseCase: GetSessionUserUseCase,
     private val poiRepository: PoiRepository,
-    private val workManager: WorkManager,
-    private val clock: Clock,
     private val usersRepository: UsersRepository,
 ) : CoroutineWorker(context, parameters) {
     companion object {
-        private const val WORKER_ID_NAME = "NOTIFICATION WORKER"
         private const val CHANNEL_ID = "GO4LUNCH_NOTIFICATION_CHANNEL_ID"
         private const val REQUEST_CODE = 4445
-
-        // todo : faire émerger un workermanager injecté sans static
-        fun setNotification(
-            context: Context,
-            workManager: WorkManager,
-            clock: Clock,
-            enable: Boolean
-        ) {
-            Log.d(this::class.java.canonicalName, "enableNotifications: $enable")
-            if (enable) {
-                workNextDayAtNoon(workManager, clock)
-            } else {
-                workManager.cancelUniqueWork(WORKER_ID_NAME)
-                NotificationManagerCompat.from(context).cancelAll()
-            }
-        }
-
-        fun workNextDayAtNoon(workManager: WorkManager, clock: Clock) {
-            val nextLunch =
-                if (LocalDateTime.now(clock).hour < 12) LocalDate.now(clock).atTime(LocalTime.NOON)
-                else LocalDate.now(clock).plusDays(1).atTime(LocalTime.NOON)
-
-            val seconds = LocalDateTime.now(clock).until(nextLunch, ChronoUnit.SECONDS)
-
-            // builder.setInputData(). Also replace 'seconds' with '15', to test.
-            val work = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
-                .setInitialDelay(seconds, TimeUnit.SECONDS).build()
-
-            workManager.beginUniqueWork(WORKER_ID_NAME, ExistingWorkPolicy.REPLACE, work).enqueue()
-        }
     }
 
     override suspend fun doWork(): Result {
-        // Todo explorer withTimeoutOrNull
-        var poiEntity: PoiEntity? = null
-        coroutineScope {
-            val job = this.launch {
-                usersRepository.updateMatesList()
-                val session = sessionUserUseCase.sessionUserFlow.filterNotNull().first()
-                val list = poiRepository.cachedPOIsListFlow.filterNotNull().first()
-                poiEntity = session.user.goingAtNoon?.let {
-                    list.firstOrNull { poi -> poi.id == it }
-                }
+        val poiEntity: PoiEntity? = withTimeoutOrNull(4_000) {
+            usersRepository.updateMatesList()
+            val session = sessionUserUseCase().filterNotNull().first()
+            val list = poiRepository.cachedPOIsListFlow.filterNotNull().first()
+            session.user.goingAtNoon?.let {
+                list.firstOrNull { poi -> poi.id == it }
             }
-            delay(4000)
-            job.cancel()
-            job.join()
         }
 
         val text = poiEntity?.let {
@@ -135,9 +91,6 @@ class NotificationWorker @AssistedInject constructor(
         notificationManager.cancelAll()
         createNotificationChannel(notificationManager)
         notificationManager.notify(notificationUID, notification)
-
-        // todo : use PeriodicRequest
-        workNextDayAtNoon(workManager, clock)
         return Result.success()
     }
 

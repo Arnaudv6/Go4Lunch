@@ -10,19 +10,21 @@ import com.freemyip.arnaudv6.go4lunch.data.pois.PoiEntity
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiMapperDelegate
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionUser
-import com.freemyip.arnaudv6.go4lunch.domain.useCase.InterpolationUseCase
-import com.freemyip.arnaudv6.go4lunch.domain.useCase.MatesByPlaceUseCase
-import com.freemyip.arnaudv6.go4lunch.data.useCase.SessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.data.users.User
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetMatesByPlaceUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.InterpolationUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @HiltViewModel
 class DetailsViewModel
 @Inject constructor(
@@ -30,8 +32,8 @@ class DetailsViewModel
     private val usersRepository: UsersRepository,
     private val connectivityRepository: ConnectivityRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
-    sessionUserUseCase: SessionUserUseCase,
-    matesByPlaceUseCase: MatesByPlaceUseCase,
+    getSessionUserUseCase: GetSessionUserUseCase,
+    getMatesByPlaceUseCase: GetMatesByPlaceUseCase,
     private val savedStateHandle: SavedStateHandle, //
     private val interpolationUseCase: InterpolationUseCase,
     private val allDispatchers: AllDispatchers,
@@ -55,9 +57,9 @@ class DetailsViewModel
 
     private val osmIdLiveData = savedStateHandle.getLiveData<Long?>(DetailsActivity.OSM_ID)
 
-    private val matesByPlaceLivedata = matesByPlaceUseCase.matesByPlaceFlow.asLiveData()
+    private val matesByPlaceLivedata = getMatesByPlaceUseCase().asLiveData()
 
-    private val sessionUserLiveData = sessionUserUseCase.sessionUserFlow.asLiveData()
+    private val sessionUserLiveData = getSessionUserUseCase().asLiveData()
 
     private val ratingsLiveData = usersRepository.placesRatingsFlow.asLiveData()
 

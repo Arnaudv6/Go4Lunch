@@ -15,8 +15,8 @@ import com.freemyip.arnaudv6.go4lunch.data.SearchRepository
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionRepository
 import com.freemyip.arnaudv6.go4lunch.data.settings.SettingsRepository
-import com.freemyip.arnaudv6.go4lunch.data.useCase.SessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -36,7 +36,7 @@ class MainViewModel @Inject constructor(
     settingsRepository: SettingsRepository,
     private val searchRepository: SearchRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
-    private val sessionUserUseCase: SessionUserUseCase,
+    private val sessionUserUseCase: GetSessionUserUseCase,
     private val application: Application,
     private val allDispatchers: AllDispatchers,
 ) : ViewModel() {
@@ -71,7 +71,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    val viewStateFlow: LiveData<MainViewState> = sessionUserUseCase.sessionUserFlow.map {
+    val viewStateFlow: LiveData<MainViewState> = sessionUserUseCase().map {
         Log.d(this.javaClass.canonicalName, "sessionUser: $it")
         if (it == null) MainViewState(
             null,
@@ -134,8 +134,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun onLunchClicked() {
-        suspendOrElse(onErrorAction =  MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))) {
-            sessionUserUseCase.sessionUserFlow.filterNotNull()
+        suspendOrElse(onErrorAction = MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))) {
+            sessionUserUseCase().filterNotNull()
                 .firstOrNull()?.user?.goingAtNoon?.let {
                     viewActionSingleLiveEvent.postValue(MainViewAction.LaunchDetail(it))
                 }
@@ -162,14 +162,17 @@ class MainViewModel @Inject constructor(
 
     fun searchTermChange(newText: String?) = searchRepository.setSearchTerms(newText)
 
-
-
-    private fun suspendOrElse(timeout : Long = 2_000, onErrorAction: MainViewAction, block: suspend CoroutineScope.() -> Unit) {
+    // withTimeoutOrNull() + onErrorAction
+    private fun suspendOrElse(
+        timeout: Long = 2_000,
+        onErrorAction: MainViewAction,
+        block: suspend CoroutineScope.() -> Unit
+    ) {
         viewModelScope.launch(allDispatchers.ioDispatcher) {
             val job = launch(allDispatchers.ioDispatcher) { block() }
             delay(timeout)
             if (job.isActive) {
-                job.cancel(">2secs wait. Still no connection. Do not start activity")
+                job.cancel(application.getString(R.string.start_activity_timeout))
                 viewActionSingleLiveEvent.postValue(onErrorAction)
             }
         }

@@ -53,6 +53,7 @@
     <string name="going_at_noon" translatable="false">Going at noon</string>
     <string name="content_loading" translatable="false">Content loading</string>
     <string name="load_pois_in_this_zone">load POIs in this zone</string>
+    <string name="start_activity_timeout"><![CDATA[>2secs wait. Still no connection. Do not start activity]]></string>
 
 </resources>
 

@@ -8,9 +8,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MatesByPlaceUseCase @Inject constructor(private val usersRepository: UsersRepository) {
+class GetMatesByPlaceUseCase @Inject constructor(private val usersRepository: UsersRepository) {
 
-    fun invoke(): Flow<Map<Long, ArrayList<User>>> = usersRepository.matesListFlow.map {
+    operator fun invoke(): Flow<Map<Long, ArrayList<User>>> = usersRepository.matesListFlow.map {
         buildMap {
             for (user in it) {
                 val placeId = user.goingAtNoon

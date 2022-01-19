@@ -2,6 +2,7 @@ package com.freemyip.arnaudv6.go4lunch.ui.map
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.freemyip.arnaudv6.go4lunch.R
 import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
@@ -10,7 +11,7 @@ import com.freemyip.arnaudv6.go4lunch.data.SearchRepository
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.settings.BoxEntity
 import com.freemyip.arnaudv6.go4lunch.data.settings.SettingsRepository
-import com.freemyip.arnaudv6.go4lunch.domain.useCase.MatesByPlaceUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetMatesByPlaceUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    matesByPlaceUseCase: MatesByPlaceUseCase,
+    getMatesByPlaceUseCase: GetMatesByPlaceUseCase,
     searchRepository: SearchRepository,
     private val poiRepository: PoiRepository,
     private val settingsRepository: SettingsRepository,
@@ -42,7 +43,7 @@ class MapViewModel @Inject constructor(
     private val unfilteredPinsListFlow =
         combine(
             poiRepository.cachedPOIsListFlow,
-            matesByPlaceUseCase.matesByPlaceFlow
+            getMatesByPlaceUseCase()
         ) { poiList, matesByPlace ->
             poiList.map {
                 MapViewState.Pin(
