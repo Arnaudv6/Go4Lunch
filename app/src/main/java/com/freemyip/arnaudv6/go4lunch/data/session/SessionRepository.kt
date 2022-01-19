@@ -27,7 +27,7 @@ class SessionRepository @Inject constructor(
     companion object {
         const val URL = "https://arnaudv6.eu.auth0.com"
         const val CLIENT_ID = "IpKogHzhn6NoGh9aP6Xu8nYK5Pe25i60"
-        const val REDIRECT_URI = "https://arnaudv6.freemyip.com/go4lunch/oauth2redirect"
+        const val REDIRECT_URI = "com.freemyip.arnaudv6://arnaudv6.freemyip.com/go4lunch/oauth2redirect"
     }
 
     private var notFinished: Boolean = true

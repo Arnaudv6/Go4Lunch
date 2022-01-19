@@ -20,11 +20,11 @@
         android:theme="@style/Theme.Go4Lunch"
         tools:targetApi="n">
         <!-- https://developer.android.com/jetpack/androidx/releases/work#2.6.0-alpha01 -->
+        <!-- Todo Nino app code inspection goes red here, long version helps not -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             tools:node="remove" />
-        <!-- Todo Nino app code inspection goes mad here -->
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
@@ -42,14 +42,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <!-- todo: autoverify = true https://developer.android.com/training/app-links -->
+                <!-- don't need 'autoverify' https://developer.android.com/training/app-links -->
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http" />
-                <data android:scheme="https" />
+                <data android:scheme="com.freemyip.arnaudv6" />
                 <data android:host="arnaudv6.freemyip.com" />
                 <data android:path="/go4lunch/oauth2redirect" />
             </intent-filter>
