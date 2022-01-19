@@ -10,8 +10,8 @@ import com.freemyip.arnaudv6.go4lunch.data.pois.PoiEntity
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiMapperDelegate
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionUser
-import com.freemyip.arnaudv6.go4lunch.data.useCase.InterpolationUseCase
-import com.freemyip.arnaudv6.go4lunch.data.useCase.MatesByPlaceUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.InterpolationUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.MatesByPlaceUseCase
 import com.freemyip.arnaudv6.go4lunch.data.useCase.SessionUserUseCase
 import com.freemyip.arnaudv6.go4lunch.data.users.User
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository

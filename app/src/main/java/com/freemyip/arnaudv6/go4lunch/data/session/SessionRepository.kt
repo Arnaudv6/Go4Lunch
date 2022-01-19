@@ -36,7 +36,8 @@ class SessionRepository @Inject constructor(
                 if (ex != null || serviceConfiguration == null) {
                     Log.d(this::class.java.canonicalName, "failed to fetch configuration")
                     return@RetrieveConfigurationCallback
-                    // todo Nino: proper way to retry?
+                    // todo proper way to retry?
+                    //  while (notFinished); delay(5000)
                 } else {
                     val log = "Retrieved endpoint: ${serviceConfiguration.authorizationEndpoint}"
                     Log.d(this::class.java.canonicalName, log)
@@ -49,8 +50,9 @@ class SessionRepository @Inject constructor(
                         ).build()
                     )
                 }
-            })
-        awaitClose { /* Todo Nino Nothing to do I think? */ }
+            }
+        )
+        awaitClose { /* Todo PR ! */ }
     }
 
 }

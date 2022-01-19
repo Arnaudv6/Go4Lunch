@@ -52,7 +52,7 @@ class NotificationWorker @AssistedInject constructor(
         private const val CHANNEL_ID = "GO4LUNCH_NOTIFICATION_CHANNEL_ID"
         private const val REQUEST_CODE = 4445
 
-        // todo Nino : static OK?
+        // todo : faire émerger un workermanager injecté sans static
         fun setNotification(
             context: Context,
             workManager: WorkManager,
@@ -84,7 +84,7 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        // Todo Nino, timeout OK?
+        // Todo explorer withTimeoutOrNull
         var poiEntity: PoiEntity? = null
         coroutineScope {
             val job = this.launch {
@@ -136,7 +136,7 @@ class NotificationWorker @AssistedInject constructor(
         createNotificationChannel(notificationManager)
         notificationManager.notify(notificationUID, notification)
 
-        // todo Nino : is there a race-condition, here? Can I launch and un-attach?
+        // todo : use PeriodicRequest
         workNextDayAtNoon(workManager, clock)
         return Result.success()
     }

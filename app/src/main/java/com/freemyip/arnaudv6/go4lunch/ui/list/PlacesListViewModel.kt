@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import ch.poole.openinghoursparser.OpeningHoursParser
 import com.freemyip.arnaudv6.go4lunch.R
 import com.freemyip.arnaudv6.go4lunch.data.GpsProviderWrapper
@@ -13,7 +12,7 @@ import com.freemyip.arnaudv6.go4lunch.data.SearchRepository
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiEntity
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiMapperDelegate
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
-import com.freemyip.arnaudv6.go4lunch.data.useCase.MatesByPlaceUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.MatesByPlaceUseCase
 import com.freemyip.arnaudv6.go4lunch.data.users.User
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
