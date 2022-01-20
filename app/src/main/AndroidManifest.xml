@@ -41,8 +41,9 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--
             <intent-filter>
-                <!-- don't need 'autoverify' https://developer.android.com/training/app-links -->
+                <!- - don't need 'autoverify' https://developer.android.com/training/app-links - ->
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -52,6 +53,7 @@
                 <data android:host="arnaudv6.freemyip.com" />
                 <data android:path="/go4lunch/oauth2redirect" />
             </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".ui.detail.DetailsActivity"

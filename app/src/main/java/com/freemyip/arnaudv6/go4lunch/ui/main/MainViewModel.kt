@@ -1,6 +1,7 @@
 package com.freemyip.arnaudv6.go4lunch.ui.main
 
 import android.app.Application
+import android.content.Intent
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
@@ -24,6 +25,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import net.openid.appauth.AuthorizationException
+import net.openid.appauth.AuthorizationResponse
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -106,8 +109,23 @@ class MainViewModel @Inject constructor(
         gpsProviderWrapper.locationPermissionUpdate(fine, coarse)
     }
 
+    fun setAuthorizationResponse(intent: Intent) {
+        Log.e("TAG", "setAuthorizationResponse")
+        val response = AuthorizationResponse.fromIntent(intent)
+        val exception = AuthorizationException.fromIntent(intent)
+        if (response != null) {
+            sessionRepository.setAuthState(response, exception)
+            viewActionSingleLiveEvent.postValue(MainViewAction.SnackBar("Login successful"))
+        } else {
+            viewActionSingleLiveEvent.postValue(MainViewAction.SnackBar("Login failed"))
+        }
+    }
+
     fun onLogoutClicked() {
-        suspendOrElse(onErrorAction = MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))) {
+        suspendOrElse(
+            timeout = 10_000,
+            onErrorAction = MainViewAction.SnackBar(application.getString(R.string.endpoint_retreival_failed))
+        ) {
             sessionRepository.authorizationRequestFlow.filterNotNull()
                 .firstOrNull()?.let {
                     viewActionSingleLiveEvent.postValue(MainViewAction.InitAuthorization(it))

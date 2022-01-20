@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -29,10 +30,11 @@ import com.freemyip.arnaudv6.go4lunch.ui.utils.mySnackBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import net.openid.appauth.AuthorizationRequest
 import net.openid.appauth.AuthorizationService
 
-
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity :
     AppCompatActivity(),
@@ -50,6 +52,8 @@ class MainActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        savedInstanceState?.let { viewModel.setAuthorizationResponse(intent) }
 
         setContentView(R.layout.activity_main)
 
@@ -166,6 +170,7 @@ class MainActivity :
     }
 
     private fun initAuthorization(authorizationRequest: AuthorizationRequest) {
+        Log.e("TAG", "initAuthorization")
         AuthorizationService(this).performAuthorizationRequest(
             authorizationRequest,
             PendingIntent.getActivity(

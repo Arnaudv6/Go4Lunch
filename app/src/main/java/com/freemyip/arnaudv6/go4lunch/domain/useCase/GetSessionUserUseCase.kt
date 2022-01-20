@@ -1,5 +1,8 @@
 package com.freemyip.arnaudv6.go4lunch.domain.useCase
 
+import android.util.Log
+import com.freemyip.arnaudv6.go4lunch.data.ConnectivityRepository
+import com.freemyip.arnaudv6.go4lunch.data.session.Session
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionRepository
 import com.freemyip.arnaudv6.go4lunch.data.session.SessionUser
 import com.freemyip.arnaudv6.go4lunch.data.users.User
@@ -16,21 +19,36 @@ class GetSessionUserUseCase
 @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val usersRepository: UsersRepository,
+    private val connectivityRepository: ConnectivityRepository
 ) {
     operator fun invoke(): Flow<SessionUser?> =
         combine(
-            sessionRepository.sessionFlow,
+            connectivityRepository.isNetworkAvailableFlow,
+            sessionRepository.authStateFlow,
             usersRepository.matesListFlow
-        ) { session, mates ->
+        ) { _, session, mates -> // not using network info (yet)
             if (session == null) null
-            else mates.firstOrNull { it.id == session.userId }.let {
-                when (it) {
-                    is User -> SessionUser(
-                        user = it,
-                        liked = usersRepository.getLikedById(it.id) ?: LongArray(0),
-                        connectedThrough = session.connectionType
-                    )
-                    else -> null
+            else {
+                // todo change this for a useful code !
+                val session2 = Session(1, "gmail")
+                /*
+                session.performActionWithFreshTokens(
+                    session.
+                    session.idToken
+                )
+                sessionRepository.userInfoEndPoint
+                 */
+                Log.e("TAG", "invoke: ${session.idToken}", )
+
+                mates.firstOrNull { it.id == session2.userId }.let {
+                    when (it) {
+                        is User -> SessionUser(
+                            user = it,
+                            liked = usersRepository.getLikedById(it.id) ?: LongArray(0),
+                            connectedThrough = session2.connectionType
+                        )
+                        else -> null
+                    }
                 }
             }
         }
