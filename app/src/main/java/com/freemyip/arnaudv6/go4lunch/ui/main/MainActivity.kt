@@ -53,7 +53,7 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        savedInstanceState?.let { viewModel.setAuthorizationResponse(intent) }
+        viewModel.setAuthorizationResponse(intent)
 
         setContentView(R.layout.activity_main)
 
@@ -170,15 +170,15 @@ class MainActivity :
     }
 
     private fun initAuthorization(authorizationRequest: AuthorizationRequest) {
-        Log.e("TAG", "initAuthorization")
+        Log.d(this.javaClass.canonicalName, "initAuthorization()")
         AuthorizationService(this).performAuthorizationRequest(
             authorizationRequest,
             PendingIntent.getActivity(
                 this,
                 0,
                 Intent(this, this::class.java),
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 } else {
                     PendingIntent.FLAG_UPDATE_CURRENT
                 }
@@ -187,8 +187,8 @@ class MainActivity :
                 this,
                 0,
                 Intent(this, this::class.java),
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 } else {
                     PendingIntent.FLAG_UPDATE_CURRENT
                 }

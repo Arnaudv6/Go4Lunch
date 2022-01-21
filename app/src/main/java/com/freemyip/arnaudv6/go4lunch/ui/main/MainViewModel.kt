@@ -110,27 +110,33 @@ class MainViewModel @Inject constructor(
     }
 
     fun setAuthorizationResponse(intent: Intent) {
-        Log.e("TAG", "setAuthorizationResponse")
         val response = AuthorizationResponse.fromIntent(intent)
         val exception = AuthorizationException.fromIntent(intent)
         if (response != null) {
-            sessionRepository.setAuthState(response, exception)
+            viewModelScope.launch {
+                sessionRepository.setAuthState(response, exception)
+            }
+            // todo move this to after GetSessionUserUseCase
             viewActionSingleLiveEvent.postValue(MainViewAction.SnackBar("Login successful"))
-        } else {
+        } else if (exception != null) {
             viewActionSingleLiveEvent.postValue(MainViewAction.SnackBar("Login failed"))
         }
     }
 
     fun onLogoutClicked() {
-        suspendOrElse(
-            timeout = 10_000,
-            onErrorAction = MainViewAction.SnackBar(application.getString(R.string.endpoint_retreival_failed))
-        ) {
-            sessionRepository.authorizationRequestFlow.filterNotNull()
-                .firstOrNull()?.let {
-                    viewActionSingleLiveEvent.postValue(MainViewAction.InitAuthorization(it))
-                }
+        viewActionSingleLiveEvent.postValue(
+            MainViewAction.InitAuthorization(sessionRepository.authorizationRequest)
+        )
+        /*
+        viewModelScope.launch {
+            withTimeoutOrNull(7_000) {  // no onErrorAction here, as repo might be alive.
+                sessionRepository.authorizationRequestFlow.filterNotNull()
+                    .firstOrNull()?.let {
+                        viewActionSingleLiveEvent.postValue(MainViewAction.InitAuthorization(it))
+                    }
+            }
         }
+        */
         /*
         viewModelScope.launch(allDispatchers.ioDispatcher) {
             usersRepository.insertUser(User(1, "Arnaud", "v6", "https://avatars.githubusercontent.com/u/6125315",1181634478))

@@ -24,21 +24,14 @@ class GetSessionUserUseCase
     operator fun invoke(): Flow<SessionUser?> =
         combine(
             connectivityRepository.isNetworkAvailableFlow,
-            sessionRepository.authStateFlow,
+            sessionRepository.userInfoFlow,
             usersRepository.matesListFlow
         ) { _, session, mates -> // not using network info (yet)
             if (session == null) null
             else {
+                Log.e("TAG", "invoke: $session")
                 // todo change this for a useful code !
                 val session2 = Session(1, "gmail")
-                /*
-                session.performActionWithFreshTokens(
-                    session.
-                    session.idToken
-                )
-                sessionRepository.userInfoEndPoint
-                 */
-                Log.e("TAG", "invoke: ${session.idToken}", )
 
                 mates.firstOrNull { it.id == session2.userId }.let {
                     when (it) {

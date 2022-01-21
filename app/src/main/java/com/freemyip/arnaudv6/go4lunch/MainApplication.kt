@@ -9,6 +9,10 @@ import javax.inject.Inject
 @HiltAndroidApp
 class MainApplication : Application(), Configuration.Provider {
 
+    // this can be accessed with either:
+    //  @ApplicationContext appContext: Context
+    //  application: Application
+
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
