@@ -55,9 +55,6 @@ class SessionRepository @Inject constructor(
     private val userInfoMutableStateFlow = MutableStateFlow<User?>(null)
     val userInfoFlow: Flow<User?> = userInfoMutableStateFlow.asStateFlow()
 
-    // todo Nino : any idea how I can use authState.performActionWithFreshTokens()
-    //  with room requests?
-
     private var authState: AuthState? = null
 
     fun setAuthState(response: AuthorizationResponse, exception: AuthorizationException?) {

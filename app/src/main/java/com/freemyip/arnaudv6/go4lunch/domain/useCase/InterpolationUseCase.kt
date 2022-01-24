@@ -2,29 +2,39 @@ package com.freemyip.arnaudv6.go4lunch.domain.useCase
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
+import com.freemyip.arnaudv6.go4lunch.data.users.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-// TODO Nino découper : une seule méthode "invoke / execute" avec un nom de class "métier"
-//  make use of GetSessionUserUseCase
+abstract class InterpolationUseCase<T>(
+    private val coroutineScope: CoroutineScope,
+    private val dispatchers: AllDispatchers,
+    private val timeout: Long = 1_000
+) {
+    private val interpolatedValueMutableLiveData = MutableLiveData<T?>()
+    val liveData: LiveData<T?> = interpolatedValueMutableLiveData
 
-class InterpolationUseCase @Inject constructor() {
-    private val interpolatedValuesMutableLiveData = MutableLiveData(Values(null, null))
-    val interpolatedValuesLiveData: LiveData<Values> = interpolatedValuesMutableLiveData
+    protected suspend fun interpolate(value: T, block: suspend () -> Unit) {
+        withContext(dispatchers.mainDispatcher) {
+            interpolatedValueMutableLiveData.value = value
+        }
 
-    fun setGoingAtNoon(goingAtNoon: Boolean?) {
-        interpolatedValuesMutableLiveData.postValue(
-            Values(goingAtNoon, interpolatedValuesLiveData.value?.isLikedPlace)
-        )
+        val job = coroutineScope.launch(dispatchers.ioDispatcher) {
+            delay(timeout)
+            withContext(dispatchers.mainDispatcher) {
+                interpolatedValueMutableLiveData.value = null
+            }
+        }
+
+        block()
+
+        job.cancel()
     }
-
-    fun setLikeCurrentPlace(isLikedPlace: Boolean?) {  // change boolean for a tmp likedPlacesList?
-        interpolatedValuesMutableLiveData.postValue(
-            Values(interpolatedValuesLiveData.value?.goingAtNoon, isLikedPlace)
-        )
-    }
-
-    data class Values(val goingAtNoon: Boolean?, val isLikedPlace: Boolean?)
 }
 
