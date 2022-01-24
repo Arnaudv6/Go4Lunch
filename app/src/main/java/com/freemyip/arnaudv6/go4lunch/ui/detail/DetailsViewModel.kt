@@ -12,13 +12,13 @@ import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.users.User
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
 import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetMatesByPlaceUseCase
-import com.freemyip.arnaudv6.go4lunch.domain.useCase.InterpolationUseCase
 import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSynchronizedUserUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.SetGoingAtNoonUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.SetLikedPlaceUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +34,8 @@ class DetailsViewModel
     getSynchronizedUserUseCase: GetSynchronizedUserUseCase,
     getMatesByPlaceUseCase: GetMatesByPlaceUseCase,
     private val savedStateHandle: SavedStateHandle, //
-    private val interpolationUseCase: InterpolationUseCase,
+    private val setGoingAtNoonUseCase: SetGoingAtNoonUseCase,
+    private val setLikedPlaceUseCase: SetLikedPlaceUseCase,
     private val allDispatchers: AllDispatchers,
     @ApplicationContext appContext: Context
 ) : ViewModel() {
@@ -62,6 +63,10 @@ class DetailsViewModel
 
     private val ratingsLiveData = usersRepository.placesRatingsFlow.asLiveData()
 
+    private val goingAtNoonInterpolatedLiveData = setGoingAtNoonUseCase.flow.asLiveData()
+
+    private val likedPlaceInterpolatedLiveData = setLikedPlaceUseCase.flow.asLiveData()
+
     private val poiLiveData: LiveData<PoiEntity?> = osmIdLiveData.switchMap {
         liveData { emit(if (it == null) null else poiRepository.getPoiById(it)) }
     }
@@ -88,7 +93,8 @@ class DetailsViewModel
                 poi,
                 sessionUserLiveData.value,
                 goingMatesListLiveData.value,
-                interpolationUseCase.interpolatedValuesLiveData.value,
+                goingAtNoonInterpolatedLiveData.value,
+                likedPlaceInterpolatedLiveData.value,
                 ratingsLiveData.value
             )?.let { value = it }
         }
@@ -97,7 +103,8 @@ class DetailsViewModel
                 poiLiveData.value,
                 session,
                 goingMatesListLiveData.value,
-                interpolationUseCase.interpolatedValuesLiveData.value,
+                goingAtNoonInterpolatedLiveData.value,
+                likedPlaceInterpolatedLiveData.value,
                 ratingsLiveData.value
             )?.let { value = it }
         }
@@ -106,16 +113,28 @@ class DetailsViewModel
                 poiLiveData.value,
                 sessionUserLiveData.value,
                 mates,
-                interpolationUseCase.interpolatedValuesLiveData.value,
+                goingAtNoonInterpolatedLiveData.value,
+                likedPlaceInterpolatedLiveData.value,
                 ratingsLiveData.value
             )?.let { value = it }
         }
-        addSource(interpolationUseCase.interpolatedValuesLiveData) { interpolated ->
+        addSource(goingAtNoonInterpolatedLiveData) { goingAtNoon ->
             toViewState(
                 poiLiveData.value,
                 sessionUserLiveData.value,
                 goingMatesListLiveData.value,
-                interpolated,
+                goingAtNoon,
+                likedPlaceInterpolatedLiveData.value,
+                ratingsLiveData.value
+            )?.let { value = it }
+        }
+        addSource(likedPlaceInterpolatedLiveData) { liked ->
+            toViewState(
+                poiLiveData.value,
+                sessionUserLiveData.value,
+                goingMatesListLiveData.value,
+                goingAtNoonInterpolatedLiveData.value,
+                liked,
                 ratingsLiveData.value
             )?.let { value = it }
         }
@@ -124,7 +143,8 @@ class DetailsViewModel
                 poiLiveData.value,
                 sessionUserLiveData.value,
                 goingMatesListLiveData.value,
-                interpolationUseCase.interpolatedValuesLiveData.value,
+                goingAtNoonInterpolatedLiveData.value,
+                likedPlaceInterpolatedLiveData.value,
                 ratings
             )?.let { value = it }
         }
@@ -134,16 +154,15 @@ class DetailsViewModel
         poiEntity: PoiEntity?,
         session: User?,
         mates: List<DetailsViewState.Item>?,
-        interpolatedValues: InterpolationUseCase.Values?,
+        goingAtNoonInterpolated: Boolean?,
+        likedPlaceInterpolated: Boolean?,
         ratings: Map<Long, Int>?
     ): DetailsViewState? {
         poiEntity?.let { poi ->
-            val goingColor =
-                interpolatedValues?.goingAtNoon?.let { if (it) colorGold else colorInactive }
-                    ?: if (session?.goingAtNoon == poi.id) colorGold else colorInactive
-            val likeColor =
-                interpolatedValues?.isLikedPlace?.let { if (it) colorActive else colorInactive }
-                    ?: if (session?.liked?.contains(poi.id) == true) colorActive else colorInactive
+            val goingColor = goingAtNoonInterpolated?.let { if (it) colorGold else colorInactive }
+                ?: if (session?.goingAtNoon == poi.id) colorGold else colorInactive
+            val likeColor = likedPlaceInterpolated?.let { if (it) colorActive else colorInactive }
+                ?: if (session?.liked?.contains(poi.id) == true) colorActive else colorInactive
             return DetailsViewState(
                 name = poi.name,
                 goAtNoonColor = goingColor,
@@ -165,10 +184,7 @@ class DetailsViewModel
     fun goingAtNoonClicked() {
         savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
             viewModelScope.launch(allDispatchers.ioDispatcher) {
-                sessionUserLiveData.value?.let { user ->
-                    val initialState = user.goingAtNoon == placeId
-                    interpolationUseCase.setGoingAtNoon(user, placeId, !initialState)
-                }
+                sessionUserLiveData.value?.let { user -> setGoingAtNoonUseCase(user, placeId) }
             }
         }
     }
@@ -176,19 +192,7 @@ class DetailsViewModel
     fun likeClicked() {
         savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
             viewModelScope.launch(allDispatchers.ioDispatcher) {
-                sessionUserLiveData.value?.let { session ->
-                    session.liked?.let { liked ->
-                        val initialState = liked.contains(placeId)
-                        interpolationUseCase.setLikeCurrentPlace(!initialState)
-                        launch {
-                            delay(1_000)
-                            interpolationUseCase.setLikeCurrentPlace(null)
-                        }
-                        if (initialState) usersRepository.deleteLiked(session.email, placeId)
-                        else usersRepository.insertLiked(session.email, placeId)
-
-                    }
-                }
+                sessionUserLiveData.value?.let { user -> setLikedPlaceUseCase(user, placeId) }
             }
         }
     }

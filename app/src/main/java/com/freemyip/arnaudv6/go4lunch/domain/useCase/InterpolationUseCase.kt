@@ -1,34 +1,33 @@
 package com.freemyip.arnaudv6.go4lunch.domain.useCase
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
-import com.freemyip.arnaudv6.go4lunch.data.users.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 abstract class InterpolationUseCase<T>(
-    private val coroutineScope: CoroutineScope,
+    // todo Nino : private val coroutineScope: CoroutineScope, c'est mieux qu'un withContext()?
     private val dispatchers: AllDispatchers,
     private val timeout: Long = 1_000
 ) {
-    private val interpolatedValueMutableLiveData = MutableLiveData<T?>()
-    val liveData: LiveData<T?> = interpolatedValueMutableLiveData
+    private val interpolatedValueMutableStateFlow = MutableStateFlow<T?>(null)
+    val flow: Flow<T?> = interpolatedValueMutableStateFlow.asStateFlow()
 
     protected suspend fun interpolate(value: T, block: suspend () -> Unit) {
         withContext(dispatchers.mainDispatcher) {
-            interpolatedValueMutableLiveData.value = value
+            interpolatedValueMutableStateFlow.value = value
         }
 
-        val job = coroutineScope.launch(dispatchers.ioDispatcher) {
-            delay(timeout)
-            withContext(dispatchers.mainDispatcher) {
-                interpolatedValueMutableLiveData.value = null
+        val job = withContext(dispatchers.ioDispatcher) {
+            launch(dispatchers.ioDispatcher) {
+                delay(timeout)
+                withContext(dispatchers.mainDispatcher) {
+                    interpolatedValueMutableStateFlow.value = null
+                }
             }
         }
 
