@@ -51,7 +51,7 @@ class NotificationWorker
             usersRepository.updateMatesList()
             val session = synchronizedUserUseCase().filterNotNull().first()
             val list = poiRepository.cachedPOIsListFlow.filterNotNull().first()
-            session.user.goingAtNoon?.let {
+            session.goingAtNoon?.let {
                 list.firstOrNull { poi -> poi.id == it }
             }
         }
