@@ -36,7 +36,7 @@ class MatesViewModel @Inject constructor(
     ) { mates, places ->
         mates.map { user ->
             MatesViewStateItem(
-                mateId = user.id,
+                mateId = user.email,
                 placeId = user.goingAtNoon,
                 imageUrl = user.avatarUrl.orEmpty(),
                 text = getText(user, places)

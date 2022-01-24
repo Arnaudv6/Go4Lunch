@@ -23,7 +23,7 @@ data class DetailsViewState(
     val matesList: List<Item>
 ) {
     data class Item(
-        val mateId: Long,
+        val mateId: String,
         val imageUrl: String,
         val text: String
     )

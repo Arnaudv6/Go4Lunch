@@ -9,15 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.freemyip.arnaudv6.go4lunch.R
-import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
-import com.freemyip.arnaudv6.go4lunch.data.ConnectivityRepository
-import com.freemyip.arnaudv6.go4lunch.data.GpsProviderWrapper
-import com.freemyip.arnaudv6.go4lunch.data.SearchRepository
+import com.freemyip.arnaudv6.go4lunch.data.*
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
-import com.freemyip.arnaudv6.go4lunch.data.session.SessionRepository
 import com.freemyip.arnaudv6.go4lunch.data.settings.SettingsRepository
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
-import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSessionUserUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSynchronizedUserUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -39,7 +35,7 @@ class MainViewModel @Inject constructor(
     settingsRepository: SettingsRepository,
     private val searchRepository: SearchRepository,
     private val gpsProviderWrapper: GpsProviderWrapper,
-    private val sessionUserUseCase: GetSessionUserUseCase,
+    private val synchronizedUserUseCase: GetSynchronizedUserUseCase,
     private val application: Application,
     private val allDispatchers: AllDispatchers,
 ) : ViewModel() {
@@ -74,7 +70,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    val viewStateFlow: LiveData<MainViewState> = sessionUserUseCase().map {
+    val viewStateFlow: LiveData<MainViewState> = synchronizedUserUseCase().map {
         Log.d(this.javaClass.canonicalName, "sessionUser: $it")
         if (it == null) MainViewState(
             null,
@@ -83,13 +79,13 @@ class MainViewModel @Inject constructor(
             null
         )
         else MainViewState(
-            it.user.avatarUrl,
+            it.avatarUrl,
             listOfNotNull(
-                it.user.firstName,
-                it.user.lastName.uppercase()
+                it.firstName,
+                it.lastName.uppercase()
             ).joinToString(separator = " "),
-            it.connectedThrough,
-            it.user.goingAtNoon
+            it.email,
+            it.goingAtNoon
         )
     }.asLiveData()
 
@@ -116,7 +112,7 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch {
                 sessionRepository.setAuthState(response, exception)
             }
-            // todo move this to after GetSessionUserUseCase
+
             viewActionSingleLiveEvent.postValue(MainViewAction.SnackBar("Login successful"))
         } else if (exception != null) {
             viewActionSingleLiveEvent.postValue(MainViewAction.SnackBar("Login failed"))
@@ -159,8 +155,8 @@ class MainViewModel @Inject constructor(
 
     fun onLunchClicked() {
         suspendOrElse(onErrorAction = MainViewAction.SnackBar(application.getString(R.string.not_going_at_noon))) {
-            sessionUserUseCase().filterNotNull()
-                .firstOrNull()?.user?.goingAtNoon?.let {
+            synchronizedUserUseCase().filterNotNull()
+                .firstOrNull()?.goingAtNoon?.let {
                     viewActionSingleLiveEvent.postValue(MainViewAction.LaunchDetail(it))
                 }
         }

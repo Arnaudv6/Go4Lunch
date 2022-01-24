@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 @Keep
 data class UserBody (
-    val id: Long,
+    val email: String,
 
     @SerializedName("firstname")
     val firstName: String,

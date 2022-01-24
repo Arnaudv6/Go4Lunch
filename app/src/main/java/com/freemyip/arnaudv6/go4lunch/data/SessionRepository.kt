@@ -1,8 +1,9 @@
-package com.freemyip.arnaudv6.go4lunch.data.session
+package com.freemyip.arnaudv6.go4lunch.data
 
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
+import com.freemyip.arnaudv6.go4lunch.data.users.User
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -26,12 +27,12 @@ class SessionRepository @Inject constructor(
             "com.freemyip.arnaudv6://arnaudv6.freemyip.com/go4lunch/oauth2redirect"
     }
 
-    val authService = AuthorizationService(appContext)
+    private val authService = AuthorizationService(appContext)
 
     // AuthorizationServiceConfiguration.fetchFromIssuer(Uri.parse(URL))
     //  is preferred, but implemented with crappy asynchronous behaviour
     //  https://github.com/openid/AppAuth-Android/issues/796
-    val serviceConfig = AuthorizationServiceConfiguration(
+    private val serviceConfig = AuthorizationServiceConfiguration(
         Uri.parse("$URL/authorize"),
         Uri.parse("$URL/oauth/token")
     )
@@ -51,29 +52,13 @@ class SessionRepository @Inject constructor(
         // https://auth0.com/docs/secure/tokens/id-tokens/id-token-structure
         .build()
 
-    private val userInfoMutableStateFlow = MutableStateFlow<JSONObject?>(null)
-    val userInfoFlow: Flow<JSONObject?> = userInfoMutableStateFlow.asStateFlow()
+    private val userInfoMutableStateFlow = MutableStateFlow<User?>(null)
+    val userInfoFlow: Flow<User?> = userInfoMutableStateFlow.asStateFlow()
 
-/*
-{
-    "given_name"
-    "family_name"
-    "nickname"
-    "name"
-    "picture"
-    "locale"
-    "email"
-    "email_verified
-    "iss"
-    "sub"
-    "aud"
-    "iat
-    "exp
-    "nonce"
-}
-*/
+    // todo Nino : any idea how I can use authState.performActionWithFreshTokens()
+    //  with room requests?
 
-    var authState: AuthState? = null
+    private var authState: AuthState? = null
 
     fun setAuthState(response: AuthorizationResponse, exception: AuthorizationException?) {
         authState = AuthState(response, exception)
@@ -86,8 +71,16 @@ class SessionRepository @Inject constructor(
                     authState?.update(resp, ex)
                     it.idToken?.let { token ->
                         val truncated = token.split('.')[1]
-                        val decoded64 = String(Base64.decode(truncated, Base64.URL_SAFE))
-                        userInfoMutableStateFlow.tryEmit(JSONObject(decoded64))
+                        val decoded64 = String(Base64.decode(truncated, Base64.DEFAULT))
+                        val jsonObject = JSONObject(decoded64)
+                        userInfoMutableStateFlow.tryEmit(
+                            User(
+                                email = jsonObject.getString("email"),
+                                firstName = jsonObject.getString("given_name"),
+                                lastName = jsonObject.getString("family_name"),
+                                avatarUrl = jsonObject.getString("picture").replace("\\/", "/")
+                            )
+                        )
                     }
                 }
             }

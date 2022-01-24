@@ -12,7 +12,7 @@ interface UserRetrofit {
 
     @Headers("Accept: application/vnd.pgrst.object")
     @GET(USERS)
-    suspend fun getUserById(@Query("id") userId: EqualId): Response<UserResponse>
+    suspend fun getUserById(@Query("id") userEmailId: EqualEmailId): Response<UserResponse>
 
     @GET(USERS)
     suspend fun getUsers(): Response<List<UserResponse>>
@@ -26,7 +26,7 @@ interface UserRetrofit {
     @FormUrlEncoded
     @PATCH(USERS)
     suspend fun setGoingAtNoon(
-        @Query("id") userId: EqualId,
+        @Query("id") userEmailId: EqualEmailId,
         @Field("goingatnoon", encoded = true) osmId: NullableLong
     ): Response<Unit>  // response needed for interpolation
 
@@ -35,7 +35,7 @@ interface UserRetrofit {
     @FormUrlEncoded
     @POST(USERS)
     suspend fun setGoingAtNoon2(
-        @Query("id") userId: EqualId,
+        @Query("id") userEmailId: EqualEmailId,
         @Field("goingatnoon", encoded = true) osmId: NullableLong  // todo fix that deletion
     ): Response<Unit>  // response needed for interpolation
 
@@ -49,25 +49,29 @@ interface UserRetrofit {
     suspend fun getLikedPlaceIds(): Response<List<LikedResponse>>
 
     @GET(LIKED)  // "likedplaces?select=likedplaceid"
-    suspend fun getLikedById(@Query("userid") userId: EqualId): Response<List<LikedResponse>>
+    suspend fun getLikedById(@Query("userid") userEmailId: EqualEmailId): Response<List<LikedResponse>>
 
     @FormUrlEncoded
     @Headers("Prefer: resolution=merge-duplicates")
     // todo fix duplicates. (primary key auto-assigned)
     @POST(LIKED)
     suspend fun insertLiked(
-        @Field("userid") userId: Long,
+        @Field("userid") userId: String,
         @Field("likedplaceid") osmId: Long
     ): Response<Unit>  // response needed for interpolation
 
     @DELETE(LIKED)
     suspend fun deleteLiked(
-        @Query("userid") userId: EqualId,
+        @Query("userid") userEmailId: EqualEmailId,
         @Query("likedplaceid") osmId: EqualId
     ): Response<Unit>  // response needed for interpolation
 
     data class EqualId(val id: Long) {
         override fun toString() = "eq.$id"
+    }
+
+    data class EqualEmailId(val email: String) {
+        override fun toString() = "eq.$email"
     }
 
     data class NullableLong(val long: Long?) {

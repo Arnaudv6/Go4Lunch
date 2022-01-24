@@ -9,12 +9,11 @@ import com.freemyip.arnaudv6.go4lunch.data.ConnectivityRepository
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiEntity
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiMapperDelegate
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
-import com.freemyip.arnaudv6.go4lunch.data.session.SessionUser
 import com.freemyip.arnaudv6.go4lunch.data.users.User
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
 import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetMatesByPlaceUseCase
 import com.freemyip.arnaudv6.go4lunch.domain.useCase.InterpolationUseCase
-import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSessionUserUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSynchronizedUserUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -32,7 +31,7 @@ class DetailsViewModel
     private val usersRepository: UsersRepository,
     private val connectivityRepository: ConnectivityRepository,
     private val poiMapperDelegate: PoiMapperDelegate,
-    getSessionUserUseCase: GetSessionUserUseCase,
+    getSynchronizedUserUseCase: GetSynchronizedUserUseCase,
     getMatesByPlaceUseCase: GetMatesByPlaceUseCase,
     private val savedStateHandle: SavedStateHandle, //
     private val interpolationUseCase: InterpolationUseCase,
@@ -59,7 +58,7 @@ class DetailsViewModel
 
     private val matesByPlaceLivedata = getMatesByPlaceUseCase().asLiveData()
 
-    private val sessionUserLiveData = getSessionUserUseCase().asLiveData()
+    private val sessionUserLiveData = getSynchronizedUserUseCase().asLiveData()
 
     private val ratingsLiveData = usersRepository.placesRatingsFlow.asLiveData()
 
@@ -77,7 +76,7 @@ class DetailsViewModel
         matesByPlace: Map<Long, ArrayList<User>>?
     ): List<DetailsViewState.Item> = matesByPlace?.get(osmId)?.map { user ->
         DetailsViewState.Item(
-            mateId = user.id,
+            mateId = user.email,
             imageUrl = user.avatarUrl.orEmpty(),
             text = user.firstName
         )
@@ -133,7 +132,7 @@ class DetailsViewModel
 
     private fun toViewState(
         poiEntity: PoiEntity?,
-        session: SessionUser?,
+        session: User?,
         mates: List<DetailsViewState.Item>?,
         interpolatedValues: InterpolationUseCase.Values?,
         ratings: Map<Long, Int>?
@@ -141,7 +140,7 @@ class DetailsViewModel
         poiEntity?.let { poi ->
             val goingColor =
                 interpolatedValues?.goingAtNoon?.let { if (it) colorGold else colorInactive }
-                    ?: if (session?.user?.goingAtNoon == poi.id) colorGold else colorInactive
+                    ?: if (session?.goingAtNoon == poi.id) colorGold else colorInactive
             val likeColor =
                 interpolatedValues?.isLikedPlace?.let { if (it) colorActive else colorInactive }
                     ?: if (session?.liked?.contains(poi.id) == true) colorActive else colorInactive
@@ -166,15 +165,15 @@ class DetailsViewModel
     fun goingAtNoonClicked() {
         savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
             viewModelScope.launch(allDispatchers.ioDispatcher) {
-                sessionUserLiveData.value?.user?.let { user ->
+                sessionUserLiveData.value?.let { user ->
                     val initialState = user.goingAtNoon == placeId
                     interpolationUseCase.setGoingAtNoon(!initialState)
                     launch {
                         delay(1_000)
                         interpolationUseCase.setGoingAtNoon(null)
                     }
-                    if (initialState) usersRepository.setGoingAtNoon(user.id, null)
-                    else usersRepository.setGoingAtNoon(user.id, placeId)
+                    if (initialState) usersRepository.setGoingAtNoon(user.email, null)
+                    else usersRepository.setGoingAtNoon(user.email, placeId)
                 }
             }
         }
@@ -184,14 +183,17 @@ class DetailsViewModel
         savedStateHandle.get<Long>(DetailsActivity.OSM_ID)?.let { placeId ->
             viewModelScope.launch(allDispatchers.ioDispatcher) {
                 sessionUserLiveData.value?.let { session ->
-                    val initialState = session.liked.contains(placeId)
-                    interpolationUseCase.setLikeCurrentPlace(!initialState)
-                    launch {
-                        delay(1_000)
-                        interpolationUseCase.setLikeCurrentPlace(null)
+                    session.liked?.let { liked ->
+                        val initialState = liked.contains(placeId)
+                        interpolationUseCase.setLikeCurrentPlace(!initialState)
+                        launch {
+                            delay(1_000)
+                            interpolationUseCase.setLikeCurrentPlace(null)
+                        }
+                        if (initialState) usersRepository.deleteLiked(session.email, placeId)
+                        else usersRepository.insertLiked(session.email, placeId)
+
                     }
-                    if (initialState) usersRepository.deleteLiked(session.user.id, placeId)
-                    else usersRepository.insertLiked(session.user.id, placeId)
                 }
             }
         }

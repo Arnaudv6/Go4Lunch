@@ -38,34 +38,36 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
             userRetrofit.getUsers().body()?.mapNotNull { toUser(it) } ?: emptyList()
         )
 
-        likedPlacesFlow.emit(userRetrofit.getLikedPlaceIds().body()
-            ?.map { it.likedPlaceId }?.toLongArray()
+        likedPlacesFlow.emit(
+            userRetrofit.getLikedPlaceIds().body()
+                ?.map { it.likedPlaceId }?.toLongArray()
         )
 
-        visitedPlacesFlow.emit(userRetrofit.getVisitedPlaceIds().body()
-            ?.map { it.visitedId }?.toLongArray()
+        visitedPlacesFlow.emit(
+            userRetrofit.getVisitedPlaceIds().body()
+                ?.map { it.visitedId }?.toLongArray()
         )
     }
 
     suspend fun insertUser(user: User) = userRetrofit.insertUser(
-        UserBody(user.id, user.firstName, user.lastName, user.avatarUrl, user.goingAtNoon)
+        UserBody(user.email, user.firstName, user.lastName, user.avatarUrl, user.goingAtNoon)
     )
 
-    suspend fun insertLiked(userId: Long, osmId: Long) {
-        if (userRetrofit.insertLiked(userId, osmId).isSuccessful) refreshUser(userId)
+    suspend fun insertLiked(email: String, osmId: Long) {
+        if (userRetrofit.insertLiked(email, osmId).isSuccessful) refreshUser(email)
     }
 
-    suspend fun deleteLiked(userId: Long, osmId: Long) {
+    suspend fun deleteLiked(email: String, osmId: Long) {
         if (userRetrofit.deleteLiked(
-                UserRetrofit.EqualId(userId),
+                UserRetrofit.EqualEmailId(email),
                 UserRetrofit.EqualId(osmId)
             ).isSuccessful
-        ) refreshUser(userId)
+        ) refreshUser(email)
     }
 
-    suspend fun setGoingAtNoon(userId: Long, osmId: Long?) {
+    suspend fun setGoingAtNoon(userId: String, osmId: Long?) {
         if (userRetrofit.setGoingAtNoon(
-                UserRetrofit.EqualId(userId),
+                UserRetrofit.EqualEmailId(userId),
                 UserRetrofit.NullableLong(osmId)
             ).isSuccessful
         /*
@@ -83,29 +85,31 @@ class UsersRepository @Inject constructor(private val userRetrofit: UserRetrofit
         ) refreshUser(userId)
     }
 
-    private suspend fun refreshUser(userId: Long) {
-        val user = toUser(userRetrofit.getUserById(UserRetrofit.EqualId(userId)).body())
+    private suspend fun refreshUser(userId: String) {
+        val user = toUser(userRetrofit.getUserById(UserRetrofit.EqualEmailId(userId)).body())
         // execution order matters as getUserById() is suspend and list is heavy on memory
-        val list = ArrayList(matesListMutableSharedFlow.replayCache.first().filter { it.id != userId })
+        val list =
+            ArrayList(matesListMutableSharedFlow.replayCache.first().filter { it.email != userId })
         list.add(user)
         matesListMutableSharedFlow.tryEmit(list)
     }
 
     private fun toUser(userResponse: UserResponse?): User? =
         if (
-            userResponse?.id != null
+            userResponse?.email != null
             && userResponse.firstName != null
             && userResponse.lastName != null
         ) User(
-            id = userResponse.id,
+            email = userResponse.email,
             firstName = userResponse.firstName,
             lastName = userResponse.lastName,
             avatarUrl = userResponse.avatarUrl,
             goingAtNoon = userResponse.goingAtNoon
         ) else null
 
-    suspend fun getLikedById(userId: Long): LongArray? = userRetrofit
-        .getLikedById(UserRetrofit.EqualId(userId)).body()?.map { it.likedPlaceId }?.toLongArray()
+    suspend fun getLikedById(userId: String) = userRetrofit
+        .getLikedById(UserRetrofit.EqualEmailId(userId)).body()?.map { it.likedPlaceId }
+        ?.toLongArray()
 
 }
 

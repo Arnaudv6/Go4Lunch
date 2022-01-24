@@ -18,7 +18,7 @@ import com.freemyip.arnaudv6.go4lunch.data.pois.PoiEntity
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiMapperDelegate
 import com.freemyip.arnaudv6.go4lunch.data.pois.PoiRepository
 import com.freemyip.arnaudv6.go4lunch.data.users.UsersRepository
-import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSessionUserUseCase
+import com.freemyip.arnaudv6.go4lunch.domain.useCase.GetSynchronizedUserUseCase
 import com.freemyip.arnaudv6.go4lunch.ui.detail.DetailsActivity
 import com.freemyip.arnaudv6.go4lunch.ui.main.MainActivity
 import dagger.assisted.Assisted
@@ -37,7 +37,7 @@ class NotificationWorker
     @Assisted private val context: Context,
     @Assisted @NonNull parameters: WorkerParameters,
     private val poiMapperDelegate: PoiMapperDelegate,
-    private val sessionUserUseCase: GetSessionUserUseCase,
+    private val synchronizedUserUseCase: GetSynchronizedUserUseCase,
     private val poiRepository: PoiRepository,
     private val usersRepository: UsersRepository,
 ) : CoroutineWorker(context, parameters) {
@@ -49,7 +49,7 @@ class NotificationWorker
     override suspend fun doWork(): Result {
         val poiEntity: PoiEntity? = withTimeoutOrNull(4_000) {
             usersRepository.updateMatesList()
-            val session = sessionUserUseCase().filterNotNull().first()
+            val session = synchronizedUserUseCase().filterNotNull().first()
             val list = poiRepository.cachedPOIsListFlow.filterNotNull().first()
             session.user.goingAtNoon?.let {
                 list.firstOrNull { poi -> poi.id == it }

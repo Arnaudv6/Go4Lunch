@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 @Keep
 data class UserResponse(
-
-    val id: Long?,
+    val email: String?,
 
     @SerializedName("firstname")
     val firstName: String?,
