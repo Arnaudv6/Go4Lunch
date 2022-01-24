@@ -167,13 +167,7 @@ class DetailsViewModel
             viewModelScope.launch(allDispatchers.ioDispatcher) {
                 sessionUserLiveData.value?.let { user ->
                     val initialState = user.goingAtNoon == placeId
-                    interpolationUseCase.setGoingAtNoon(!initialState)
-                    launch {
-                        delay(1_000)
-                        interpolationUseCase.setGoingAtNoon(null)
-                    }
-                    if (initialState) usersRepository.setGoingAtNoon(user.email, null)
-                    else usersRepository.setGoingAtNoon(user.email, placeId)
+                    interpolationUseCase.setGoingAtNoon(user, placeId, !initialState)
                 }
             }
         }

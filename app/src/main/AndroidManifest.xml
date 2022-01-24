@@ -20,7 +20,6 @@
         android:theme="@style/Theme.Go4Lunch"
         tools:targetApi="n">
         <!-- https://developer.android.com/jetpack/androidx/releases/work#2.6.0-alpha01 -->
-        <!-- Todo Nino app code inspection goes red here, long version helps not -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
