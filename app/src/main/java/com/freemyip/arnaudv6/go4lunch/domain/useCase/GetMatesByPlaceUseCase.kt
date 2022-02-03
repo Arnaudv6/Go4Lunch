@@ -13,9 +13,8 @@ class GetMatesByPlaceUseCase @Inject constructor(private val usersRepository: Us
     operator fun invoke(): Flow<Map<Long, ArrayList<User>>> = usersRepository.matesListFlow.map {
         buildMap {
             for (user in it) {
-                val placeId = user.goingAtNoon
-                if (placeId != null) {
-                    put(placeId, ArrayList(listOf(user)))
+                user.goingAtNoon?.let { placeId ->
+                    this[placeId]?.add(user) ?: put(placeId, ArrayList(listOf(user)))
                 }
             }
         }

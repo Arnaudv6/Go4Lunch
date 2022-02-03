@@ -1,5 +1,5 @@
 Notes:
-  - my usage of nominatim is borderline. search-autocompletion is unacceptable use
+  - my usage of nominatim is borderline. search-autocompletion / type-ahead is unacceptable use
   - distances are calculated by GPS coordinates, not taking routes into account
   - restaurants images are not linked to actual restaurants they're attached to
   - map scale is erratic non-sense

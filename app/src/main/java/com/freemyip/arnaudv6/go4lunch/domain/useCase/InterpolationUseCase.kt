@@ -1,7 +1,6 @@
 package com.freemyip.arnaudv6.go4lunch.domain.useCase
 
 import com.freemyip.arnaudv6.go4lunch.data.AllDispatchers
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +9,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 abstract class InterpolationUseCase<T>(
-    // todo Nino : private val coroutineScope: CoroutineScope, c'est mieux qu'un withContext()?
     private val dispatchers: AllDispatchers,
     private val timeout: Long = 1_000
 ) {

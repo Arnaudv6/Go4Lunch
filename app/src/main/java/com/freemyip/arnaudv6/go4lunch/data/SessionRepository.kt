@@ -6,6 +6,7 @@ import android.util.Base64
 import com.freemyip.arnaudv6.go4lunch.data.users.User
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,6 +55,16 @@ class SessionRepository @Inject constructor(
 
     private val userInfoMutableStateFlow = MutableStateFlow<User?>(null)
     val userInfoFlow: Flow<User?> = userInfoMutableStateFlow.asStateFlow()
+
+    suspend fun getFreshToken(): String? {
+        // performActionWithFreshTokens(), is java callBack crap, making it a suspend.
+        val idTokenChannel = Channel<String?>(capacity = 1)
+        authState?.performActionWithFreshTokens(authService) { _, idToken, _ ->
+            idTokenChannel.trySend(idToken)
+            // only idToken is relevant to API server, discarding accessToken and exceptions
+        }
+        return idTokenChannel.receive()
+    }
 
     private var authState: AuthState? = null
 

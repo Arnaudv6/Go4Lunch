@@ -36,8 +36,8 @@ class DataModule {
 
     companion object {
         private const val BASE_URL_NOMINATIM: String = "https://nominatim.openstreetmap.org/"
-        private const val BASE_DOMAIN_USERS: String = "192.168.1.79"
-        private const val BASE_URL_USERS: String = "https://192.168.1.79:22280/"
+        private const val BASE_DOMAIN_USERS: String = "arnaudv6.freemyip.com"
+        private const val BASE_URL_USERS: String = "https://$BASE_DOMAIN_USERS:3514/"
     }
 
     @Provides
@@ -81,6 +81,23 @@ class DataModule {
         @ApplicationContext context: Context,
         workerFactory: HiltWorkerFactory
     ): WorkManager = WorkManager.getInstance(context)
+
+    /* Me: This would work with (static) API key. But tokens change. Add query Parameter to repo instead.
+    @Singleton
+    @Provides
+    fun provideAuthTokenHeaderInjectionInterceptor(): Interceptor =
+        Interceptor {
+            it.proceed(
+                it.request().let { request ->
+                    request.newBuilder().url(
+                        request.url.newBuilder()
+                            .addQueryParameter("key", "key")
+                            .build()
+                    ).build()
+                }
+            )
+        }
+    */
 
     @Singleton
     @Provides
